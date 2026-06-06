@@ -8,7 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const vscodeDir = path.join(rootDir, ".vscode");
 const envPath = path.join(vscodeDir, "mcp.local.env");
-const clarityPath = path.join(vscodeDir, "clarity.projects.local.json");
 
 const rl = readline.createInterface({ input, output });
 
@@ -51,10 +50,7 @@ async function main() {
     line("GOOGLE_ADS_LOGIN_CUSTOMER_ID", googleAdsLoginCustomerId),
     "GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json",
     line("MANGOOLS_API_KEY", mangoolsApiKey),
-    "CLARITY_PROJECTS_FILE=../.vscode/clarity.projects.local.json",
   ].filter(Boolean);
-
-  fs.writeFileSync(envPath, `${envLines.join("\n")}\n`);
 
   if (clarityProjectName && clarityApiToken) {
     const clarityConfig = {
@@ -66,13 +62,17 @@ async function main() {
         },
       ],
     };
-    fs.writeFileSync(clarityPath, `${JSON.stringify(clarityConfig, null, 2)}\n`);
+    envLines.push(
+      `CLARITY_PROJECTS_JSON_BASE64=${Buffer.from(
+        JSON.stringify(clarityConfig),
+        "utf8"
+      ).toString("base64")}`
+    );
   }
 
+  fs.writeFileSync(envPath, `${envLines.join("\n")}\n`);
+
   console.log(`\nWrote ${path.relative(rootDir, envPath)}`);
-  if (fs.existsSync(clarityPath)) {
-    console.log(`Wrote ${path.relative(rootDir, clarityPath)}`);
-  }
   console.log("\nFor Google OAuth, run:");
   console.log("  cd google-mcp");
   console.log("  npm run auth");

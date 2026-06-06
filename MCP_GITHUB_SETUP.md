@@ -44,11 +44,11 @@ npm run auth
 - VS Code / Copilot reads `.vscode/mcp.json`.
 - Claude Code reads `.mcp.json`.
 - Codex reads `.codex/config.toml`.
-- All three start the same local MCP servers and the servers read secrets from `.vscode/mcp.local.env`.
+- All three start the same local MCP servers and the servers read secrets from one local file: `.vscode/mcp.local.env`.
 
 ## VS Code files
 
 - `.vscode/mcp.json` is safe to commit.
 - `.vscode/mcp.local.env` is local only.
 - `.vscode/google.tokens.local.json` is local only.
-- `.vscode/clarity.projects.local.json` is local only.
+- Clarity multi-project tokens can live inside `.vscode/mcp.local.env` as `CLARITY_PROJECTS_JSON_BASE64`.

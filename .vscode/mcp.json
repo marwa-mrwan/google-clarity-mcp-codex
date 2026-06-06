@@ -13,10 +13,7 @@
       "type": "stdio",
       "command": "node",
       "args": ["${workspaceFolder}/clarity-mcp/index.js"],
-      "envFile": "${workspaceFolder}/.vscode/mcp.local.env",
-      "env": {
-        "CLARITY_PROJECTS_FILE": "${workspaceFolder}/.vscode/clarity.projects.local.json"
-      }
+      "envFile": "${workspaceFolder}/.vscode/mcp.local.env"
     },
     "mangools": {
       "type": "stdio",

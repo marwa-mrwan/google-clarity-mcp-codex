@@ -2,6 +2,11 @@ import fs from "fs";
 import path from "path";
 
 export function loadProjects(projectRoot) {
+  const envProjects = loadProjectsFromEnv();
+  if (envProjects) {
+    return envProjects;
+  }
+
   const configPath = resolveConfigPath(projectRoot);
 
   if (!fs.existsSync(configPath)) {
@@ -26,6 +31,32 @@ export function loadProjects(projectRoot) {
   const projects = Array.isArray(parsed.projects) ? parsed.projects : [];
 
   return { configPath, projects: projects.map(normalizeProject) };
+}
+
+function loadProjectsFromEnv() {
+  const raw =
+    process.env.CLARITY_PROJECTS_JSON ||
+    decodeBase64Env(process.env.CLARITY_PROJECTS_JSON_BASE64);
+
+  if (!raw) {
+    return undefined;
+  }
+
+  const parsed = JSON.parse(raw);
+  const projects = Array.isArray(parsed.projects) ? parsed.projects : [];
+
+  return {
+    configPath: "CLARITY_PROJECTS_JSON",
+    projects: projects.map(normalizeProject),
+  };
+}
+
+function decodeBase64Env(value) {
+  if (!value) {
+    return undefined;
+  }
+
+  return Buffer.from(value, "base64").toString("utf8");
 }
 
 export function listSafeProjects(projects) {
