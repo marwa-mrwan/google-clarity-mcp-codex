@@ -13,7 +13,7 @@ MCP server for Mangools API:
 
 ```powershell
 cd D:\Codex\mangools-mcp
-Copy-Item .env.example .env
+Create `../.vscode/mcp.local.env`
 ```
 
 Edit `.env`:

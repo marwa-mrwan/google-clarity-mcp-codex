@@ -1,9 +1,0 @@
-{
-  "projects": [
-    {
-      "name": "example-project",
-      "label": "Example Project",
-      "token": "PASTE_CLARITY_DATA_EXPORT_TOKEN_HERE"
-    }
-  ]
-}

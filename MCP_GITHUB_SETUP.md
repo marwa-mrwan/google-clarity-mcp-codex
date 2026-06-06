@@ -5,7 +5,7 @@ This workspace is prepared so source code can be pushed to GitHub while local to
 ## Do not commit
 
 - `.env`
-- `.env.*` except `.env.example`
+- `.env.*`
 - `tokens.json`
 - `projects.json`
 - `projects.local.json`
@@ -24,10 +24,16 @@ cd ../clarity-mcp && npm install
 cd ../mangools-mcp && npm install
 ```
 
-3. Create local secrets:
+3. Create one local secrets file at `.vscode/mcp.local.env`:
 
-```bash
-node scripts/setup-vscode-mcp-secrets.mjs
+```env
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GOOGLE_ADS_DEVELOPER_TOKEN=...
+GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
+GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
+MANGOOLS_API_KEY=...
+CLARITY_PROJECTS_JSON_BASE64=...
 ```
 
 4. Connect Google OAuth:
