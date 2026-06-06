@@ -1,10 +1,24 @@
 import { google } from "googleapis";
+import {
+  listSafeAnalyticsProperties,
+  resolveAnalyticsProperty,
+} from "./analytics-properties.js";
 
 export function getAnalyticsTools() {
   return [
     {
       name: "ga4_list_properties",
       description: "List all Google Analytics 4 properties available to the authenticated user.",
+      inputSchema: {
+        type: "object",
+        properties: {},
+        required: [],
+      },
+    },
+    {
+      name: "ga4_list_configured_properties",
+      description:
+        "List locally configured GA4 project mappings from the MCP secrets file, including project name, website, and property ID.",
       inputSchema: {
         type: "object",
         properties: {},
@@ -20,6 +34,16 @@ export function getAnalyticsTools() {
           property_id: {
             type: "string",
             description: "GA4 property ID, numbers only. Example: 123456789.",
+          },
+          project_name: {
+            type: "string",
+            description:
+              "Configured project name from ga4_list_configured_properties. Used when property_id is omitted.",
+          },
+          website: {
+            type: "string",
+            description:
+              "Configured website URL from ga4_list_configured_properties. Used when property_id is omitted.",
           },
           start_date: {
             type: "string",
@@ -46,7 +70,7 @@ export function getAnalyticsTools() {
             description: "Maximum number of rows. Defaults to 20.",
           },
         },
-        required: ["property_id", "start_date", "end_date", "metrics"],
+        required: ["start_date", "end_date", "metrics"],
       },
     },
     {
@@ -59,19 +83,33 @@ export function getAnalyticsTools() {
             type: "string",
             description: "GA4 property ID.",
           },
+          project_name: {
+            type: "string",
+            description:
+              "Configured project name from ga4_list_configured_properties. Used when property_id is omitted.",
+          },
+          website: {
+            type: "string",
+            description:
+              "Configured website URL from ga4_list_configured_properties. Used when property_id is omitted.",
+          },
           dimensions: {
             type: "array",
             items: { type: "string" },
             description: "Realtime dimensions such as country, city, unifiedScreenName, or deviceCategory.",
           },
         },
-        required: ["property_id"],
+        required: [],
       },
     },
   ];
 }
 
 export async function handleAnalyticsTool(name, args, authClient) {
+  if (name === "ga4_list_configured_properties") {
+    return listSafeAnalyticsProperties();
+  }
+
   if (name === "ga4_list_properties") {
     const analyticsAdmin = google.analyticsadmin({ version: "v1beta", auth: authClient });
 
@@ -101,7 +139,8 @@ export async function handleAnalyticsTool(name, args, authClient) {
   }
 
   if (name === "ga4_run_report") {
-    const { property_id, start_date, end_date, metrics, dimensions = [], limit = 20 } = args;
+    const { start_date, end_date, metrics, dimensions = [], limit = 20 } = args;
+    const property_id = resolveAnalyticsProperty(args);
     const token = (await authClient.getAccessToken()).token;
     const { default: axios } = await import("axios");
 
@@ -137,7 +176,8 @@ export async function handleAnalyticsTool(name, args, authClient) {
   }
 
   if (name === "ga4_realtime") {
-    const { property_id, dimensions = ["country"] } = args;
+    const { dimensions = ["country"] } = args;
+    const property_id = resolveAnalyticsProperty(args);
     const token = (await authClient.getAccessToken()).token;
     const { default: axios } = await import("axios");
 
