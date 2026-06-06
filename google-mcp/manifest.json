@@ -1,0 +1,60 @@
+{
+  "dxt_version": "0.1",
+  "name": "google-mcp",
+  "display_name": "Google Marketing Suite",
+  "version": "1.0.0",
+  "description": "Google Search Console, GA4, Google Ads, Business Profile, Merchant Center, PageSpeed Insights, and Tag Manager",
+  "long_description": "Connect to Google marketing APIs via OAuth2: Search Console for SEO data, GA4 for analytics, Google Ads for campaign management, Business Profile for local performance, Merchant Center for product and issue reporting, PageSpeed Insights for technical audits, and Tag Manager for tag auditing.",
+  "author": {
+    "name": "Custom"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/index.js"
+      ],
+      "env": {
+        "GOOGLE_CLIENT_ID": "${user_config.google_client_id}",
+        "GOOGLE_CLIENT_SECRET": "${user_config.google_client_secret}",
+        "GOOGLE_ADS_DEVELOPER_TOKEN": "${user_config.google_ads_developer_token}",
+        "GOOGLE_ADS_LOGIN_CUSTOMER_ID": "${user_config.google_ads_login_customer_id}",
+        "GOOGLE_REFRESH_TOKEN": "${user_config.google_refresh_token}"
+      }
+    }
+  },
+  "user_config": {
+    "google_client_id": {
+      "type": "string",
+      "title": "Google Client ID",
+      "description": "From Google Cloud Console > Credentials",
+      "required": true
+    },
+    "google_client_secret": {
+      "type": "string",
+      "title": "Google Client Secret",
+      "description": "From Google Cloud Console > Credentials",
+      "required": true
+    },
+    "google_ads_developer_token": {
+      "type": "string",
+      "title": "Google Ads Developer Token",
+      "description": "From Google Ads API Center. Optional unless you use Ads tools.",
+      "required": false
+    },
+    "google_ads_login_customer_id": {
+      "type": "string",
+      "title": "Google Ads MCC Customer ID",
+      "description": "Manager account customer ID without dashes. Optional.",
+      "required": false
+    },
+    "google_refresh_token": {
+      "type": "string",
+      "title": "Google Refresh Token",
+      "description": "OAuth refresh token used to connect to Google APIs.",
+      "required": true
+    }
+  }
+}

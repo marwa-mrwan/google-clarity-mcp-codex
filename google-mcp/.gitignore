@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+tokens.json
+tokens.*.json
+credentials*.json
+*credential*.json
+*secret*.json
+*token*.json
+outputs/
+npm-debug.log*

@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+node_modules/
+package-lock.json
+projects.json
+projects.local.json
+*secret*.json
+*token*.json
+npm-debug.log*

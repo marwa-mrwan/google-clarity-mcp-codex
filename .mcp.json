@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "google-marketing-suite": {
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/google-mcp/index.js"]
+    },
+    "microsoft-clarity": {
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/clarity-mcp/index.js"]
+    },
+    "mangools": {
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR:-.}/mangools-mcp/index.js"]
+    }
+  }
+}

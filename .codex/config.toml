@@ -1,0 +1,17 @@
+[mcp_servers.google-marketing-suite]
+command = "node"
+args = ["google-mcp/index.js"]
+startup_timeout_sec = 20
+tool_timeout_sec = 120
+
+[mcp_servers.microsoft-clarity]
+command = "node"
+args = ["clarity-mcp/index.js"]
+startup_timeout_sec = 20
+tool_timeout_sec = 120
+
+[mcp_servers.mangools]
+command = "node"
+args = ["mangools-mcp/index.js"]
+startup_timeout_sec = 20
+tool_timeout_sec = 120
