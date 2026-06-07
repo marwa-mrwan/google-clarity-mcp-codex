@@ -1,0 +1,39 @@
+{
+  "name": "marwa-marketing-mcp",
+  "version": "1.0.0",
+  "description": "Marketing intelligence MCP plugin for SEO, Google Search Console, Google Ads, GA4, PageSpeed, Microsoft Clarity, and Mangools keyword research.",
+  "author": {
+    "name": "marwa-mrwan",
+    "url": "https://github.com/marwa-mrwan"
+  },
+  "homepage": "https://github.com/marwa-mrwan/codex-mcp-plugins",
+  "repository": "https://github.com/marwa-mrwan/codex-mcp-plugins",
+  "license": "MIT",
+  "keywords": [
+    "seo",
+    "google-search-console",
+    "google-ads",
+    "ga4",
+    "pagespeed",
+    "microsoft-clarity",
+    "mangools",
+    "keyword-research"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Marwa Marketing MCP",
+    "shortDescription": "SEO, Ads, Clarity, and keyword research.",
+    "longDescription": "Local MCP tools and routing skill for site audits, Search Console checks, Google Ads analysis, PageSpeed reviews, Clarity UX insights, and Mangools keyword research.",
+    "developerName": "marwa-mrwan",
+    "category": "Marketing",
+    "capabilities": ["MCP", "Research", "Analysis"],
+    "websiteURL": "https://github.com/marwa-mrwan/codex-mcp-plugins",
+    "defaultPrompt": [
+      "Analyze this site using Search Console and PageSpeed.",
+      "Audit Google Ads performance and search terms.",
+      "Do keyword research for this page with Mangools."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

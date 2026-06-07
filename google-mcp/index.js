@@ -52,6 +52,14 @@ const server = new Server(
   { capabilities: { tools: {} } }
 );
 
+server.onerror = (error) => {
+  console.error("MCP protocol error:", error);
+};
+
+function keepStdioServerAlive() {
+  setInterval(() => {}, 1 << 30);
+}
+
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return { tools: ALL_TOOLS };
 });
@@ -104,6 +112,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
+  process.stdin.resume();
+  keepStdioServerAlive();
   console.error("Google MCP Server is running.");
   console.error(`Tools available: ${ALL_TOOLS.length}`);
   console.error("   - Search Console:", getSearchConsoleTools().length);

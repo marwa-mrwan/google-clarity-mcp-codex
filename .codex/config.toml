@@ -3,15 +3,18 @@ command = "node"
 args = ["google-mcp/index.js"]
 startup_timeout_sec = 20
 tool_timeout_sec = 120
+env = { MCP_SECRETS_ENV_FILE = ".vscode/mcp.local.env", GOOGLE_TOKEN_FILE = ".vscode/google.tokens.local.json" }
 
 [mcp_servers.microsoft-clarity]
 command = "node"
 args = ["clarity-mcp/index.js"]
 startup_timeout_sec = 20
 tool_timeout_sec = 120
+env = { MCP_SECRETS_ENV_FILE = ".vscode/mcp.local.env" }
 
 [mcp_servers.mangools]
 command = "node"
 args = ["mangools-mcp/index.js"]
 startup_timeout_sec = 20
 tool_timeout_sec = 120
+env = { MCP_SECRETS_ENV_FILE = ".vscode/mcp.local.env" }
