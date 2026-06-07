@@ -47,6 +47,11 @@ const ALL_TOOLS = [
   ...getReportingTools(),
 ];
 
+const AUTHLESS_TOOLS = new Set([
+  "ga4_list_configured_properties",
+  "psi_audit_url",
+]);
+
 const server = new Server(
   { name: "google-mcp-server", version: "1.0.0" },
   { capabilities: { tools: {} } }
@@ -68,7 +73,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
   try {
-    const authClient = await getAuthenticatedClient();
+    const authClient = AUTHLESS_TOOLS.has(name) ? null : await getAuthenticatedClient();
     let result;
 
     if (name.startsWith("gsc_")) {
