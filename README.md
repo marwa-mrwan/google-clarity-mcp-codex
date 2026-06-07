@@ -1,7 +1,3 @@
-name: marketing-intelligence
-description: Use when the user asks to analyze a website, check Google Search Console, audit Google Ads, review PageSpeed or GA4, inspect Microsoft Clarity behavior, or do Mangools keyword research.
----
-
 # Marketing Intelligence
 
 Use this skill as the routing layer for Marwa Marketing MCP. Prefer the local MCP tools when available, then synthesize the findings into a practical action plan.
