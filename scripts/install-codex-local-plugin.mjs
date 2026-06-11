@@ -4,17 +4,60 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "..", "..");
-const sourcePlugin = path.join(repoRoot, "plugins", "marwa-marketing-mcp");
+const repoRoot = path.resolve(__dirname, "..");
 const home = os.homedir();
 const targetPluginRoot = path.join(home, "plugins");
 const targetPlugin = path.join(targetPluginRoot, "marwa-marketing-mcp");
 const agentsPluginDir = path.join(home, ".agents", "plugins");
 const marketplacePath = path.join(agentsPluginDir, "marketplace.json");
 const codexConfigPath = path.join(home, ".codex", "config.toml");
-const mcpRoot = path.join(repoRoot, "codex-mcp-plugins");
+const mcpRoot = repoRoot;
 const secretsFile = path.join(mcpRoot, ".vscode", "mcp.local.env");
 const googleTokenFile = path.join(mcpRoot, ".vscode", "google.tokens.local.json");
+
+function buildLocalMcpConfig() {
+  return {
+    mcpServers: {
+      "google-marketing-suite": {
+        command: "node",
+        args: [path.join(mcpRoot, "google-mcp", "index.js")],
+        env: {
+          MCP_SECRETS_ENV_FILE: secretsFile,
+          GOOGLE_TOKEN_FILE: googleTokenFile,
+        },
+      },
+      "microsoft-clarity": {
+        command: "node",
+        args: [path.join(mcpRoot, "clarity-mcp", "index.js")],
+        env: {
+          MCP_SECRETS_ENV_FILE: secretsFile,
+        },
+      },
+      mangools: {
+        command: "node",
+        args: [path.join(mcpRoot, "mangools-mcp", "index.js")],
+        env: {
+          MCP_SECRETS_ENV_FILE: secretsFile,
+        },
+      },
+    },
+  };
+}
+
+function installLocalPluginFiles() {
+  fs.rmSync(targetPlugin, { recursive: true, force: true });
+  fs.mkdirSync(targetPlugin, { recursive: true });
+  fs.cpSync(path.join(repoRoot, ".codex-plugin"), path.join(targetPlugin, ".codex-plugin"), {
+    recursive: true,
+  });
+  fs.cpSync(path.join(repoRoot, "skills"), path.join(targetPlugin, "skills"), {
+    recursive: true,
+  });
+  fs.writeFileSync(
+    path.join(targetPlugin, ".mcp.json"),
+    `${JSON.stringify(buildLocalMcpConfig(), null, 2)}\n`
+  );
+}
 
 function upsertMarketplace() {
   fs.mkdirSync(agentsPluginDir, { recursive: true });
@@ -120,8 +163,7 @@ function upsertCodexConfig() {
 }
 
 fs.mkdirSync(targetPluginRoot, { recursive: true });
-fs.rmSync(targetPlugin, { recursive: true, force: true });
-fs.cpSync(sourcePlugin, targetPlugin, { recursive: true });
+installLocalPluginFiles();
 upsertMarketplace();
 upsertCodexConfig();
 

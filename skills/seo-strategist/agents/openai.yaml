@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO Strategist"
+  short_description: "Audit, plan, and report SEO with data"
+  default_prompt: "Use $seo-strategist to run an SEO audit, keyword strategy, or client report review."
