@@ -1,6 +1,8 @@
-# Marketing Intelligence
+# Marketing Intelligence MCP
 
-Use this skill as the routing layer for Marwa Marketing MCP. Prefer the local MCP tools when available, then synthesize the findings into a practical action plan.
+Marketing Intelligence MCP is a local marketing analysis workspace that connects Google Search Console, GA4, Google Ads, Microsoft Clarity, and Mangools to strategy skills for SEO, paid media, and campaign planning.
+
+Use this workspace as the routing layer for marketing analysis. Prefer the local MCP tools when available, then synthesize the findings into a practical action plan.
 
 ## Tool Routing
 
