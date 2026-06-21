@@ -1,6 +1,6 @@
 ---
 name: seo-strategist
-description: Data-driven, white-hat SEO strategy, audits, keyword research, content optimization, cannibalization checks, ecommerce SEO, technical SEO, link building, algorithm update diagnosis, paid/organic overlap, tracking and UX analysis, Search Console analysis, and client report review. Use when Codex is asked to analyze or improve organic search performance, investigate traffic drops, plan SEO content, review SEO reports, audit technical/on-page issues, diagnose cannibalization, or build SEO recommendations from GSC, Analytics, Clarity, Mangools, GTM, Ads, crawl exports, or manual inputs.
+description: Data-driven, white-hat SEO strategy, audits, keyword research, content optimization, cannibalization checks, ecommerce SEO, technical SEO, local SEO, GBP/Maps, schema, hreflang, SXO, topical clusters, backlinks, algorithm update diagnosis, paid/organic overlap, tracking and UX analysis, Search Console analysis, and client report review. Use when Codex is asked to analyze or improve organic search performance, investigate traffic drops, plan SEO content, review SEO reports, audit technical/on-page issues, diagnose cannibalization, or build SEO recommendations from GSC, Analytics, Clarity, Mangools, GTM, Ads, crawl exports, or manual inputs.
 ---
 
 # SEO Strategist
@@ -51,8 +51,33 @@ Load only the reference needed for the task:
 - `references/advanced/user-story-framework.md`: convert SERP/PAA/ad-copy signals into user stories and search intent requirements.
 - `references/advanced/persona-scoring.md`: score page fit by persona relevance, clarity, trust, and action.
 - `references/advanced/google-ai-optimization-guide.md`: AI Overviews/GEO/LLM visibility, citability, crawler access, llms.txt, and brand mention strategy.
+- `references/specialized/README.md`: map specialized SEO packs into this single skill without calling separate skills.
+- `references/specialized/backlinks/backlink-quality.md`: backlink quality, risk, relevance, authority, toxicity, and disavow evaluation.
+- `references/specialized/backlinks/free-backlink-sources.md`: white-hat free/low-cost link opportunities and outreach source ideas.
+- `references/specialized/local-maps/local-seo-signals.md`: local SEO ranking signals, NAP, reviews, proximity, local content, and citations.
+- `references/specialized/local-maps/maps-gbp-checklist.md`: Google Business Profile and Maps optimization checks.
+- `references/specialized/local-maps/maps-geo-grid.md`: geo-grid visibility interpretation and local rank tracking.
+- `references/specialized/local-maps/local-schema-types.md`: local business schema types and local structured-data choices.
+- `references/specialized/local-maps/maps-api-endpoints.md` and `references/specialized/local-maps/maps-free-apis.md`: Maps and local data source planning.
+- `references/specialized/hreflang/locale-formats.md`: hreflang locale code and URL mapping checks.
+- `references/specialized/hreflang/content-parity.md`: parity checks across localized pages.
+- `references/specialized/hreflang/cultural-profiles.md` and `references/specialized/hreflang/machine-translation-qa.md`: localization quality and translation QA.
+- `references/specialized/clusters/hub-spoke-architecture.md`, `references/specialized/clusters/serp-overlap-methodology.md`, and `references/specialized/clusters/execution-workflow.md`: topical authority, cluster planning, overlap checks, and execution.
+- `references/specialized/content-briefs/page-type-templates.md`, `references/specialized/content-briefs/keyword-density.md`, and `references/specialized/content-briefs/excluded-domains.md`: SEO content briefs, competitor exclusions, and optimization guardrails.
+- `references/specialized/drift/comparison-rules.md`: content drift, ranking drift, and before/after comparisons.
+- `references/specialized/ecommerce/marketplace-endpoints.md` and `references/specialized/ecommerce/ucp-universal-commerce-protocol.md`: ecommerce marketplace and feed-style analysis supplements.
+- `references/specialized/google-apis/*.md`: Google API readiness, auth, rate limits, GA4, GSC, PageSpeed/CrUX, Indexing API, Keyword Planner, NLP, and YouTube source planning.
+- `references/specialized/schema/deprecated-types-2024-2026.md`: deprecated schema and implementation risk checks.
+- `references/specialized/sxo/wireframe-templates.md`: page layout and SXO wireframe patterns.
+- `references/specialized/technical/agent-friendly-pages.md`: agent-friendly pages, crawler accessibility, and AI assistant readability.
+- `references/specialized/flow/flow-framework.md`: integrated Find, Optimize, Leverage, Win workflow.
+- `references/specialized/premium-report-standard.md`: client-ready report quality bar.
+- `references/specialized/shared-data-cache.md`: shared evidence/cache conventions for multi-step audits.
+- `references/specialized/thinking-framework.md`: strategic reasoning checks before final recommendations.
 
 For broad SEO requests, read `master-instructions.md` first, then the specific task reference.
+
+Do not ask the user to call a separate SEO skill when a specialized pack covers the request. Stay in `seo-strategist`, load the relevant pack, and produce one integrated analysis.
 
 ## Workflow
 
@@ -71,6 +96,12 @@ For broad SEO requests, read `master-instructions.md` first, then the specific t
    - Client Report Review
    - Algorithm/Traffic Drop Diagnosis
    - Ecommerce SEO
+   - Local SEO / GBP / Maps
+   - International SEO / Hreflang
+   - Topical Cluster / Content Brief
+   - Schema / Rich Results
+   - Programmatic SEO
+   - SEO Reporting
 2. Complete session initialization.
 3. Choose the relevant reference file.
 4. Pull or request the minimum data required for that workflow.
@@ -88,9 +119,14 @@ For broad SEO requests, read `master-instructions.md` first, then the specific t
 - For ranking problems, check page-type/SERP intent mismatch before recommending more backlinks or more content.
 - For AI-search or AI Overview requests, evaluate citability, entity/brand mentions, crawler access, and llms.txt before content rewrite recommendations.
 - For ecommerce, check faceted navigation, parameter URLs, category pages, product pages, out-of-stock handling, duplicate content, schema, and internal linking.
+- For local SEO, check GBP completeness, NAP consistency, reviews, categories, service areas, local landing pages, local schema, proximity/geo-grid patterns, and citation quality.
+- For hreflang, validate locale format, reciprocal annotations, canonical alignment, content parity, translated template quality, and regional intent differences.
+- For schema, check eligibility, required/recommended properties, deprecated types, conflicts with visible content, and validation risks before recommending implementation.
+- For topical clusters, check SERP overlap before splitting or merging pages; assign one hub, supporting spokes, and internal link paths.
+- For programmatic or scaled pages, check indexability, uniqueness, template quality, crawl budget, thin-content risk, and quality gates before recommending scale.
 - For link building, recommend earned/editorial tactics only. Use disavow cautiously and only for clear toxic/manipulative patterns.
 - For paid/organic overlap, identify keywords with both organic visibility and paid spend before recommending budget shifts.
-- For client report review, run duplicate, tone/language, unsupported claim, contradiction, and missing-section checks before approving.
+- For client report review, run duplicate, tone/language, unsupported claim, contradiction, missing-section, executive-summary, and next-step checks before approving.
 
 ## Output Expectations
 
@@ -120,4 +156,4 @@ For reports, include:
 
 ## Attribution
 
-Selected advanced SEO frameworks and reference material are adapted from the MIT-licensed `codex-seo` and `claude-seo` projects by AgriciDaniel.
+Selected SEO frameworks, advanced packs, and reference material are adapted from the MIT-licensed `codex-seo` and `claude-seo` projects by AgriciDaniel.
