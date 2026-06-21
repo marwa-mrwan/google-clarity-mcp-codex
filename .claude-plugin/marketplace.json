@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "marwa-marketing-mcp",
+  "name": "marketing-intelligence-mcp",
   "owner": {
     "name": "marwa-mrwan"
   },
@@ -9,14 +9,14 @@
   },
   "plugins": [
     {
-      "name": "marwa-marketing-mcp",
+      "name": "marketing-intelligence-mcp",
       "source": "./",
       "description": "Marketing intelligence MCP plugin for site audits, Search Console checks, Google Ads analysis, Clarity UX insights, and Mangools keyword research.",
       "version": "1.0.0",
       "author": {
         "name": "marwa-mrwan"
       },
-      "repository": "https://github.com/marwa-mrwan/codex-mcp-plugins",
+      "repository": "https://github.com/marwa-mrwan/marketing-intelligence-mcp",
       "license": "MIT",
       "category": "marketing",
       "keywords": [
