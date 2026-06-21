@@ -19,8 +19,8 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 ## Strategy Routing
 
 - Use `seo-strategist` for organic search strategy, technical SEO, content strategy, cannibalization, SXO, GEO/AI-search visibility, and Search Console-led recommendations.
-- Use `google-ads-strategist` for Google Ads-specific planning, bidding, keywords, account diagnosis, and client reporting.
-- Use `paid-ads-strategist` for multi-platform paid media strategy, channel mix, Meta/Google/TikTok/LinkedIn comparisons, creative strategy, tracking/attribution, and budget allocation.
+- Use `paid-ads-strategist` as the main umbrella for paid media: Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative strategy, tracking/attribution, budget allocation, and channel mix.
+- Use `google-ads-strategist` as a supporting deep Google Ads reference when the user needs Google-only launch planning, bidding, keywords, account diagnosis, or client reporting. Do not ask the user to call it separately when `paid-ads-strategist` can load the supporting references.
 - For campaign planning, combine sources in this order: tracking health, business goal, landing page readiness, search intent, paid demand, creative angles, budget rules.
 
 ## Workflow

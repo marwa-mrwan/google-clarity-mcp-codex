@@ -1,6 +1,6 @@
 ---
 name: paid-ads-strategist
-description: Multi-platform paid media strategy, audits, budget allocation, creative analysis, tracking diagnosis, and campaign planning across Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, Apple, and Amazon Ads. Use when Codex is asked to improve campaigns, choose channels, audit paid media, plan launch budgets, review creatives, diagnose tracking, compare platform performance, or build an acquisition strategy from Ads, GA4, Clarity, GSC, Mangools, CRM, or manual exports.
+description: Multi-platform paid media strategy, audits, budget allocation, creative analysis, tracking diagnosis, brand DNA, creative specs, landing page readiness, reporting, and campaign planning across Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, Apple, Amazon, and emerging ad platforms. Use when Codex is asked to improve campaigns, choose channels, audit paid media, plan launch budgets, review creatives, diagnose tracking, compare platform performance, build a Google Ads plan, or build an acquisition strategy from Ads, GA4, Clarity, GSC, Mangools, CRM, or manual exports.
 ---
 
 # Paid Ads Strategist
@@ -39,6 +39,7 @@ If the user has already supplied enough context or clearly asks to proceed with 
 ## Reference Selection
 
 Load only the references needed for the task:
+- `references/thinking-framework.md`: strategic reasoning, assumptions, sequencing, and decision quality checks before final recommendations.
 - `references/scoring-system.md`: platform health scoring, severity multipliers, cross-platform checks, and quick-win logic.
 - `references/benchmarks.md`: industry and platform benchmarks for CPC, CTR, CVR, CPA, ROAS, and creative performance.
 - `references/budget-allocation.md`: channel mix by business type, 70/20/10 allocation, scaling rules, MER, and minimum viable budgets.
@@ -46,10 +47,21 @@ Load only the references needed for the task:
 - `references/conversion-tracking.md`: pixel/CAPI/enhanced conversions/offline imports/Consent Mode/MMP tracking checks.
 - `references/google-audit.md`: Google Ads audit checklist and PMax/Search/asset checks.
 - `references/meta-audit.md`: Meta Ads audit checklist, creative fatigue, CAPI, Advantage+, and learning-phase checks.
+- `references/linkedin-audit.md`: LinkedIn Ads B2B targeting, funnel fit, creative, and lead quality checks.
+- `references/tiktok-audit.md`: TikTok Ads creative, audience, learning, and conversion checks.
+- `references/microsoft-audit.md`: Microsoft Ads search/shopping/audience checks and Google import risks.
 - `references/platform-specs.md`: creative format requirements across major ad platforms.
+- `references/google-creative-specs.md`, `references/meta-creative-specs.md`, `references/tiktok-creative-specs.md`, `references/linkedin-creative-specs.md`, `references/microsoft-creative-specs.md`, and `references/youtube-creative-specs.md`: placement-specific creative specs and format constraints.
+- `references/additional-platforms.md`: Apple, Amazon, Reddit, Pinterest, Snapchat, X, and other platform fit checks.
 - `references/compliance.md`: policy and regulated-industry checks.
 - `references/copy-frameworks.md`: ad copy frameworks and message-angle structure.
+- `references/brand-dna-template.md`: brand positioning, ICP, tone, proof points, offers, objections, and creative strategy inputs.
+- `references/voice-to-style.md`: turn voice/client notes into brand voice, messaging style, and creative direction.
+- `references/image-providers.md`: source images and creative assets safely.
+- `references/mcp-integration.md`: how paid ads analysis should use MCP/data connectors.
 - `references/gaql-notes.md`: Google Ads API/GAQL field compatibility and query safety.
+
+For Google-only deep strategy, use the Google-specific rules in this skill first. If detailed launch planning, expert execution modes, or client presentation structure is needed, also read `../google-ads-strategist/references/master-instructions.md`, `../google-ads-strategist/references/strategic-planner.md`, `../google-ads-strategist/references/expert-agent-modes.md`, or `../google-ads-strategist/references/reporting-client-presentation.md` as supporting references. Do not ask the user to call a separate skill.
 
 ## Workflow
 
@@ -57,11 +69,16 @@ Load only the references needed for the task:
    - Full paid media audit
    - Google Ads deep dive
    - Meta Ads / creative fatigue
+   - TikTok Ads audit
+   - LinkedIn Ads audit
+   - Microsoft Ads audit
    - Budget allocation / channel mix
    - Campaign launch strategy
    - Tracking and attribution audit
    - Landing page readiness
    - Creative and copy direction
+   - Brand DNA / messaging system
+   - Creative format adaptation
    - Competitor and keyword opportunity
    - Client report review
 2. Load only the needed reference files.
@@ -86,6 +103,8 @@ Load only the references needed for the task:
 - For ecommerce, judge performance using MER/POAS when platform ROAS conflicts with business revenue.
 - For healthcare, finance, housing, employment, or sensitive categories, run compliance checks before copy, targeting, or creative recommendations.
 - For creative recommendations, specify the platform, placement, format, angle, hook, proof, CTA, and refresh cadence.
+- For brand or creative work, collect brand DNA before writing final copy: ICP, offer, proof, objections, forbidden claims, tone, visual style, and compliance constraints.
+- For platform expansion, validate business fit, minimum viable budget, creative demand, tracking support, and funnel role before recommending a new channel.
 - For client-facing plans, translate technical findings into business impact, action, owner, and timeline.
 
 ## Output Templates
