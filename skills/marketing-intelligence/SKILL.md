@@ -16,13 +16,21 @@ Use this skill as the routing layer for Marwa Marketing MCP. Prefer the local MC
 - Backlinks and competitors: use `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, and `siteprofiler_competitors`.
 - UX friction and behavior: use `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, and `clarity_compare_projects`.
 
+## Strategy Routing
+
+- Use `seo-strategist` for organic search strategy, technical SEO, content strategy, cannibalization, SXO, GEO/AI-search visibility, and Search Console-led recommendations.
+- Use `google-ads-strategist` for Google Ads-specific planning, bidding, keywords, account diagnosis, and client reporting.
+- Use `paid-ads-strategist` for multi-platform paid media strategy, channel mix, Meta/Google/TikTok/LinkedIn comparisons, creative strategy, tracking/attribution, and budget allocation.
+- For campaign planning, combine sources in this order: tracking health, business goal, landing page readiness, search intent, paid demand, creative angles, budget rules.
+
 ## Workflow
 
 1. Clarify the target site, country, language, date range, and business goal only if missing.
 2. Start with cheap discovery calls such as list/configured-properties/options before spending API quota.
 3. For vague requests, plan the MCP calls first, then run the smallest set that answers the question.
-4. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
-5. Always end with concrete next actions, including the exact tool/source behind each recommendation.
+4. Choose the strategy skill based on the user's goal, then use MCP tools as evidence.
+5. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
+6. Always end with concrete next actions, including the exact tool/source behind each recommendation.
 
 ## Output Style
 
