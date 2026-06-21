@@ -28,6 +28,34 @@ Use this workspace as the routing layer for marketing analysis. Prefer the local
 5. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
 6. Always end with concrete next actions, including the exact tool/source behind each recommendation.
 
+## Local Account Mapping
+
+Keep per-client IDs and tokens in `.vscode/marketing.accounts.local.json`. This file is ignored by Git and can be edited whenever accounts are added or tokens change.
+
+```json
+{
+  "accounts": [
+    {
+      "name": "example_account",
+      "label": "Example Account",
+      "website": "https://example.com/",
+      "analytics_property_id": "123456789",
+      "clarity_token": "PASTE_CLARITY_DATA_EXPORT_TOKEN"
+    }
+  ]
+}
+```
+
+The Google MCP server uses `analytics_property_id`. The Clarity MCP server uses `clarity_token`. Both can match accounts by `name`, `label`, or website where the tool supports it.
+
+To migrate from an existing GA4 properties file and an old env file with `CLARITY_PROJECTS_JSON_BASE64`, run:
+
+```bash
+node scripts/build-marketing-accounts.mjs \
+  --analytics /path/to/google.analytics.properties.local.json \
+  --env /path/to/mcp.local.env
+```
+
 ## Output Style
 
 - Keep the answer business-focused, not API-focused.

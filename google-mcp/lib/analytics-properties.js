@@ -3,6 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageRoot = path.resolve(__dirname, "..");
+const workspaceRoot = path.resolve(packageRoot, "..");
 
 function decodeBase64Env(value) {
   if (!value) {
@@ -13,14 +15,14 @@ function decodeBase64Env(value) {
 }
 
 function readConfiguredFile() {
-  const configPath = process.env.GOOGLE_ANALYTICS_PROPERTIES_FILE;
+  const configPath =
+    process.env.GOOGLE_ANALYTICS_PROPERTIES_FILE ||
+    process.env.MARKETING_ACCOUNTS_FILE;
   if (!configPath) {
     return undefined;
   }
 
-  const resolvedPath = path.isAbsolute(configPath)
-    ? configPath
-    : path.resolve(__dirname, "..", configPath);
+  const resolvedPath = resolveConfigPath(configPath);
 
   if (!fs.existsSync(resolvedPath)) {
     throw new Error(`Configured GA4 properties file does not exist: ${resolvedPath}`);
@@ -42,7 +44,13 @@ function normalizeProperty(property) {
   const name = String(property.name || property.project || "").trim();
   const label = String(property.label || name).trim();
   const website = String(property.website || property.site_url || property.url || "").trim();
-  const propertyId = property.property_id ?? property.propertyId ?? property.analytics_id ?? null;
+  const propertyId =
+    property.property_id ??
+    property.propertyId ??
+    property.analytics_property_id ??
+    property.analyticsPropertyId ??
+    property.analytics_id ??
+    null;
 
   if (!name) {
     throw new Error("Each GA4 property mapping needs a non-empty name.");
@@ -58,9 +66,9 @@ function normalizeProperty(property) {
 
 export function loadConfiguredAnalyticsProperties() {
   const raw =
+    readConfiguredFile() ||
     process.env.GOOGLE_ANALYTICS_PROPERTIES_JSON ||
-    decodeBase64Env(process.env.GOOGLE_ANALYTICS_PROPERTIES_JSON_BASE64) ||
-    readConfiguredFile();
+    decodeBase64Env(process.env.GOOGLE_ANALYTICS_PROPERTIES_JSON_BASE64);
 
   if (!raw) {
     return [];
@@ -71,7 +79,9 @@ export function loadConfiguredAnalyticsProperties() {
     ? parsed.properties
     : Array.isArray(parsed.accounts)
       ? parsed.accounts
-      : [];
+      : Array.isArray(parsed.projects)
+        ? parsed.projects
+        : [];
 
   return properties.map(normalizeProperty);
 }
@@ -116,4 +126,17 @@ export function resolveAnalyticsProperty(args = {}) {
   }
 
   return selected.property_id;
+}
+
+function resolveConfigPath(configPath) {
+  if (path.isAbsolute(configPath)) {
+    return configPath;
+  }
+
+  const candidates = [
+    path.resolve(workspaceRoot, configPath),
+    path.resolve(packageRoot, configPath),
+  ];
+
+  return candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
 }

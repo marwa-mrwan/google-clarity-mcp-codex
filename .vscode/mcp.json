@@ -6,14 +6,18 @@
       "args": ["${workspaceFolder}/google-mcp/index.js"],
       "envFile": "${workspaceFolder}/.vscode/mcp.local.env",
       "env": {
-        "GOOGLE_TOKEN_FILE": "${workspaceFolder}/.vscode/google.tokens.local.json"
+        "GOOGLE_TOKEN_FILE": "${workspaceFolder}/.vscode/google.tokens.local.json",
+        "MARKETING_ACCOUNTS_FILE": "${workspaceFolder}/.vscode/marketing.accounts.local.json"
       }
     },
     "microsoft-clarity": {
       "type": "stdio",
       "command": "node",
       "args": ["${workspaceFolder}/clarity-mcp/index.js"],
-      "envFile": "${workspaceFolder}/.vscode/mcp.local.env"
+      "envFile": "${workspaceFolder}/.vscode/mcp.local.env",
+      "env": {
+        "MARKETING_ACCOUNTS_FILE": "${workspaceFolder}/.vscode/marketing.accounts.local.json"
+      }
     },
     "mangools": {
       "type": "stdio",

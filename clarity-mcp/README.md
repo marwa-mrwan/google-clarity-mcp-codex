@@ -6,20 +6,24 @@ Standalone MCP server for Microsoft Clarity Data Export API.
 
 1. Generate a Clarity API token from your Clarity project:
    `Settings -> Data Export -> Generate new API token`
-2. Add your projects to `projects.json`.
-3. For each project, set:
+2. Add your accounts to `../.vscode/marketing.accounts.local.json`.
+3. For each account, set:
 
 ```json
 {
-  "projects": [
+  "accounts": [
     {
       "name": "hairpro",
       "label": "Hair Pro Clinic",
-      "token": "your_token"
+      "website": "https://hairproclinic.com/",
+      "analytics_property_id": "123456789",
+      "clarity_token": "your_clarity_data_export_token"
     }
   ]
 }
 ```
+
+The old `projects.json`, `projects.local.json`, `CLARITY_PROJECTS_FILE`, and `CLARITY_PROJECTS_JSON_BASE64` options still work. The shared account file is recommended because GA4 and Clarity stay together per client.
 
 4. Install dependencies:
 

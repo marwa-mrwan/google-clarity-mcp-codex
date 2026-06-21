@@ -33,17 +33,42 @@ GOOGLE_ADS_DEVELOPER_TOKEN=...
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
 GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
 MANGOOLS_API_KEY=...
-CLARITY_PROJECTS_JSON_BASE64=...
 ```
 
-4. Connect Google OAuth:
+4. Create one local account mapping file at `.vscode/marketing.accounts.local.json`:
+
+```json
+{
+  "accounts": [
+    {
+      "name": "example_account",
+      "label": "Example Account",
+      "website": "https://example.com/",
+      "analytics_property_id": "123456789",
+      "clarity_token": "PASTE_CLARITY_DATA_EXPORT_TOKEN"
+    }
+  ]
+}
+```
+
+Use one object per client/account. To add a new account, copy one object and change `name`, `label`, `website`, `analytics_property_id`, and `clarity_token`.
+
+If you already have a GA4 properties file and an old local env file with `CLARITY_PROJECTS_JSON_BASE64`, generate the shared local account file with:
+
+```bash
+node scripts/build-marketing-accounts.mjs \
+  --analytics /path/to/google.analytics.properties.local.json \
+  --env /path/to/mcp.local.env
+```
+
+5. Connect Google OAuth:
 
 ```bash
 cd google-mcp
 npm run auth
 ```
 
-5. Open the workspace in VS Code and run `MCP: List Servers`.
+6. Open the workspace in VS Code and run `MCP: List Servers`.
 
 ## Agent configs
 
@@ -57,4 +82,6 @@ npm run auth
 - `.vscode/mcp.json` is safe to commit.
 - `.vscode/mcp.local.env` is local only.
 - `.vscode/google.tokens.local.json` is local only.
-- Clarity multi-project tokens can live inside `.vscode/mcp.local.env` as `CLARITY_PROJECTS_JSON_BASE64`.
+- `.vscode/marketing.accounts.local.json` is local only.
+- GA4 and Clarity can share `.vscode/marketing.accounts.local.json`, so each account has one editable row with its website, Analytics property ID, and Clarity token.
+- Legacy Clarity multi-project tokens can still live inside `.vscode/mcp.local.env` as `CLARITY_PROJECTS_JSON_BASE64`, but the account mapping file is easier to maintain.

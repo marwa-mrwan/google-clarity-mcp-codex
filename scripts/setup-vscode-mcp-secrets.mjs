@@ -8,6 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const vscodeDir = path.join(rootDir, ".vscode");
 const envPath = path.join(vscodeDir, "mcp.local.env");
+const accountsPath = path.join(vscodeDir, "marketing.accounts.local.json");
 
 const rl = readline.createInterface({ input, output });
 
@@ -38,6 +39,10 @@ async function main() {
   const clarityProjectLabel = clarityProjectName
     ? await ask("Clarity project label", { optional: true })
     : "";
+  const website = clarityProjectName ? await ask("Website URL", { optional: true }) : "";
+  const analyticsPropertyId = clarityProjectName
+    ? await ask("GA4 analytics_property_id", { optional: true })
+    : "";
   const clarityApiToken = clarityProjectName
     ? await ask("Clarity Data Export token")
     : "";
@@ -52,27 +57,27 @@ async function main() {
     line("MANGOOLS_API_KEY", mangoolsApiKey),
   ].filter(Boolean);
 
+  fs.writeFileSync(envPath, `${envLines.join("\n")}\n`);
+
   if (clarityProjectName && clarityApiToken) {
-    const clarityConfig = {
-      projects: [
+    const accountConfig = {
+      accounts: [
         {
           name: clarityProjectName,
           label: clarityProjectLabel || clarityProjectName,
-          token: clarityApiToken,
+          website,
+          analytics_property_id: analyticsPropertyId,
+          clarity_token: clarityApiToken,
         },
       ],
     };
-    envLines.push(
-      `CLARITY_PROJECTS_JSON_BASE64=${Buffer.from(
-        JSON.stringify(clarityConfig),
-        "utf8"
-      ).toString("base64")}`
-    );
+    fs.writeFileSync(accountsPath, `${JSON.stringify(accountConfig, null, 2)}\n`);
   }
 
-  fs.writeFileSync(envPath, `${envLines.join("\n")}\n`);
-
   console.log(`\nWrote ${path.relative(rootDir, envPath)}`);
+  if (fs.existsSync(accountsPath)) {
+    console.log(`Wrote ${path.relative(rootDir, accountsPath)}`);
+  }
   console.log("\nFor Google OAuth, run:");
   console.log("  cd google-mcp");
   console.log("  npm run auth");
