@@ -17,10 +17,11 @@ Be evidence-led. Separate:
 Do not trust platform-reported ROAS/CPA alone. Cross-check with GA4, CRM, MER, post-purchase surveys, lead quality, or closed revenue whenever available.
 
 Always start strategic outputs with:
-1. Biggest Risk
-2. Fastest Growth Lever
-3. Budget / Tracking Dependency
-4. Next Campaign Actions
+1. Executive Snapshot
+2. Biggest Risk
+3. Fastest Growth Lever
+4. Budget / Tracking Dependency
+5. Next Campaign Actions
 
 ## Required Context
 
@@ -92,6 +93,42 @@ For Google-only deep strategy, use the Google-specific rules in this skill first
 5. Score issues by revenue risk, wasted spend, data reliability, and speed to fix.
 6. Return a prioritized action plan with source labels such as `[Ads]`, `[GA4]`, `[CRM]`, `[Clarity]`, `[GSC]`, `[Mangools]`, or `[Manual]`.
 
+## Analysis Depth Standard
+
+Do not produce shallow optimization bullets. For every major paid media issue, explain:
+- What is wrong: campaign/ad group/ad/keyword/audience/tracking/landing page problem.
+- Where it appears: platform, account, campaign, ad group, asset group, landing page, device, geo, query, audience, or creative.
+- Evidence: metric, date range, source tool/export, and comparison point.
+- Why it matters: wasted spend, missed conversions, poor lead quality, attribution risk, learning-phase risk, or scaling constraint.
+- Likely root cause: tracking, structure, bidding, targeting, creative fatigue, search intent, budget, landing page, or offer-market fit.
+- Exact fix: concrete account changes and implementation sequence.
+- Risk/guardrail: what could go wrong and how to avoid it.
+- Verification: KPI, expected movement, tool, and review window.
+
+Always include `Data Gaps` when CRM quality, offline revenue, conversion setup, or landing page data is missing.
+
+## Required Audit Structure
+
+For serious paid media audits or campaign plans, use:
+
+1. Executive Snapshot:
+   - Paid media health score out of 100.
+   - Biggest wasted-spend risk.
+   - Fastest growth lever.
+   - Confidence level and missing data.
+2. Tracking and Data Quality:
+   - Primary/secondary conversions, attribution, enhanced/offline conversions, CRM quality, and GA4 consistency.
+3. Account/Campaign Diagnosis:
+   - Structure, budget, bidding, search terms, negatives, audiences, creatives/assets, landing pages, and recommendations.
+4. Issue Cards:
+   - Each card must include evidence, impact, root cause, fix, owner, priority, and verification.
+5. Action Plan:
+   - 0-7 days, 8-14 days, 15-30 days, 60-90 days.
+6. Testing Plan:
+   - Hypothesis, change, control, KPI, minimum data needed, and decision rule.
+7. Budget Plan:
+   - Keep, cut, shift, scale, or test budget with reasoning.
+
 ## Hard Rules
 
 - Tracking comes before bidding changes. Do not optimize automated bidding when conversion data is broken or low quality.
@@ -111,13 +148,18 @@ For Google-only deep strategy, use the Google-specific rules in this skill first
 
 ### Audit Summary
 
-| Priority | Finding | Evidence | Impact | Action | Owner |
-|---|---|---|---|---|---|
+| Priority | Finding | Evidence | Root Cause | Impact | Action | Owner | Verification |
+|---|---|---|---|---|---|---|---|
 
 ### Campaign Plan
 
 | Channel | Role | Budget Share | Campaign Type | KPI | Tracking Requirement | Creative Angle |
 |---|---|---:|---|---|---|---|
+
+### 30/60/90 Plan
+
+| Window | Workstream | Action | Owner | KPI | Dependency |
+|---|---|---|---|---|---|
 
 ### Creative Brief
 

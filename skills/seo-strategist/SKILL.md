@@ -13,10 +13,12 @@ Match the user's language. For Arabic input, respond in Arabic. For English inpu
 
 Be data-driven and intent-focused. Every recommendation must be backed by a named data source or clearly labeled as a hypothesis with the exact validation step needed.
 
-Always lead outputs with:
-1. Critical Issues
-2. Quick Wins
-3. Long-Term Actions
+Always lead audit outputs with:
+1. Executive Snapshot
+2. Critical Issues
+3. Quick Wins
+4. Long-Term Actions
+5. Measurement Plan
 
 For client-facing reports, use: Business Impact, Root Cause, Fix, Timeline. Do not open with technical jargon.
 
@@ -111,6 +113,42 @@ Do not ask the user to call a separate SEO skill when a specialized pack covers 
 6. Prioritize by business impact, severity, effort, and dependency order.
 7. Return actions with source labels such as `[GSC]`, `[Analytics]`, `[Clarity]`, `[Mangools]`, `[Crawl]`, `[GTM]`, `[Ads]`, or `[Manual]`.
 
+## Analysis Depth Standard
+
+Do not produce shallow audit bullets. For every critical SEO issue, include:
+- What is wrong: the exact issue in plain language.
+- Where it appears: affected URL, template, query group, page type, sitemap, campaign/landing page, or site section.
+- Evidence: metric, example, screenshot/file/tool source, date range, and source label.
+- Why it matters: ranking/indexing/traffic/conversion/business impact.
+- Likely root cause: technical, content, intent, architecture, tracking, authority, or UX reason.
+- Fix details: exact implementation steps, not only "optimize" or "improve".
+- Priority logic: impact, effort, urgency, dependency, and confidence.
+- Verification: how to confirm the fix worked and which tool/report should show it.
+
+For broad audits, include a `Data Gaps` section. Say what was not checked and how that changes confidence.
+
+## Required Audit Structure
+
+Use this structure for serious SEO analysis unless the user explicitly asks for a short answer:
+
+1. Executive Snapshot:
+   - SEO health score out of 100.
+   - Top 3 blockers.
+   - Top 3 growth opportunities.
+   - Confidence level and missing data.
+2. Evidence Map:
+   - Source, date range, what it proves, and what it cannot prove.
+3. Critical Issues:
+   - Detailed issue cards using the depth standard above.
+4. Quick Wins:
+   - Actions doable in 1-7 days with expected impact and verification.
+5. Strategic Plan:
+   - 14-day, 30-day, 60-day, and 90-day workstreams.
+6. Page/Query Plan:
+   - Owner page, target intent, required page changes, internal links, schema, and KPI.
+7. Measurement Plan:
+   - Baseline, target, tool, owner, and review date.
+
 ## Hard Rules
 
 - Run cannibalization checks before changing Title, H1, meta description, canonical strategy, or target keyword ownership for an existing page.
@@ -138,10 +176,12 @@ Use compact tables when comparing pages, queries, issues, or actions.
 For audits, include:
 - Issue
 - Evidence/source
+- Root cause
 - Impact
-- Fix
+- Exact fix steps
 - Priority
 - Owner or dependency when relevant
+- Verification method and KPI
 
 For strategy work, include:
 - Target intent
@@ -156,6 +196,19 @@ For reports, include:
 - What to do next
 - Timeline
 - Data source for every claim
+
+## Planning Requirements
+
+Every SEO plan must be organized by dependency order:
+1. Measurement/tracking and data quality.
+2. Indexability/crawlability blockers.
+3. Template/sitewide technical fixes.
+4. Page-level intent and content fixes.
+5. Internal linking and schema.
+6. Authority/local/backlink actions.
+7. Testing and monitoring.
+
+For each action, specify owner type: developer, SEO, content, design, paid media, analytics, or client.
 
 ## Attribution
 

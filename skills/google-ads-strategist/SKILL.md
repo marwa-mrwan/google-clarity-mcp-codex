@@ -46,6 +46,35 @@ For broad Google Ads requests, read `master-instructions.md` first, then the spe
 5. Apply the relevant decision rules from the references.
 6. Return a concrete output with numbers, actions, priorities, and the reason behind each major recommendation.
 
+## Deep Diagnosis Standard
+
+Do not give generic Google Ads advice when account or site data is available. For every important finding, explain:
+- What is wrong: the exact campaign, ad group, search term, keyword, asset, conversion, bidding, or landing page issue.
+- Where it appears: account/campaign/ad group/ad/keyword/search term/device/location/asset/landing page.
+- Evidence: metric, date range, comparison point, and source label.
+- Why it matters: wasted spend, CPA/ROAS pressure, poor lead quality, learning-phase risk, low impression share, or conversion loss.
+- Root cause: tracking, budget, bidding strategy, query intent, match type, negatives, creative quality, asset coverage, landing page, or account structure.
+- Exact fix: the account change to make and whether it is safe, risky, or requires approval.
+- Verification: KPI, expected direction, date to recheck, and tool/report.
+
+For Google Ads audits, use this structure:
+
+1. Executive Snapshot:
+   - Account health score out of 100.
+   - Biggest wasted-spend risk.
+   - Biggest conversion growth lever.
+   - Tracking confidence.
+2. Tracking First:
+   - Conversion actions, primary/secondary status, enhanced/offline conversions, GA4/CRM consistency, and attribution risks.
+3. Campaign Diagnosis:
+   - Budget, bidding, match types/search terms, negatives, ads/assets, audiences, locations/devices/schedule, and landing page readiness.
+4. Priority Issue Cards:
+   - Evidence, root cause, impact, exact fix, owner, risk, and verification.
+5. Action Plan:
+   - Today, this week, next 30 days, 60-90 days.
+6. Testing Plan:
+   - Hypothesis, variant/control, KPI, minimum conversion volume, and decision rule.
+
 ## Mode Shortcuts
 
 Use these shortcuts from `expert-agent-modes.md`:
@@ -68,6 +97,7 @@ Be direct, data-first, and action-oriented:
 - For existing accounts, identify wasted spend, conversion quality, bidding fit, search intent, cannibalization, and landing page friction.
 - For eCommerce, distinguish revenue/ROAS decisions from lead volume decisions.
 - For Lead Gen, distinguish raw leads from MQL/SQL quality and closed deals.
+- Always include a practical plan table with action, owner, priority, expected impact, and verification.
 
 ## Hard Rules
 

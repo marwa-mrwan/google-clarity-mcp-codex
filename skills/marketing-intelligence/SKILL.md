@@ -11,7 +11,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 
 - Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, and `psi_audit_url`.
 - Analytics traffic and conversions: use `ga4_list_properties`, `ga4_run_report`, and `ga4_realtime`.
-- Google Ads audits: use `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, and `ads_deep_report`.
+- Google Ads audits: use `ads_list_accounts`, `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, and `ads_deep_report`.
 - Keyword research: use `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, and `serpchecker_serps`.
 - Backlinks and competitors: use `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, and `siteprofiler_competitors`.
 - UX friction and behavior: use `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, and `clarity_compare_projects`.
@@ -32,9 +32,31 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 5. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
 6. Always end with concrete next actions, including the exact tool/source behind each recommendation.
 
+## Minimum Evidence Packs
+
+Use these packs unless the user asks for a very small check.
+
+- SEO site audit: GSC performance/pages, GSC index/sitemaps when available, PageSpeed, Mangools overview/backlinks/keywords, Clarity behavior for key pages, GA4 landing/conversion data when available, and rendered DOM/Chrome DevTools when a page-level technical issue is suspected.
+- Google Ads audit: `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_campaign_full_audit` for priority campaigns, `ads_search_terms`, `ads_campaign_search_terms`, `ads_keyword_performance`, conversion/recommendation/budget/asset deep reports, GA4 landing/conversion data, and Clarity landing page friction when available.
+- Paid/organic overlap: combine Ads search terms/cost/conversions, GSC queries/pages, GA4 landing conversions, Mangools keyword difficulty/competitors, and landing page readiness.
+
+If a connector is missing or a report fails, explicitly list it under `Data Gaps` and explain how it limits confidence.
+
 ## Output Style
 
 - Keep the answer business-focused, not API-focused.
 - Mention missing credentials or inaccessible accounts plainly.
-- For audits, include priority, evidence, and recommended action.
+- For audits, do not stop at short issue bullets. Every important issue must explain: what is wrong, where it appears, why it matters, likely root cause, evidence/source, business impact, exact fix, owner/dependency, priority, and how to verify success.
 - For keyword research, include intent, difficulty, opportunity, and suggested content angle.
+
+## Deep Analysis Format
+
+For SEO, Ads, or combined audits, use this structure unless the user asks for a shorter answer:
+
+1. Executive Snapshot: overall health, biggest risk, fastest win, confidence level, and data gaps.
+2. Evidence Used: tools/files checked and date range.
+3. Critical Issues: detailed diagnosis, not just symptoms.
+4. Opportunity Backlog: growth ideas ranked by impact/effort.
+5. Action Plan: 7 days, 14 days, 30 days, 60-90 days.
+6. Measurement Plan: KPI, baseline, target, verification tool, owner.
+7. Open Questions: only the questions that materially change the plan.
