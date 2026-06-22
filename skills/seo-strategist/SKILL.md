@@ -70,6 +70,7 @@ Load only the reference needed for the task:
 - `references/specialized/schema/deprecated-types-2024-2026.md`: deprecated schema and implementation risk checks.
 - `references/specialized/sxo/wireframe-templates.md`: page layout and SXO wireframe patterns.
 - `references/specialized/technical/agent-friendly-pages.md`: agent-friendly pages, crawler accessibility, and AI assistant readability.
+- `references/specialized/technical/site-delivery-checklist.md`: practical site launch/delivery checklist for technical SEO, Arabic/English handling, schema, WordPress plugins, forms, CTAs, tracking, and tool connections.
 - `references/specialized/flow/flow-framework.md`: integrated Find, Optimize, Leverage, Win workflow.
 - `references/specialized/premium-report-standard.md`: client-ready report quality bar.
 - `references/specialized/shared-data-cache.md`: shared evidence/cache conventions for multi-step audits.
@@ -102,6 +103,7 @@ Do not ask the user to call a separate SEO skill when a specialized pack covers 
    - Schema / Rich Results
    - Programmatic SEO
    - SEO Reporting
+   - Site Launch / Delivery QA
 2. Complete session initialization.
 3. Choose the relevant reference file.
 4. Pull or request the minimum data required for that workflow.
@@ -122,6 +124,7 @@ Do not ask the user to call a separate SEO skill when a specialized pack covers 
 - For local SEO, check GBP completeness, NAP consistency, reviews, categories, service areas, local landing pages, local schema, proximity/geo-grid patterns, and citation quality.
 - For hreflang, validate locale format, reciprocal annotations, canonical alignment, content parity, translated template quality, and regional intent differences.
 - For schema, check eligibility, required/recommended properties, deprecated types, conflicts with visible content, and validation risks before recommending implementation.
+- For site launch or delivery QA, apply `site-delivery-checklist.md` after the core technical audit and separate SEO blockers from implementation, tracking, WordPress, form, CTA, and manual QA tasks.
 - For topical clusters, check SERP overlap before splitting or merging pages; assign one hub, supporting spokes, and internal link paths.
 - For programmatic or scaled pages, check indexability, uniqueness, template quality, crawl budget, thin-content risk, and quality gates before recommending scale.
 - For link building, recommend earned/editorial tactics only. Use disavow cautiously and only for clear toxic/manipulative patterns.

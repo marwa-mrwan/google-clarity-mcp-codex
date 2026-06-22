@@ -14,7 +14,7 @@ These packs extend `seo-strategist` without splitting work across separate skill
 - `google-apis/`: Search Console, GA4, PageSpeed/CrUX, Indexing API, Keyword Planner, NLP, YouTube, auth, and quota notes.
 - `schema/`: deprecated schema types and implementation risk checks, supplementing `advanced/schema-types.md`.
 - `sxo/`: wireframe templates for search experience and conversion improvements.
-- `technical/`: agent-friendly page guidance for crawler and AI assistant accessibility.
+- `technical/`: agent-friendly page guidance plus practical site delivery QA for launch checks, WordPress plugins, forms, CTAs, bilingual handling, tracking, and tool connections.
 - `flow/`: integrated SEO workflow framework and bibliography.
 - `premium-report-standard.md`: client-ready reporting standard.
 - `shared-data-cache.md`: shared data/cache expectations for multi-step audits.
