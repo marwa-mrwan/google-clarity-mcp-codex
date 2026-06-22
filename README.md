@@ -9,6 +9,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 - `google-mcp`: Google Search Console, GA4, Google Ads, PageSpeed Insights, Google Tag Manager, Google Business Profile, Merchant Center, and combined marketing reports.
 - `clarity-mcp`: Microsoft Clarity project lookup, live insights, metrics, and project analysis.
 - `mangools-mcp`: KWFinder, SERPChecker, LinkMiner, and SiteProfiler research.
+- `chrome-devtools`: local Chrome DevTools MCP for rendered-page checks, console errors, network inspection, screenshots, and landing page QA.
 - `skills/`: strategy skills for SEO, Google Ads, paid media, and marketing intelligence routing.
 - `scripts/`: setup and migration helpers for local account mapping.
 
@@ -47,11 +48,14 @@ Clone the repo and install dependencies:
 git clone https://github.com/marwa-mrwan/marketing-intelligence-mcp.git
 cd marketing-intelligence-mcp
 
+npm install
 cd google-mcp && npm install
 cd ../clarity-mcp && npm install
 cd ../mangools-mcp && npm install
 cd ..
 ```
+
+The root `npm install` installs `chrome-devtools-mcp` locally so the MCP config can run it with `npx --no-install` instead of downloading it at runtime.
 
 Create `.vscode/mcp.local.env`:
 
@@ -148,6 +152,8 @@ google-marketing-suite: 39 tools
 microsoft-clarity: 8 tools
 mangools: 82 tools
 ```
+
+Chrome DevTools MCP is configured in `.mcp.json` and `.vscode/mcp.json` as `chrome-devtools`. It runs headless, uses the locally installed package with `npx --no-install`, disables usage statistics, and disables CrUX URL lookups. Restart Codex or reload the VS Code MCP session after pulling changes so the new server appears.
 
 To test Google Ads access without printing account names or secrets:
 

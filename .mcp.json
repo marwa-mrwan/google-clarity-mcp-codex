@@ -23,6 +23,16 @@
       "env": {
         "MCP_SECRETS_ENV_FILE": ".vscode/mcp.local.env"
       }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "--no-install",
+        "chrome-devtools-mcp",
+        "--headless",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ]
     }
   }
 }
