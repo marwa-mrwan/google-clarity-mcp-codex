@@ -8,6 +8,306 @@ import axios from "axios";
 const DEFAULT_ADS_VERSIONS = ["v24", "v23", "v22", "v21"];
 let ADS_API_BASE = null;
 
+const CUSTOMER_ID_PROPERTY = {
+  type: "string",
+  description: "Google Ads customer ID without dashes.",
+};
+
+const OPTIONAL_DATE_RANGE_PROPERTIES = {
+  start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
+  end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
+};
+
+const MUTATION_SAFETY_PROPERTIES = {
+  dry_run: {
+    type: "boolean",
+    description: "Preview the mutation without calling Google Ads mutate endpoints. Defaults to true.",
+    default: true,
+  },
+  confirm: {
+    type: "boolean",
+    description: "Must be true together with dry_run=false and env guardrails before any write executes.",
+    default: false,
+  },
+  validate_only: {
+    type: "boolean",
+    description: "When guardrails allow an API call, ask Google Ads to validate the mutation without applying it.",
+    default: false,
+  },
+  partial_failure: {
+    type: "boolean",
+    description: "Enable Google Ads partial failure handling for supported mutate endpoints.",
+    default: false,
+  },
+};
+
+const ADS_DEEP_REPORT_TYPES = [
+  "device_performance",
+  "geo_performance",
+  "user_location_performance",
+  "landing_pages",
+  "expanded_landing_pages",
+  "age_range_performance",
+  "gender_performance",
+  "campaign_budgets",
+  "conversion_actions",
+  "recommendations",
+  "change_events",
+  "campaign_negative_keywords",
+  "ad_group_negative_keywords",
+  "shared_negative_keyword_sets",
+  "negative_keyword_list_members",
+  "negative_keyword_candidates",
+  "auction_insights_campaign",
+  "auction_insights_keyword",
+  "asset_performance",
+  "pmax_asset_groups",
+  "pmax_asset_group_assets",
+  "shopping_products",
+  "user_lists",
+  "custom_audiences",
+  "campaign_audience_targets",
+  "ad_group_audience_targets",
+  "campaign_audience_performance",
+  "ad_group_audience_performance",
+  "webpage_targets",
+  "targeted_location_performance",
+  "location_targets",
+  "excluded_locations",
+  "proximity_targets",
+  "ad_schedules",
+  "day_of_week_performance",
+  "hour_of_day_performance",
+  "dynamic_search_ads",
+  "dynamic_search_targets",
+  "experiments",
+  "experiment_arms",
+  "experiment_campaigns",
+  "customer_labels",
+  "customer_user_access",
+  "customer_user_access_invitations",
+  "campaign_settings",
+  "bidding_strategies",
+  "campaign_conversion_goals",
+  "customer_conversion_goals",
+  "campaign_labels",
+  "ad_group_labels",
+  "keyword_quality",
+  "device_bid_modifiers",
+  "placements",
+  "topics",
+  "campaign_asset_links",
+  "ad_group_asset_links",
+  "customer_asset_links",
+  "asset_details",
+  "pmax_listing_groups",
+  "pmax_search_terms",
+  "shopping_listing_groups",
+  "demand_gen_campaigns",
+  "video_campaigns",
+];
+
+const readTool = (name, description, properties = {}, required = []) => ({
+  name,
+  description,
+  inputSchema: {
+    type: "object",
+    properties,
+    required,
+  },
+});
+
+const mutationTool = (name, description, properties = {}, required = []) =>
+  readTool(
+    name,
+    description,
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      ...properties,
+      ...MUTATION_SAFETY_PROPERTIES,
+    },
+    ["customer_id", ...required]
+  );
+
+const ADVANCED_READ_TOOLS = [
+  readTool(
+    "ads_account_hierarchy",
+    "Read the full Google Ads MCC hierarchy recursively from a manager account.",
+    {
+      customer_id: {
+        ...CUSTOMER_ID_PROPERTY,
+        description: "Manager customer ID without dashes.",
+      },
+      max_depth: {
+        type: "number",
+        description: "Maximum recursion depth. Defaults to 5.",
+        default: 5,
+      },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_customer_details",
+    "Read customer metadata, status, currency, timezone, optimization score, tracking URL fields, labels, and access summaries where available.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_campaign_full_audit",
+    "Run a multi-section read-only campaign audit covering settings, budget, bidding, targeting, assets, conversion goals, recommendations, and performance.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      campaign_id: { type: "string", description: "Campaign ID without dashes." },
+      ...OPTIONAL_DATE_RANGE_PROPERTIES,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 100.", default: 100 },
+    },
+    ["customer_id", "campaign_id"]
+  ),
+  readTool(
+    "ads_ad_group_full_audit",
+    "Run a multi-section read-only ad group audit covering settings, keywords, negative keywords, audiences, placements, topics, ads, assets, and performance.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+      campaign_id: { type: "string", description: "Optional campaign ID filter." },
+      ...OPTIONAL_DATE_RANGE_PROPERTIES,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 100.", default: 100 },
+    },
+    ["customer_id", "ad_group_id"]
+  ),
+];
+
+const WRITE_TOOLS = [
+  mutationTool("ads_pause_campaign", "Safely pause a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+  }, ["campaign_id"]),
+  mutationTool("ads_enable_campaign", "Safely enable a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+  }, ["campaign_id"]),
+  mutationTool("ads_update_campaign_budget", "Safely update a campaign budget amount.", {
+    budget_id: { type: "string", description: "Campaign budget ID without dashes." },
+    amount: { type: "number", description: "Budget amount in the account currency, not micros." },
+  }, ["budget_id", "amount"]),
+  mutationTool("ads_update_campaign_dates", "Safely update campaign start and/or end dates.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
+    end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
+  }, ["campaign_id"]),
+  mutationTool("ads_update_campaign_bidding", "Safely update a campaign bidding strategy field set.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    bidding_strategy_type: {
+      type: "string",
+      enum: ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS", "MAXIMIZE_CONVERSION_VALUE", "TARGET_CPA", "TARGET_ROAS"],
+    },
+    target_cpa: { type: "number", description: "Optional target CPA in account currency." },
+    target_roas: { type: "number", description: "Optional target ROAS as a decimal, e.g. 3.5." },
+  }, ["campaign_id", "bidding_strategy_type"]),
+  mutationTool("ads_update_target_cpa", "Safely update campaign target CPA.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    target_cpa: { type: "number", description: "Target CPA in account currency." },
+  }, ["campaign_id", "target_cpa"]),
+  mutationTool("ads_update_target_roas", "Safely update campaign target ROAS.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    target_roas: { type: "number", description: "Target ROAS as a decimal, e.g. 3.5." },
+  }, ["campaign_id", "target_roas"]),
+  mutationTool("ads_add_campaign_negative_keywords", "Safely add campaign negative keywords.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    keywords: { type: "array", items: { type: "string" }, description: "Negative keyword texts." },
+    match_type: { type: "string", enum: ["BROAD", "PHRASE", "EXACT"], default: "PHRASE" },
+  }, ["campaign_id", "keywords"]),
+  mutationTool("ads_add_ad_group_negative_keywords", "Safely add ad group negative keywords.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    keywords: { type: "array", items: { type: "string" }, description: "Negative keyword texts." },
+    match_type: { type: "string", enum: ["BROAD", "PHRASE", "EXACT"], default: "PHRASE" },
+  }, ["ad_group_id", "keywords"]),
+  mutationTool("ads_add_keywords", "Safely add biddable keywords to an ad group.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    keywords: { type: "array", items: { type: "string" }, description: "Keyword texts." },
+    match_type: { type: "string", enum: ["BROAD", "PHRASE", "EXACT"], default: "PHRASE" },
+    cpc_bid: { type: "number", description: "Optional CPC bid in account currency." },
+  }, ["ad_group_id", "keywords"]),
+  mutationTool("ads_pause_keywords", "Safely pause ad group keywords by criterion IDs.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    criterion_ids: { type: "array", items: { type: "string" }, description: "Keyword criterion IDs." },
+  }, ["ad_group_id", "criterion_ids"]),
+  mutationTool("ads_enable_keywords", "Safely enable ad group keywords by criterion IDs.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    criterion_ids: { type: "array", items: { type: "string" }, description: "Keyword criterion IDs." },
+  }, ["ad_group_id", "criterion_ids"]),
+  mutationTool("ads_update_keyword_bid", "Safely update a keyword CPC bid.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    criterion_id: { type: "string", description: "Keyword criterion ID without dashes." },
+    cpc_bid: { type: "number", description: "CPC bid in account currency." },
+  }, ["ad_group_id", "criterion_id", "cpc_bid"]),
+  mutationTool("ads_pause_ad", "Safely pause an ad.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    ad_id: { type: "string", description: "Ad ID without dashes." },
+  }, ["ad_group_id", "ad_id"]),
+  mutationTool("ads_enable_ad", "Safely enable an ad.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    ad_id: { type: "string", description: "Ad ID without dashes." },
+  }, ["ad_group_id", "ad_id"]),
+  mutationTool("ads_create_responsive_search_ad", "Safely create a responsive search ad.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
+    headlines: { type: "array", items: { type: "string" }, description: "RSA headlines." },
+    descriptions: { type: "array", items: { type: "string" }, description: "RSA descriptions." },
+    path1: { type: "string", description: "Optional path 1." },
+    path2: { type: "string", description: "Optional path 2." },
+    status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
+  }, ["ad_group_id", "final_urls", "headlines", "descriptions"]),
+  mutationTool("ads_update_responsive_search_ad", "Safely update a responsive search ad.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    ad_id: { type: "string", description: "Ad ID without dashes." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Optional replacement final URLs." },
+    headlines: { type: "array", items: { type: "string" }, description: "Optional replacement headlines." },
+    descriptions: { type: "array", items: { type: "string" }, description: "Optional replacement descriptions." },
+    path1: { type: "string", description: "Optional path 1." },
+    path2: { type: "string", description: "Optional path 2." },
+  }, ["ad_group_id", "ad_id"]),
+  mutationTool("ads_create_ad_group", "Safely create a search ad group.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    name: { type: "string", description: "Ad group name." },
+    status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
+    type: { type: "string", enum: ["SEARCH_STANDARD"], default: "SEARCH_STANDARD" },
+    cpc_bid: { type: "number", description: "Optional CPC bid in account currency." },
+  }, ["campaign_id", "name"]),
+  mutationTool("ads_create_search_campaign", "Safely create a search campaign using an existing explicit budget.", {
+    name: { type: "string", description: "Campaign name." },
+    budget_id: { type: "string", description: "Existing campaign budget ID without dashes." },
+    status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
+    start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
+    end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
+    bidding_strategy_type: { type: "string", enum: ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS"], default: "MANUAL_CPC" },
+  }, ["name", "budget_id"]),
+  mutationTool("ads_apply_recommendation", "Safely apply a Google Ads recommendation.", {
+    recommendation_resource_name: { type: "string", description: "Full recommendation resource name." },
+  }, ["recommendation_resource_name"]),
+  mutationTool("ads_dismiss_recommendation", "Safely dismiss a Google Ads recommendation.", {
+    recommendation_resource_name: { type: "string", description: "Full recommendation resource name." },
+  }, ["recommendation_resource_name"]),
+  mutationTool("ads_add_sitelink_asset", "Safely create a sitelink asset.", {
+    link_text: { type: "string", description: "Sitelink text." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
+    description1: { type: "string", description: "Optional description line 1." },
+    description2: { type: "string", description: "Optional description line 2." },
+  }, ["link_text", "final_urls"]),
+  mutationTool("ads_link_asset_to_campaign", "Safely link an existing asset to a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    asset_id: { type: "string", description: "Asset ID without dashes." },
+    field_type: { type: "string", description: "Asset field type, for example SITELINK.", default: "SITELINK" },
+  }, ["campaign_id", "asset_id"]),
+  mutationTool("ads_upload_offline_conversion", "Safely upload offline click conversions. Dry-run is strongly recommended first.", {
+    conversions: {
+      type: "array",
+      description: "Click conversions with gclid, conversion_action, conversion_date_time, and optional value/currency.",
+      items: { type: "object" },
+    },
+  }, ["conversions"]),
+];
+
 function getAdsVersions() {
   const configuredVersion = process.env.GOOGLE_ADS_API_VERSION?.trim();
   if (!configuredVersion) {
@@ -359,49 +659,7 @@ export function getAdsTools() {
           customer_id: { type: "string", description: "Customer ID without dashes." },
           report_type: {
             type: "string",
-            enum: [
-              "device_performance",
-              "geo_performance",
-              "user_location_performance",
-              "landing_pages",
-              "expanded_landing_pages",
-              "age_range_performance",
-              "gender_performance",
-              "campaign_budgets",
-              "conversion_actions",
-              "recommendations",
-              "change_events",
-              "campaign_negative_keywords",
-              "ad_group_negative_keywords",
-              "shared_negative_keyword_sets",
-              "negative_keyword_list_members",
-              "negative_keyword_candidates",
-              "auction_insights_campaign",
-              "auction_insights_keyword",
-              "asset_performance",
-              "pmax_asset_groups",
-              "pmax_asset_group_assets",
-              "shopping_products",
-              "user_lists",
-              "custom_audiences",
-              "campaign_audience_targets",
-              "ad_group_audience_targets",
-              "campaign_audience_performance",
-              "ad_group_audience_performance",
-              "webpage_targets",
-              "targeted_location_performance",
-              "location_targets",
-              "excluded_locations",
-              "proximity_targets",
-              "ad_schedules",
-              "day_of_week_performance",
-              "hour_of_day_performance",
-              "dynamic_search_ads",
-              "dynamic_search_targets",
-              "experiments",
-              "experiment_arms",
-              "experiment_campaigns",
-            ],
+            enum: ADS_DEEP_REPORT_TYPES,
             description: "Type of deep-analysis report to run.",
           },
           start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
@@ -417,6 +675,8 @@ export function getAdsTools() {
         required: ["customer_id", "report_type"],
       },
     },
+    ...ADVANCED_READ_TOOLS,
+    ...WRITE_TOOLS,
   ];
 }
 
@@ -447,6 +707,62 @@ export async function handleAdsTool(name, args, authClient) {
     return `AND ${field} = ${value}`;
   };
 
+  const normalizeCustomerId = (value, field = "customer_id") => {
+    const normalized = String(value || "").replaceAll("-", "").trim();
+    if (!/^\d+$/.test(normalized)) {
+      throw new Error(`${field} must be a numeric Google Ads ID without dashes.`);
+    }
+    return normalized;
+  };
+
+  const assertNumericId = (value, field) => normalizeCustomerId(value, field);
+
+  const assertDate = (value, field) => {
+    if (!value) return undefined;
+    const text = String(value);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+      throw new Error(`${field} must use YYYY-MM-DD format.`);
+    }
+    return text;
+  };
+
+  const assertFiniteNumber = (value, field, min = 0) => {
+    const number = Number(value);
+    if (!Number.isFinite(number) || number < min) {
+      throw new Error(`${field} must be a number greater than or equal to ${min}.`);
+    }
+    return number;
+  };
+
+  const amountToMicros = (value, field = "amount") =>
+    Math.round(assertFiniteNumber(value, field, 0) * 1_000_000);
+
+  const assertNonEmptyString = (value, field, maxLength = 2048) => {
+    const text = String(value || "").trim();
+    if (!text) {
+      throw new Error(`${field} is required.`);
+    }
+    if (text.length > maxLength) {
+      throw new Error(`${field} is too long. Maximum length is ${maxLength}.`);
+    }
+    return text;
+  };
+
+  const assertStringArray = (value, field, { min = 1, max = 50, itemMax = 2048 } = {}) => {
+    if (!Array.isArray(value) || value.length < min || value.length > max) {
+      throw new Error(`${field} must be an array with ${min}-${max} items.`);
+    }
+    return value.map((item, index) => assertNonEmptyString(item, `${field}[${index}]`, itemMax));
+  };
+
+  const assertEnum = (value, field, allowed, fallback) => {
+    const text = String(value || fallback || "").toUpperCase();
+    if (!allowed.includes(text)) {
+      throw new Error(`${field} must be one of: ${allowed.join(", ")}.`);
+    }
+    return text;
+  };
+
   const stringContainsFilter = (field, value) => {
     if (!value) return "";
     return `AND ${field} LIKE '%${String(value).replaceAll("'", "\\'")}%'`;
@@ -465,6 +781,9 @@ export async function handleAdsTool(name, args, authClient) {
     const trimmed = String(gaqlQuery || "").trim();
     if (!/^SELECT\s/i.test(trimmed)) {
       throw new Error("Only read-only GAQL SELECT queries are allowed.");
+    }
+    if (/\b(MUTATE|CREATE|DELETE|UPDATE|INSERT|DROP|ALTER|TRUNCATE|CALL)\b/i.test(trimmed)) {
+      throw new Error("GAQL query contains a forbidden mutating or DDL keyword.");
     }
     if (/;\s*\S/.test(trimmed)) {
       throw new Error("Only one GAQL query is allowed.");
@@ -545,6 +864,107 @@ export async function handleAdsTool(name, args, authClient) {
     cost: money(metrics.costMicros),
     costPerConversion: money(metrics.costPerConversion),
   });
+
+  const campaignResource = (customerId, campaignId) =>
+    `customers/${customerId}/campaigns/${assertNumericId(campaignId, "campaign_id")}`;
+
+  const budgetResource = (customerId, budgetId) =>
+    `customers/${customerId}/campaignBudgets/${assertNumericId(budgetId, "budget_id")}`;
+
+  const adGroupResource = (customerId, adGroupId) =>
+    `customers/${customerId}/adGroups/${assertNumericId(adGroupId, "ad_group_id")}`;
+
+  const adGroupCriterionResource = (customerId, adGroupId, criterionId) =>
+    `customers/${customerId}/adGroupCriteria/${assertNumericId(adGroupId, "ad_group_id")}~${assertNumericId(criterionId, "criterion_id")}`;
+
+  const adGroupAdResource = (customerId, adGroupId, adId) =>
+    `customers/${customerId}/adGroupAds/${assertNumericId(adGroupId, "ad_group_id")}~${assertNumericId(adId, "ad_id")}`;
+
+  const assetResource = (customerId, assetId) =>
+    `customers/${customerId}/assets/${assertNumericId(assetId, "asset_id")}`;
+
+  const allowedMutationCustomerIds = () =>
+    new Set(
+      String(process.env.GOOGLE_ADS_MUTATION_CUSTOMER_IDS || "")
+        .split(",")
+        .map((id) => id.replaceAll("-", "").trim())
+        .filter(Boolean)
+    );
+
+  const mutationSafety = (args, customerId, preview) => {
+    const dryRun = args.dry_run !== false;
+    const mutationsEnabled = process.env.GOOGLE_ADS_ENABLE_MUTATIONS === "true";
+    const allowlist = allowedMutationCustomerIds();
+    const customerAllowed = allowlist.has(customerId);
+    const confirmed = args.confirm === true;
+    const blockedReasons = [];
+
+    if (dryRun) blockedReasons.push("dry_run is true");
+    if (!mutationsEnabled) blockedReasons.push("GOOGLE_ADS_ENABLE_MUTATIONS is not true");
+    if (!customerAllowed) blockedReasons.push("customer_id is not in GOOGLE_ADS_MUTATION_CUSTOMER_IDS");
+    if (!confirmed) blockedReasons.push("confirm is not true");
+
+    return {
+      dryRun,
+      mutationsEnabled,
+      customerAllowed,
+      confirmed,
+      blockedReasons,
+      preview,
+    };
+  };
+
+  const adsMutationRequest = async (endpoint, body) => {
+    const token = (await authClient.getAccessToken()).token;
+    const base = await getWorkingBase(token, developerToken);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "developer-token": developerToken,
+      "Content-Type": "application/json",
+    };
+    if (loginCustomerId) {
+      headers["login-customer-id"] = loginCustomerId;
+    }
+    const res = await axios.post(`${base}${endpoint}`, body, { headers });
+    return {
+      data: res.data,
+      requestId: res.headers["request-id"] || res.headers["request_id"] || null,
+    };
+  };
+
+  const executeMutation = async ({ tool, customerId, endpoint, body, args }) => {
+    const normalizedCustomerId = normalizeCustomerId(customerId);
+    const requestBody = {
+      partialFailure: args.partial_failure === true,
+      validateOnly: args.validate_only === true,
+      ...body,
+    };
+    const preview = {
+      tool,
+      customerId: normalizedCustomerId,
+      endpoint,
+      requestBody,
+      note: "Dry-run previews do not call Google Ads mutate endpoints.",
+    };
+    const safety = mutationSafety(args, normalizedCustomerId, preview);
+
+    if (safety.blockedReasons.length > 0) {
+      return {
+        executed: false,
+        dryRun: safety.dryRun,
+        safety,
+      };
+    }
+
+    const response = await adsMutationRequest(endpoint, requestBody);
+    return {
+      executed: requestBody.validateOnly !== true,
+      validateOnly: requestBody.validateOnly,
+      dryRun: false,
+      requestId: response.requestId,
+      response: response.data,
+    };
+  };
 
   const resolveGeoTargetConstants = async (customerId, rows) => {
     const resources = [
@@ -1039,6 +1459,252 @@ export async function handleAdsTool(name, args, authClient) {
           AND campaign.experiment_type != BASE
           ${campaignFilter} ${dateClause}
         ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      customer_labels: `SELECT customer.id, customer.descriptive_name,
+          customer_label.resource_name, customer_label.label,
+          label.id, label.name, label.status, label.text_label.background_color,
+          label.text_label.description
+        FROM customer_label
+        ORDER BY label.name ASC LIMIT ${rowLimit}`,
+
+      customer_user_access: `SELECT customer_user_access.resource_name,
+          customer_user_access.user_id, customer_user_access.email_address,
+          customer_user_access.access_role,
+          customer_user_access.access_creation_date_time,
+          customer_user_access.inviter_user_email_address
+        FROM customer_user_access
+        LIMIT ${rowLimit}`,
+
+      customer_user_access_invitations: `SELECT customer_user_access_invitation.resource_name,
+          customer_user_access_invitation.invitation_id,
+          customer_user_access_invitation.email_address,
+          customer_user_access_invitation.access_role,
+          customer_user_access_invitation.invitation_status,
+          customer_user_access_invitation.creation_date_time
+        FROM customer_user_access_invitation
+        LIMIT ${rowLimit}`,
+
+      campaign_settings: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign.serving_status, campaign.primary_status,
+          campaign.primary_status_reasons, campaign.advertising_channel_type,
+          campaign.advertising_channel_sub_type, campaign.bidding_strategy_type,
+          campaign.bidding_strategy, campaign.campaign_budget,
+          campaign.start_date, campaign.end_date, campaign.optimization_score,
+          campaign.tracking_url_template, campaign.final_url_suffix,
+          campaign.url_custom_parameters,
+          campaign.network_settings.target_google_search,
+          campaign.network_settings.target_search_network,
+          campaign.network_settings.target_content_network,
+          campaign.network_settings.target_partner_search_network,
+          campaign.maximize_conversions.target_cpa_micros,
+          campaign.maximize_conversion_value.target_roas,
+          campaign.target_cpa.target_cpa_micros,
+          campaign.target_roas.target_roas
+        FROM campaign
+        WHERE campaign.status != 'REMOVED' ${campaignFilter}
+        ORDER BY campaign.name ASC LIMIT ${rowLimit}`,
+
+      bidding_strategies: `SELECT bidding_strategy.id, bidding_strategy.name,
+          bidding_strategy.status, bidding_strategy.type,
+          bidding_strategy.currency_code,
+          bidding_strategy.effective_currency_code,
+          bidding_strategy.target_cpa.target_cpa_micros,
+          bidding_strategy.target_roas.target_roas,
+          bidding_strategy.maximize_conversions.target_cpa_micros,
+          bidding_strategy.maximize_conversion_value.target_roas
+        FROM bidding_strategy
+        WHERE bidding_strategy.status != 'REMOVED'
+        ORDER BY bidding_strategy.name ASC LIMIT ${rowLimit}`,
+
+      campaign_conversion_goals: `SELECT campaign.id, campaign.name,
+          campaign_conversion_goal.category, campaign_conversion_goal.origin,
+          campaign_conversion_goal.biddable
+        FROM campaign_conversion_goal
+        WHERE campaign.status != 'REMOVED' ${campaignFilter}
+        ORDER BY campaign.name ASC LIMIT ${rowLimit}`,
+
+      customer_conversion_goals: `SELECT customer_conversion_goal.category,
+          customer_conversion_goal.origin, customer_conversion_goal.biddable
+        FROM customer_conversion_goal
+        LIMIT ${rowLimit}`,
+
+      campaign_labels: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign_label.resource_name, campaign_label.label,
+          label.id, label.name, label.status
+        FROM campaign_label
+        WHERE campaign.status != 'REMOVED' ${campaignFilter}
+        ORDER BY campaign.name ASC LIMIT ${rowLimit}`,
+
+      ad_group_labels: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name, ad_group.status,
+          ad_group_label.resource_name, ad_group_label.label,
+          label.id, label.name, label.status
+        FROM ad_group_label
+        WHERE ad_group.status != 'REMOVED' ${campaignFilter} ${adGroupFilter}
+        ORDER BY campaign.name ASC, ad_group.name ASC LIMIT ${rowLimit}`,
+
+      keyword_quality: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_criterion.criterion_id,
+          ad_group_criterion.keyword.text,
+          ad_group_criterion.keyword.match_type,
+          ad_group_criterion.status,
+          ad_group_criterion.quality_info.quality_score,
+          ad_group_criterion.quality_info.creative_quality_score,
+          ad_group_criterion.quality_info.post_click_quality_score,
+          ad_group_criterion.quality_info.search_predicted_ctr,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM keyword_view
+        ${adGroupWhere}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      device_bid_modifiers: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_bid_modifier.criterion_id,
+          ad_group_bid_modifier.bid_modifier,
+          ad_group_bid_modifier.device.type
+        FROM ad_group_bid_modifier
+        WHERE campaign.status != 'REMOVED'
+          AND ad_group.status != 'REMOVED'
+          ${campaignFilter} ${adGroupFilter}
+        ORDER BY campaign.name ASC, ad_group.name ASC LIMIT ${rowLimit}`,
+
+      placements: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_criterion.criterion_id, ad_group_criterion.status,
+          ad_group_criterion.negative, ad_group_criterion.placement.url,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM detail_placement_view
+        ${adGroupWhere}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      topics: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_criterion.criterion_id, ad_group_criterion.status,
+          ad_group_criterion.negative, ad_group_criterion.topic.path,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM topic_view
+        ${adGroupWhere}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      campaign_asset_links: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign_asset.asset, campaign_asset.field_type,
+          campaign_asset.status, asset.id, asset.name, asset.type,
+          asset.text_asset.text, asset.sitelink_asset.link_text,
+          asset.callout_asset.callout_text,
+          asset.structured_snippet_asset.header,
+          asset.call_asset.phone_number,
+          asset.lead_form_asset.business_name
+        FROM campaign_asset
+        WHERE campaign.status != 'REMOVED'
+          AND campaign_asset.status != 'REMOVED'
+          ${campaignFilter}
+        ORDER BY campaign.name ASC LIMIT ${rowLimit}`,
+
+      ad_group_asset_links: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_asset.asset, ad_group_asset.field_type,
+          ad_group_asset.status, asset.id, asset.name, asset.type,
+          asset.text_asset.text, asset.sitelink_asset.link_text,
+          asset.callout_asset.callout_text
+        FROM ad_group_asset
+        WHERE campaign.status != 'REMOVED'
+          AND ad_group.status != 'REMOVED'
+          AND ad_group_asset.status != 'REMOVED'
+          ${campaignFilter} ${adGroupFilter}
+        ORDER BY campaign.name ASC, ad_group.name ASC LIMIT ${rowLimit}`,
+
+      customer_asset_links: `SELECT customer_asset.asset,
+          customer_asset.field_type, customer_asset.status,
+          asset.id, asset.name, asset.type, asset.text_asset.text,
+          asset.sitelink_asset.link_text, asset.callout_asset.callout_text,
+          asset.structured_snippet_asset.header,
+          asset.call_asset.phone_number,
+          asset.image_asset.full_size.url
+        FROM customer_asset
+        WHERE customer_asset.status != 'REMOVED'
+        ORDER BY asset.id ASC LIMIT ${rowLimit}`,
+
+      asset_details: `SELECT asset.id, asset.name, asset.type,
+          asset.text_asset.text, asset.sitelink_asset.link_text,
+          asset.sitelink_asset.description1,
+          asset.sitelink_asset.description2,
+          asset.callout_asset.callout_text,
+          asset.structured_snippet_asset.header,
+          asset.structured_snippet_asset.values,
+          asset.call_asset.phone_number,
+          asset.price_asset.type,
+          asset.promotion_asset.promotion_target,
+          asset.image_asset.full_size.url,
+          asset.youtube_video_asset.youtube_video_id,
+          asset.lead_form_asset.business_name
+        FROM asset
+        ORDER BY asset.id DESC LIMIT ${rowLimit}`,
+
+      pmax_listing_groups: `SELECT campaign.id, campaign.name, asset_group.id,
+          asset_group.name, asset_group_listing_group_filter.id,
+          asset_group_listing_group_filter.type,
+          asset_group_listing_group_filter.listing_source,
+          asset_group_listing_group_filter.case_value.product_item_id.value,
+          asset_group_listing_group_filter.case_value.product_brand.value,
+          asset_group_listing_group_filter.case_value.product_category.category_id,
+          asset_group_listing_group_filter.parent_listing_group_filter,
+          asset_group_listing_group_filter.path,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM asset_group_product_group_view
+        WHERE campaign.status != 'REMOVED' ${campaignFilter} ${dateClause}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      pmax_search_terms: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign_search_term_view.search_term,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM campaign_search_term_view
+        WHERE campaign.status != 'REMOVED' ${campaignFilter} ${dateClause}
+        ORDER BY metrics.clicks DESC LIMIT ${rowLimit}`,
+
+      shopping_listing_groups: `SELECT campaign.id, campaign.name,
+          ad_group.id, ad_group.name,
+          ad_group_criterion.criterion_id,
+          ad_group_criterion.listing_group.type,
+          ad_group_criterion.listing_group.parent_ad_group_criterion,
+          ad_group_criterion.listing_group.case_value.product_item_id.value,
+          ad_group_criterion.listing_group.case_value.product_brand.value,
+          ad_group_criterion.listing_group.case_value.product_category.category_id,
+          metrics.clicks, metrics.impressions, metrics.ctr,
+          metrics.average_cpc, metrics.conversions, metrics.cost_micros
+        FROM product_group_view
+        ${adGroupWhere}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      demand_gen_campaigns: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign.advertising_channel_type,
+          campaign.advertising_channel_sub_type,
+          campaign.bidding_strategy_type, metrics.clicks,
+          metrics.impressions, metrics.ctr, metrics.average_cpc,
+          metrics.conversions, metrics.cost_micros
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+          AND campaign.advertising_channel_type = DEMAND_GEN
+          ${campaignFilter} ${dateClause}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      video_campaigns: `SELECT campaign.id, campaign.name, campaign.status,
+          campaign.advertising_channel_type,
+          campaign.advertising_channel_sub_type,
+          campaign.bidding_strategy_type, metrics.video_views,
+          metrics.video_view_rate, metrics.average_cpv,
+          metrics.clicks, metrics.impressions, metrics.cost_micros,
+          metrics.conversions
+        FROM campaign
+        WHERE campaign.status != 'REMOVED'
+          AND campaign.advertising_channel_type = VIDEO
+          ${campaignFilter} ${dateClause}
+        ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
     };
 
     if (!queries[report_type]) {
@@ -1049,8 +1715,9 @@ export async function handleAdsTool(name, args, authClient) {
   };
 
   const listClientAccounts = async (managerCustomerId) => {
+    const normalizedManagerId = normalizeCustomerId(managerCustomerId, "customer_id");
     const results = await query(
-      managerCustomerId,
+      normalizedManagerId,
       `SELECT customer_client.client_customer, customer_client.id,
         customer_client.descriptive_name, customer_client.currency_code,
         customer_client.time_zone, customer_client.manager, customer_client.level,
@@ -1061,12 +1728,598 @@ export async function handleAdsTool(name, args, authClient) {
     );
     return results
       .map((r) => r.customerClient)
-      .filter((client) => client && String(client.id) !== String(managerCustomerId))
+      .filter((client) => client && String(client.id) !== String(normalizedManagerId))
       .map((client) => ({
         ...client,
-        parentCustomerId: managerCustomerId,
+        parentCustomerId: normalizedManagerId,
       }));
   };
+
+  const safeReportSection = async (customerId, label, reportArgs) => {
+    try {
+      const gaqlQuery = deepReportQuery({ customer_id: customerId, ...reportArgs });
+      const rows = await query(customerId, gaqlQuery);
+      return { label, reportType: reportArgs.report_type, query: gaqlQuery, rows };
+    } catch (error) {
+      return { label, reportType: reportArgs.report_type, error: error.message };
+    }
+  };
+
+  const buildAccountHierarchy = async (managerCustomerId, maxDepth = 5, depth = 0, seen = new Set()) => {
+    const normalizedManagerId = normalizeCustomerId(managerCustomerId, "customer_id");
+    if (depth >= maxDepth || seen.has(normalizedManagerId)) {
+      return [];
+    }
+    seen.add(normalizedManagerId);
+
+    const clients = await listClientAccounts(normalizedManagerId);
+    return Promise.all(
+      clients.map(async (client) => ({
+        ...client,
+        children: client.manager
+          ? await buildAccountHierarchy(client.id, maxDepth, depth + 1, seen)
+          : [],
+      }))
+    );
+  };
+
+  const makeTextAssets = (texts, field, maxItems) =>
+    assertStringArray(texts, field, { min: 1, max: maxItems, itemMax: 90 }).map((text) => ({
+      text,
+    }));
+
+  const buildKeywordOperations = ({ customerId, adGroupId, keywords, matchType, negative, cpcBid }) =>
+    assertStringArray(keywords, "keywords", { min: 1, max: 100, itemMax: 80 }).map((keyword) => ({
+      create: {
+        adGroup: adGroupResource(customerId, adGroupId),
+        status: "ENABLED",
+        negative,
+        keyword: {
+          text: keyword,
+          matchType: assertEnum(matchType, "match_type", ["BROAD", "PHRASE", "EXACT"], "PHRASE"),
+        },
+        ...(cpcBid !== undefined && { cpcBidMicros: amountToMicros(cpcBid, "cpc_bid") }),
+      },
+    }));
+
+  const buildMutation = (toolName, args, customerId) => {
+    switch (toolName) {
+      case "ads_pause_campaign":
+      case "ads_enable_campaign": {
+        const status = toolName === "ads_pause_campaign" ? "PAUSED" : "ENABLED";
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: {
+            operations: [
+              {
+                update: { resourceName: campaignResource(customerId, args.campaign_id), status },
+                updateMask: "status",
+              },
+            ],
+          },
+        };
+      }
+      case "ads_update_campaign_budget":
+        return {
+          endpoint: `/customers/${customerId}/campaignBudgets:mutate`,
+          body: {
+            operations: [
+              {
+                update: {
+                  resourceName: budgetResource(customerId, args.budget_id),
+                  amountMicros: amountToMicros(args.amount),
+                },
+                updateMask: "amount_micros",
+              },
+            ],
+          },
+        };
+      case "ads_update_campaign_dates": {
+        const update = { resourceName: campaignResource(customerId, args.campaign_id) };
+        const masks = [];
+        const startDate = assertDate(args.start_date, "start_date");
+        const endDate = assertDate(args.end_date, "end_date");
+        if (startDate) {
+          update.startDate = startDate;
+          masks.push("start_date");
+        }
+        if (endDate) {
+          update.endDate = endDate;
+          masks.push("end_date");
+        }
+        if (masks.length === 0) {
+          throw new Error("ads_update_campaign_dates requires start_date and/or end_date.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: { operations: [{ update, updateMask: masks.join(",") }] },
+        };
+      }
+      case "ads_update_campaign_bidding":
+      case "ads_update_target_cpa":
+      case "ads_update_target_roas": {
+        const update = { resourceName: campaignResource(customerId, args.campaign_id) };
+        let updateMask;
+        const biddingType =
+          toolName === "ads_update_target_cpa"
+            ? "MAXIMIZE_CONVERSIONS"
+            : toolName === "ads_update_target_roas"
+              ? "MAXIMIZE_CONVERSION_VALUE"
+              : assertEnum(args.bidding_strategy_type, "bidding_strategy_type", [
+                  "MANUAL_CPC",
+                  "MAXIMIZE_CONVERSIONS",
+                  "MAXIMIZE_CONVERSION_VALUE",
+                  "TARGET_CPA",
+                  "TARGET_ROAS",
+                ]);
+
+        if (biddingType === "MANUAL_CPC") {
+          update.manualCpc = {};
+          updateMask = "manual_cpc";
+        } else if (biddingType === "MAXIMIZE_CONVERSIONS") {
+          update.maximizeConversions = {};
+          if (args.target_cpa !== undefined) {
+            update.maximizeConversions.targetCpaMicros = amountToMicros(args.target_cpa, "target_cpa");
+            updateMask = "maximize_conversions.target_cpa_micros";
+          } else {
+            updateMask = "maximize_conversions";
+          }
+        } else if (biddingType === "MAXIMIZE_CONVERSION_VALUE") {
+          update.maximizeConversionValue = {};
+          if (args.target_roas !== undefined) {
+            update.maximizeConversionValue.targetRoas = assertFiniteNumber(args.target_roas, "target_roas", 0);
+            updateMask = "maximize_conversion_value.target_roas";
+          } else {
+            updateMask = "maximize_conversion_value";
+          }
+        } else if (biddingType === "TARGET_CPA") {
+          update.targetCpa = { targetCpaMicros: amountToMicros(args.target_cpa, "target_cpa") };
+          updateMask = "target_cpa.target_cpa_micros";
+        } else if (biddingType === "TARGET_ROAS") {
+          update.targetRoas = { targetRoas: assertFiniteNumber(args.target_roas, "target_roas", 0) };
+          updateMask = "target_roas.target_roas";
+        }
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: { operations: [{ update, updateMask }] },
+        };
+      }
+      case "ads_add_campaign_negative_keywords":
+        return {
+          endpoint: `/customers/${customerId}/campaignCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.keywords, "keywords", { min: 1, max: 100, itemMax: 80 }).map((keyword) => ({
+              create: {
+                campaign: campaignResource(customerId, args.campaign_id),
+                negative: true,
+                keyword: {
+                  text: keyword,
+                  matchType: assertEnum(args.match_type, "match_type", ["BROAD", "PHRASE", "EXACT"], "PHRASE"),
+                },
+              },
+            })),
+          },
+        };
+      case "ads_add_ad_group_negative_keywords":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: buildKeywordOperations({
+              customerId,
+              adGroupId: args.ad_group_id,
+              keywords: args.keywords,
+              matchType: args.match_type,
+              negative: true,
+            }),
+          },
+        };
+      case "ads_add_keywords":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: buildKeywordOperations({
+              customerId,
+              adGroupId: args.ad_group_id,
+              keywords: args.keywords,
+              matchType: args.match_type,
+              negative: false,
+              cpcBid: args.cpc_bid,
+            }),
+          },
+        };
+      case "ads_pause_keywords":
+      case "ads_enable_keywords": {
+        const status = toolName === "ads_pause_keywords" ? "PAUSED" : "ENABLED";
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.criterion_ids, "criterion_ids", { min: 1, max: 100, itemMax: 32 }).map((criterionId) => ({
+              update: {
+                resourceName: adGroupCriterionResource(customerId, args.ad_group_id, criterionId),
+                status,
+              },
+              updateMask: "status",
+            })),
+          },
+        };
+      }
+      case "ads_update_keyword_bid":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: [
+              {
+                update: {
+                  resourceName: adGroupCriterionResource(customerId, args.ad_group_id, args.criterion_id),
+                  cpcBidMicros: amountToMicros(args.cpc_bid, "cpc_bid"),
+                },
+                updateMask: "cpc_bid_micros",
+              },
+            ],
+          },
+        };
+      case "ads_pause_ad":
+      case "ads_enable_ad": {
+        const status = toolName === "ads_pause_ad" ? "PAUSED" : "ENABLED";
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                update: { resourceName: adGroupAdResource(customerId, args.ad_group_id, args.ad_id), status },
+                updateMask: "status",
+              },
+            ],
+          },
+        };
+      }
+      case "ads_create_responsive_search_ad":
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
+                  ad: {
+                    finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+                    responsiveSearchAd: {
+                      headlines: makeTextAssets(args.headlines, "headlines", 15),
+                      descriptions: makeTextAssets(args.descriptions, "descriptions", 4),
+                      ...(args.path1 && { path1: assertNonEmptyString(args.path1, "path1", 15) }),
+                      ...(args.path2 && { path2: assertNonEmptyString(args.path2, "path2", 15) }),
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        };
+      case "ads_update_responsive_search_ad": {
+        const ad = {};
+        const masks = [];
+        if (args.final_urls) {
+          ad.finalUrls = assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 });
+          masks.push("ad.final_urls");
+        }
+        const rsa = {};
+        if (args.headlines) {
+          rsa.headlines = makeTextAssets(args.headlines, "headlines", 15);
+          masks.push("ad.responsive_search_ad.headlines");
+        }
+        if (args.descriptions) {
+          rsa.descriptions = makeTextAssets(args.descriptions, "descriptions", 4);
+          masks.push("ad.responsive_search_ad.descriptions");
+        }
+        if (args.path1) {
+          rsa.path1 = assertNonEmptyString(args.path1, "path1", 15);
+          masks.push("ad.responsive_search_ad.path1");
+        }
+        if (args.path2) {
+          rsa.path2 = assertNonEmptyString(args.path2, "path2", 15);
+          masks.push("ad.responsive_search_ad.path2");
+        }
+        if (Object.keys(rsa).length > 0) {
+          ad.responsiveSearchAd = rsa;
+        }
+        if (masks.length === 0) {
+          throw new Error("ads_update_responsive_search_ad requires at least one editable field.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                update: {
+                  resourceName: adGroupAdResource(customerId, args.ad_group_id, args.ad_id),
+                  ad,
+                },
+                updateMask: masks.join(","),
+              },
+            ],
+          },
+        };
+      }
+      case "ads_create_ad_group":
+        return {
+          endpoint: `/customers/${customerId}/adGroups:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  campaign: campaignResource(customerId, args.campaign_id),
+                  name: assertNonEmptyString(args.name, "name", 255),
+                  status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
+                  type: assertEnum(args.type, "type", ["SEARCH_STANDARD"], "SEARCH_STANDARD"),
+                  ...(args.cpc_bid !== undefined && { cpcBidMicros: amountToMicros(args.cpc_bid, "cpc_bid") }),
+                },
+              },
+            ],
+          },
+        };
+      case "ads_create_search_campaign": {
+        const campaign = {
+          name: assertNonEmptyString(args.name, "name", 255),
+          status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
+          advertisingChannelType: "SEARCH",
+          campaignBudget: budgetResource(customerId, args.budget_id),
+          networkSettings: {
+            targetGoogleSearch: true,
+            targetSearchNetwork: true,
+            targetContentNetwork: false,
+            targetPartnerSearchNetwork: false,
+          },
+        };
+        const startDate = assertDate(args.start_date, "start_date");
+        const endDate = assertDate(args.end_date, "end_date");
+        if (startDate) campaign.startDate = startDate;
+        if (endDate) campaign.endDate = endDate;
+        const biddingType = assertEnum(
+          args.bidding_strategy_type,
+          "bidding_strategy_type",
+          ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS"],
+          "MANUAL_CPC"
+        );
+        if (biddingType === "MANUAL_CPC") campaign.manualCpc = {};
+        if (biddingType === "MAXIMIZE_CONVERSIONS") campaign.maximizeConversions = {};
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: { operations: [{ create: campaign }] },
+        };
+      }
+      case "ads_apply_recommendation":
+        return {
+          endpoint: `/customers/${customerId}/recommendations:apply`,
+          body: {
+            operations: [
+              { resourceName: assertNonEmptyString(args.recommendation_resource_name, "recommendation_resource_name") },
+            ],
+          },
+        };
+      case "ads_dismiss_recommendation":
+        return {
+          endpoint: `/customers/${customerId}/recommendations:dismiss`,
+          body: {
+            operations: [
+              { resourceName: assertNonEmptyString(args.recommendation_resource_name, "recommendation_resource_name") },
+            ],
+          },
+        };
+      case "ads_add_sitelink_asset":
+        return {
+          endpoint: `/customers/${customerId}/assets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+                  sitelinkAsset: {
+                    linkText: assertNonEmptyString(args.link_text, "link_text", 25),
+                    ...(args.description1 && {
+                      description1: assertNonEmptyString(args.description1, "description1", 35),
+                    }),
+                    ...(args.description2 && {
+                      description2: assertNonEmptyString(args.description2, "description2", 35),
+                    }),
+                  },
+                },
+              },
+            ],
+          },
+        };
+      case "ads_link_asset_to_campaign":
+        return {
+          endpoint: `/customers/${customerId}/campaignAssets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  campaign: campaignResource(customerId, args.campaign_id),
+                  asset: assetResource(customerId, args.asset_id),
+                  fieldType: assertNonEmptyString(args.field_type || "SITELINK", "field_type", 80),
+                  status: "ENABLED",
+                },
+              },
+            ],
+          },
+        };
+      case "ads_upload_offline_conversion": {
+        const conversions = Array.isArray(args.conversions) ? args.conversions : [];
+        if (conversions.length === 0 || conversions.length > 100) {
+          throw new Error("conversions must contain 1-100 conversion objects.");
+        }
+        return {
+          endpoint: `/customers/${customerId}:uploadClickConversions`,
+          body: {
+            conversions: conversions.map((conversion, index) => ({
+              gclid: assertNonEmptyString(conversion.gclid, `conversions[${index}].gclid`, 512),
+              conversionAction: assertNonEmptyString(
+                conversion.conversion_action,
+                `conversions[${index}].conversion_action`
+              ),
+              conversionDateTime: assertNonEmptyString(
+                conversion.conversion_date_time,
+                `conversions[${index}].conversion_date_time`
+              ),
+              ...(conversion.conversion_value !== undefined && {
+                conversionValue: assertFiniteNumber(
+                  conversion.conversion_value,
+                  `conversions[${index}].conversion_value`,
+                  0
+                ),
+              }),
+              ...(conversion.currency_code && {
+                currencyCode: assertNonEmptyString(conversion.currency_code, `conversions[${index}].currency_code`, 3),
+              }),
+              ...(conversion.order_id && {
+                orderId: assertNonEmptyString(conversion.order_id, `conversions[${index}].order_id`, 64),
+              }),
+            })),
+          },
+        };
+      }
+      default:
+        throw new Error(`Unsupported Google Ads mutation tool: ${toolName}`);
+    }
+  };
+
+  const mutationToolNames = new Set(WRITE_TOOLS.map((tool) => tool.name));
+
+  if (name === "ads_account_hierarchy") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const maxDepth = Math.min(Math.max(Number(args.max_depth) || 5, 1), 10);
+    return {
+      rootCustomerId: customerId,
+      maxDepth,
+      children: await buildAccountHierarchy(customerId, maxDepth),
+    };
+  }
+
+  if (name === "ads_customer_details") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const sections = await Promise.all([
+      safeReportSection(customerId, "customer", {
+        report_type: "campaign_settings",
+        limit: 1,
+      }),
+      safeReportSection(customerId, "labels", {
+        report_type: "customer_labels",
+        limit: 100,
+      }),
+      safeReportSection(customerId, "user_access", {
+        report_type: "customer_user_access",
+        limit: 100,
+      }),
+      safeReportSection(customerId, "user_access_invitations", {
+        report_type: "customer_user_access_invitations",
+        limit: 100,
+      }),
+      safeReportSection(customerId, "customer_conversion_goals", {
+        report_type: "customer_conversion_goals",
+        limit: 100,
+      }),
+    ]);
+    const customerRows = await query(
+      customerId,
+      `SELECT customer.id, customer.descriptive_name,
+        customer.currency_code, customer.time_zone, customer.manager,
+        customer.test_account, customer.status, customer.optimization_score,
+        customer.tracking_url_template, customer.final_url_suffix,
+        customer.auto_tagging_enabled
+      FROM customer LIMIT 1`
+    );
+    return {
+      customer: customerRows[0]?.customer,
+      sections,
+    };
+  }
+
+  if (name === "ads_campaign_full_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const campaignId = assertNumericId(args.campaign_id, "campaign_id");
+    const baseArgs = {
+      campaign_id: campaignId,
+      start_date: args.start_date,
+      end_date: args.end_date,
+      limit: limitValue(args.limit, 100, 500),
+    };
+    const sections = await Promise.all(
+      [
+        "campaign_settings",
+        "campaign_budgets",
+        "bidding_strategies",
+        "campaign_conversion_goals",
+        "campaign_labels",
+        "location_targets",
+        "excluded_locations",
+        "proximity_targets",
+        "ad_schedules",
+        "device_performance",
+        "targeted_location_performance",
+        "day_of_week_performance",
+        "hour_of_day_performance",
+        "campaign_audience_targets",
+        "campaign_asset_links",
+        "asset_performance",
+        "recommendations",
+        "change_events",
+        "pmax_asset_groups",
+        "pmax_asset_group_assets",
+        "pmax_listing_groups",
+        "pmax_search_terms",
+        "shopping_products",
+        "shopping_listing_groups",
+        "video_campaigns",
+        "demand_gen_campaigns",
+      ].map((reportType) =>
+        safeReportSection(customerId, reportType, { ...baseArgs, report_type: reportType })
+      )
+    );
+    return { customerId, campaignId, sections };
+  }
+
+  if (name === "ads_ad_group_full_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const adGroupId = assertNumericId(args.ad_group_id, "ad_group_id");
+    const baseArgs = {
+      campaign_id: args.campaign_id,
+      ad_group_id: adGroupId,
+      start_date: args.start_date,
+      end_date: args.end_date,
+      limit: limitValue(args.limit, 100, 500),
+    };
+    const sections = await Promise.all(
+      [
+        "keyword_quality",
+        "ad_group_negative_keywords",
+        "ad_group_labels",
+        "ad_group_audience_targets",
+        "ad_group_audience_performance",
+        "device_bid_modifiers",
+        "placements",
+        "topics",
+        "ad_group_asset_links",
+        "dynamic_search_ads",
+        "dynamic_search_targets",
+      ].map((reportType) =>
+        safeReportSection(customerId, reportType, { ...baseArgs, report_type: reportType })
+      )
+    );
+    return { customerId, adGroupId, sections };
+  }
+
+  if (mutationToolNames.has(name)) {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const mutation = buildMutation(name, args, customerId);
+    return executeMutation({
+      tool: name,
+      customerId,
+      endpoint: mutation.endpoint,
+      body: mutation.body,
+      args,
+    });
+  }
 
   if (name === "ads_list_accounts") {
     const token = (await authClient.getAccessToken()).token;

@@ -14,6 +14,10 @@ It exposes one MCP server, `google-marketing-suite`, with tools for:
 
 ## Google Ads Tools
 
+For the full MCC setup, OAuth requirements, `login-customer-id` rules, access checks, and MCP validation flow, see:
+
+- [`../docs/google-ads-mcc-mcp-integration.md`](../docs/google-ads-mcc-mcp-integration.md)
+
 The Ads tools include account, campaign, ad group, ad, keyword, and keyword idea access:
 
 - `ads_list_accounts`
@@ -29,10 +33,53 @@ The Ads tools include account, campaign, ad group, ad, keyword, and keyword idea
 - `ads_account_performance`
 - `ads_gaql_query`
 - `ads_deep_report`
+- `ads_account_hierarchy`
+- `ads_customer_details`
+- `ads_campaign_full_audit`
+- `ads_ad_group_full_audit`
 
 Use `ads_list_ads` when you need actual ad creative text such as responsive search ad headlines and descriptions, expanded text ad copy, final URLs, paths, statuses, and performance metrics. Use `ads_list_ad_groups` when you need the campaign > ad group structure with metrics.
 
 Use `ads_gaql_query` for any advanced read-only GAQL report that is not covered by a dedicated tool. Use `ads_deep_report` for common analysis reports: devices, geo/user locations, landing pages, demographics, campaign budgets, conversion actions, recommendations, change history, negative keywords, assets, Performance Max asset groups, and Shopping products.
+
+### Advanced Read Reports
+
+| Tool/report | Use |
+| --- | --- |
+| `ads_account_hierarchy` | Recursively read MCC manager/client hierarchy. |
+| `ads_customer_details` | Customer metadata, labels, user access summaries, and conversion goal sections. |
+| `ads_campaign_full_audit` | Multi-section campaign audit: settings, budget, bidding, targeting, assets, goals, recommendations, and performance. |
+| `ads_ad_group_full_audit` | Multi-section ad group audit: keywords, negatives, audiences, placements, topics, ads, assets, and performance. |
+| `ads_deep_report` | Use `report_type` for specific advanced reports. |
+
+New `ads_deep_report` report types include: `customer_labels`, `customer_user_access`, `customer_user_access_invitations`, `campaign_settings`, `bidding_strategies`, `campaign_conversion_goals`, `customer_conversion_goals`, `campaign_labels`, `ad_group_labels`, `keyword_quality`, `device_bid_modifiers`, `placements`, `topics`, `campaign_asset_links`, `ad_group_asset_links`, `customer_asset_links`, `asset_details`, `pmax_listing_groups`, `pmax_search_terms`, `shopping_listing_groups`, `demand_gen_campaigns`, and `video_campaigns`.
+
+### Safe Write Tools
+
+Write tools are available but blocked by default. Every write tool defaults to `dry_run=true` and returns a preview without calling Google Ads mutate endpoints.
+
+| Tool | Purpose |
+| --- | --- |
+| `ads_pause_campaign`, `ads_enable_campaign` | Change campaign status. |
+| `ads_update_campaign_budget` | Update a campaign budget amount. |
+| `ads_update_campaign_dates` | Update campaign start/end date. |
+| `ads_update_campaign_bidding`, `ads_update_target_cpa`, `ads_update_target_roas` | Update campaign bidding settings. |
+| `ads_add_campaign_negative_keywords`, `ads_add_ad_group_negative_keywords` | Add negative keywords. |
+| `ads_add_keywords`, `ads_pause_keywords`, `ads_enable_keywords`, `ads_update_keyword_bid` | Manage ad group keywords. |
+| `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad` | Manage ads. |
+| `ads_create_ad_group`, `ads_create_search_campaign` | Create search structures from explicit inputs. |
+| `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply or dismiss recommendations. |
+| `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
+| `ads_upload_offline_conversion` | Upload click conversions with explicit conversion payloads. |
+
+To execute any mutation, all safety checks must pass:
+
+1. `GOOGLE_ADS_ENABLE_MUTATIONS=true`
+2. `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` includes the target `customer_id`
+3. Tool argument `confirm=true`
+4. Tool argument `dry_run=false`
+
+Optional `validate_only=true` asks Google Ads to validate the request without applying it after the guardrails pass.
 
 For remarketing and retargeting analysis, use `ads_deep_report` with:
 
@@ -117,10 +164,13 @@ GOOGLE_REFRESH_TOKEN=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
 GOOGLE_ADS_API_VERSION=v24
+GOOGLE_ADS_ENABLE_MUTATIONS=false
+GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
 ```
 
 `GOOGLE_ADS_DEVELOPER_TOKEN` and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` are only needed for Google Ads tools.
 `GOOGLE_ADS_API_VERSION` is optional; omit it to let the MCP try supported versions automatically.
+`GOOGLE_ADS_ENABLE_MUTATIONS` defaults to disabled. Only add customer IDs to `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` when you intentionally allow write tools for those accounts.
 
 After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
 
