@@ -5,12 +5,49 @@
 
 import axios from "axios";
 
-const ADS_VERSIONS = ["v20", "v21", "v22", "v23", "v19"];
+const DEFAULT_ADS_VERSIONS = ["v24", "v23", "v22", "v21"];
 let ADS_API_BASE = null;
+
+function getAdsVersions() {
+  const configuredVersion = process.env.GOOGLE_ADS_API_VERSION?.trim();
+  if (!configuredVersion) {
+    return DEFAULT_ADS_VERSIONS;
+  }
+
+  const normalizedVersion = configuredVersion.startsWith("v")
+    ? configuredVersion
+    : `v${configuredVersion}`;
+
+  return [
+    normalizedVersion,
+    ...DEFAULT_ADS_VERSIONS.filter((version) => version !== normalizedVersion),
+  ];
+}
+
+function findGoogleAdsErrors(value) {
+  if (!value || typeof value !== "object") {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(findGoogleAdsErrors);
+  }
+
+  const currentErrors = Array.isArray(value.errors) ? value.errors : [];
+  const nestedErrors = Object.values(value).flatMap(findGoogleAdsErrors);
+  return [...currentErrors, ...nestedErrors];
+}
+
+function isUnsupportedGoogleAdsVersion(error) {
+  const apiErrors = findGoogleAdsErrors(error.response?.data?.error);
+  return apiErrors.some(
+    (apiError) => apiError.errorCode?.requestError === "UNSUPPORTED_VERSION"
+  );
+}
 
 async function getWorkingBase(token, developerToken) {
   if (ADS_API_BASE) return ADS_API_BASE;
-  for (const version of ADS_VERSIONS) {
+  for (const version of getAdsVersions()) {
     try {
       await axios.get(
         `https://googleads.googleapis.com/${version}/customers:listAccessibleCustomers`,
@@ -19,10 +56,14 @@ async function getWorkingBase(token, developerToken) {
       ADS_API_BASE = `https://googleads.googleapis.com/${version}`;
       return ADS_API_BASE;
     } catch (err) {
-      if (err.response?.status !== 404) throw err;
+      if (err.response?.status !== 404 && !isUnsupportedGoogleAdsVersion(err)) {
+        throw err;
+      }
     }
   }
-  throw new Error("Could not find a working Google Ads API version.");
+  throw new Error(
+    `Could not find a working Google Ads API version. Tried: ${getAdsVersions().join(", ")}.`
+  );
 }
 
 async function adsRequest(endpoint, body, authClient, developerToken, loginCustomerId) {
