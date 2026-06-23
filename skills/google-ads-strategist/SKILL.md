@@ -24,6 +24,8 @@ If the user provides a URL, run or request a site readiness check before final c
 
 Before producing ad copy, claims, or landing page wording, run a policy self-check for sensitive claims, medical/personalized claims, guarantees, prohibited products, misleading urgency, trademark risk, redirects, popups, and unsupported superlatives.
 
+Before saying Ads/GA4/CRM data is missing, inspect any user-mentioned local files and likely workspace folders such as `reports/`, `.vscode/`, `exports/`, and `downloads/`. Open editor tabs are only paths, not evidence; read relevant files first. Do not print secrets from local config or token files.
+
 ## Reference Selection
 
 Load only the reference needed for the task:
@@ -45,6 +47,8 @@ For broad Google Ads requests, read `master-instructions.md` first, then the spe
 4. If complete, analyze data before recommendations.
 5. Apply the relevant decision rules from the references.
 6. Return a concrete output with numbers, actions, priorities, and the reason behind each major recommendation.
+
+When listing `Data Gaps`, distinguish `not checked`, `tool failed`, `rate-limited`, `not configured`, and `available but not used`. Do not write "no access" unless an access/config check actually failed.
 
 ## Deep Diagnosis Standard
 

@@ -30,6 +30,8 @@ Before analysis, complete session setup:
 - Site type: E-commerce, Content, B2B SaaS, Local, Mixed, or other
 - Available data connectors/files: GSC, Analytics/GA4, Ads, Clarity, Mangools, GTM, crawl export, backlink export, report draft, or manual screenshots
 
+Before saying data is missing, inspect any user-mentioned local files and likely workspace folders such as `reports/`, `.vscode/`, `exports/`, and `downloads/`. Open editor tabs are only paths, not evidence; read the file first if it is relevant. Do not print secrets from local config files.
+
 Then ask goal-specific follow-up questions from `references/master-instructions.md`. Summarize the setup and wait for explicit confirmation before starting the analysis unless the user has already provided all needed context and clearly asked to proceed.
 
 If data is missing, ask only the next most important question. Do not produce recommendations from assumptions.
@@ -125,7 +127,7 @@ Do not produce shallow audit bullets. For every critical SEO issue, include:
 - Priority logic: impact, effort, urgency, dependency, and confidence.
 - Verification: how to confirm the fix worked and which tool/report should show it.
 
-For broad audits, include a `Data Gaps` section. Say what was not checked and how that changes confidence.
+For broad audits, include a `Data Gaps` section. Say what was not checked and how that changes confidence. Do not say "no GSC/GA4/Ads access" unless a connector or file check actually failed; use precise labels: `not checked`, `tool failed`, `rate-limited`, `not configured`, or `available but not used`.
 
 ## Required Audit Structure
 

@@ -37,6 +37,8 @@ Before a full audit or campaign plan, gather missing essentials in one message:
 
 If the user has already supplied enough context or clearly asks to proceed with available data, continue and label gaps.
 
+Before declaring data missing, inspect any user-mentioned local files and likely workspace folders such as `reports/`, `.vscode/`, `exports/`, and `downloads/`. Open editor tabs are only paths, not evidence; read the file first if relevant. Local account mapping files can prove that accounts are configured, but do not print secrets.
+
 ## Reference Selection
 
 Load only the references needed for the task:
@@ -105,7 +107,7 @@ Do not produce shallow optimization bullets. For every major paid media issue, e
 - Risk/guardrail: what could go wrong and how to avoid it.
 - Verification: KPI, expected movement, tool, and review window.
 
-Always include `Data Gaps` when CRM quality, offline revenue, conversion setup, or landing page data is missing.
+Always include `Data Gaps` when CRM quality, offline revenue, conversion setup, or landing page data is missing. Use precise labels: `not checked`, `tool failed`, `rate-limited`, `not configured`, or `available but not used`. Do not claim Ads/GA4/Clarity/GSC is unavailable until a connector or local file check actually fails.
 
 ## Required Audit Structure
 

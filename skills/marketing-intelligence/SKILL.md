@@ -26,11 +26,20 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 ## Workflow
 
 1. Clarify the target site, country, language, date range, and business goal only if missing.
-2. Start with cheap discovery calls such as list/configured-properties/options before spending API quota.
-3. For vague requests, plan the MCP calls first, then run the smallest set that answers the question.
-4. Choose the strategy skill based on the user's goal, then use MCP tools as evidence.
-5. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
-6. Always end with concrete next actions, including the exact tool/source behind each recommendation.
+2. Inspect local workspace context before declaring missing data: read any user-mentioned file paths, check likely folders such as `reports/`, `.vscode/`, `exports/`, `downloads/`, and use `rg --files` to locate relevant report/export files.
+3. Start with cheap discovery calls such as list/configured-properties/options before spending API quota.
+4. For vague requests, plan the MCP calls first, then run the smallest set that answers the question.
+5. Choose the strategy skill based on the user's goal, then use MCP tools as evidence.
+6. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
+7. Always end with concrete next actions, including the exact tool/source behind each recommendation.
+
+## Local Context Rules
+
+- Open editor tabs and file paths in the prompt are not automatically evidence. If a relevant path is visible or mentioned, read it before analysis.
+- Local account mapping files such as `.vscode/marketing.accounts.local.json` mean IDs/tokens may be configured locally; do not claim GSC/GA4/Ads/Clarity is unavailable until you have checked tool access or the relevant local config. Do not print secrets.
+- Local reports or exports under `reports/` count as evidence. Use them when MCP/API calls are unavailable, rate-limited, or not needed.
+- Distinguish clearly between `not checked`, `checked but unavailable`, `tool failed`, and `not configured`.
+- In `Data Gaps`, never write "no access" unless a connector/file check actually failed. Prefer precise language such as "لم أستخدم GSC في هذا التحليل" or "فشل PageSpeed بسبب 429".
 
 ## Minimum Evidence Packs
 
@@ -40,7 +49,7 @@ Use these packs unless the user asks for a very small check.
 - Google Ads audit: `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_campaign_full_audit` for priority campaigns, `ads_search_terms`, `ads_campaign_search_terms`, `ads_keyword_performance`, conversion/recommendation/budget/asset deep reports, GA4 landing/conversion data, and Clarity landing page friction when available.
 - Paid/organic overlap: combine Ads search terms/cost/conversions, GSC queries/pages, GA4 landing conversions, Mangools keyword difficulty/competitors, and landing page readiness.
 
-If a connector is missing or a report fails, explicitly list it under `Data Gaps` and explain how it limits confidence.
+If a connector is missing or a report fails, explicitly list it under `Data Gaps` and explain how it limits confidence. Also list available local files that were used or intentionally not used.
 
 ## Output Style
 
