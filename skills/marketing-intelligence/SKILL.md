@@ -9,7 +9,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 
 ## Tool Routing
 
-- Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, and `psi_audit_url`.
+- Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, and `psi_audit_url`.
 - Analytics traffic and conversions: use `ga4_list_properties`, `ga4_run_report`, and `ga4_realtime`.
 - Google Ads audits: use `ads_list_accounts`, `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, and `ads_deep_report`.
 - Keyword research: use `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, and `serpchecker_serps`.
@@ -40,6 +40,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 - Local reports or exports under `reports/` count as evidence. Use them when MCP/API calls are unavailable, rate-limited, or not needed.
 - Distinguish clearly between `not checked`, `checked but unavailable`, `tool failed`, and `not configured`.
 - In `Data Gaps`, never write "no access" unless a connector/file check actually failed. Prefer precise language such as "لم أستخدم GSC في هذا التحليل" or "فشل PageSpeed بسبب 429".
+- Search Console sitemap changes are possible through `gsc_submit_sitemap` and `gsc_delete_sitemap` when OAuth includes the full `webmasters` scope. Deletions must be explicitly requested and confirmed; otherwise recommend a manual UI fallback.
 
 ## Minimum Evidence Packs
 

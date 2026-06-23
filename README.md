@@ -15,7 +15,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 ## Tool Routing
 
-- Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `psi_audit_url`.
+- Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `psi_audit_url`.
 - Analytics traffic and conversions: `ga4_list_properties`, `ga4_run_report`, `ga4_realtime`.
 - Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`.
 - Keyword research: `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, `serpchecker_serps`.
@@ -89,13 +89,13 @@ The OAuth flow saves tokens to the path from `GOOGLE_TOKEN_FILE`.
 {
   "access_token": "ACCESS_TOKEN_PLACEHOLDER",
   "refresh_token": "REFRESH_TOKEN_PLACEHOLDER",
-  "scope": "openid https://www.googleapis.com/auth/webmasters.readonly https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/tagmanager.readonly https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/business.manage https://www.googleapis.com/auth/content",
+  "scope": "openid https://www.googleapis.com/auth/webmasters https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/tagmanager.readonly https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/business.manage https://www.googleapis.com/auth/content",
   "token_type": "Bearer",
   "expiry_date": 1760000000000
 }
 ```
 
-The important field for long-term access is `refresh_token`. If scopes are missing or Google tools stop authorizing, rerun `npm run auth` from `google-mcp`.
+The important field for long-term access is `refresh_token`. If scopes are missing or Google tools stop authorizing, rerun `npm run auth` from `google-mcp`. Sitemap submit/delete needs the full Search Console scope `https://www.googleapis.com/auth/webmasters`; older tokens that only include `webmasters.readonly` can list/report data but cannot change submitted sitemaps.
 
 ## Local Account Mapping
 
@@ -148,7 +148,7 @@ node scripts/verify-mcp-servers.mjs
 Expected result:
 
 ```text
-google-marketing-suite: 39 tools
+google-marketing-suite: 69 tools
 microsoft-clarity: 8 tools
 mangools: 82 tools
 ```

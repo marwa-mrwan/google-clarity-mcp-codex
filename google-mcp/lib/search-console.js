@@ -75,6 +75,47 @@ export function getSearchConsoleTools() {
         required: ["site_url"],
       },
     },
+    {
+      name: "gsc_submit_sitemap",
+      description: "Submit a sitemap URL to a verified Google Search Console property.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL, for example https://example.com/ or sc-domain:example.com.",
+          },
+          sitemap_url: {
+            type: "string",
+            description: "Full sitemap URL to submit, for example https://example.com/sitemap.xml.",
+          },
+        },
+        required: ["site_url", "sitemap_url"],
+      },
+    },
+    {
+      name: "gsc_delete_sitemap",
+      description:
+        "Delete a submitted sitemap from a verified Google Search Console property. Requires confirm=true to avoid accidental deletion.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL, for example https://example.com/ or sc-domain:example.com.",
+          },
+          sitemap_url: {
+            type: "string",
+            description: "Full sitemap URL to delete, for example https://example.com/sitemap.xml.",
+          },
+          confirm: {
+            type: "boolean",
+            description: "Must be true to perform the deletion.",
+          },
+        },
+        required: ["site_url", "sitemap_url", "confirm"],
+      },
+    },
   ];
 }
 
@@ -118,6 +159,34 @@ export async function handleSearchConsoleTool(name, args, authClient) {
   if (name === "gsc_sitemaps") {
     const res = await webmasters.sitemaps.list({ siteUrl: args.site_url });
     return res.data.sitemap || [];
+  }
+
+  if (name === "gsc_submit_sitemap") {
+    await webmasters.sitemaps.submit({
+      siteUrl: args.site_url,
+      feedpath: args.sitemap_url,
+    });
+    return {
+      submitted: true,
+      site_url: args.site_url,
+      sitemap_url: args.sitemap_url,
+    };
+  }
+
+  if (name === "gsc_delete_sitemap") {
+    if (args.confirm !== true) {
+      throw new Error("gsc_delete_sitemap requires confirm=true.");
+    }
+
+    await webmasters.sitemaps.delete({
+      siteUrl: args.site_url,
+      feedpath: args.sitemap_url,
+    });
+    return {
+      deleted: true,
+      site_url: args.site_url,
+      sitemap_url: args.sitemap_url,
+    };
   }
 
   throw new Error(`Unknown Search Console tool: ${name}`);

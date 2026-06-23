@@ -174,8 +174,11 @@ GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
 
 After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
 
+- `https://www.googleapis.com/auth/webmasters`
 - `https://www.googleapis.com/auth/business.manage`
 - `https://www.googleapis.com/auth/content`
+
+Older tokens with `https://www.googleapis.com/auth/webmasters.readonly` can read Search Console data but cannot submit or delete sitemaps.
 
 ## Local Check
 
