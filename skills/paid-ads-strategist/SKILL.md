@@ -56,7 +56,7 @@ Load only the references needed for the task:
 - `references/platform-specs.md`: creative format requirements across major ad platforms.
 - `references/google-creative-specs.md`, `references/meta-creative-specs.md`, `references/tiktok-creative-specs.md`, `references/linkedin-creative-specs.md`, `references/microsoft-creative-specs.md`, and `references/youtube-creative-specs.md`: placement-specific creative specs and format constraints.
 - `references/additional-platforms.md`: Apple, Amazon, Reddit, Pinterest, Snapchat, X, and other platform fit checks.
-- `references/compliance.md`: policy and regulated-industry checks.
+- `references/compliance.md`: policy and regulated-industry checks. For Google medical/healthcare work, also read `../google-ads-strategist/references/medical-policy-check.md`.
 - `references/copy-frameworks.md`: ad copy frameworks and message-angle structure.
 - `references/brand-dna-template.md`: brand positioning, ICP, tone, proof points, offers, objections, and creative strategy inputs.
 - `references/voice-to-style.md`: turn voice/client notes into brand voice, messaging style, and creative direction.
@@ -94,6 +94,8 @@ For Google-only deep strategy, use the Google-specific rules in this skill first
 4. Apply tracking-first logic before optimization recommendations.
 5. Score issues by revenue risk, wasted spend, data reliability, and speed to fix.
 6. Return a prioritized action plan with source labels such as `[Ads]`, `[GA4]`, `[CRM]`, `[Clarity]`, `[GSC]`, `[Mangools]`, or `[Manual]`.
+
+For medical, healthcare, cosmetic clinic, dermatology, pharmacy, supplements, telemedicine, fertility, addiction, clinical trial, or other regulated health campaigns, run a Google policy check before final copy, targeting, audience, creative, or landing page recommendations. Verify the official Google Ads policy change log and relevant policy pages when internet access is available, then include a `Policy Check` block with status, date, sources, risky claims, safer replacements, targeting constraints, certification/location notes, and verification.
 
 ## Analysis Depth Standard
 
@@ -138,6 +140,7 @@ When the paid audit includes Google Ads, automatically review:
 - Copy/script output: if weak messaging is found, provide ready ad copy variations and, when useful, a call/WhatsApp/video script with hook, proof, objection handling, and CTA.
 - Tracking and UTM: auto-tagging/GCLID, tracking templates, final URL suffix, UTMs, landing page query preservation, GA4 source/medium consistency, and conversion action quality.
 - Targeting and reports: audiences/segments, remarketing, custom audiences, locations/exclusions, devices, demographics, ad schedule, placements/topics, search terms, negatives, auction insights, impression share, budget loss, assets/extensions, conversion goals, recommendations, and change history.
+- Medical policy: for healthcare accounts, check official Google medical and personalized advertising rules before recommending remarketing, Customer Match, Your Data segments, lookalikes, audience expansion, custom segments, claim-heavy copy, or procedure outcome promises.
 - Tool routing: prefer `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_list_ads`, `ads_search_terms`, `ads_keyword_performance`, and relevant `ads_deep_report` reports. If a report fails, mark it as `tool failed` and continue.
 
 ## Hard Rules

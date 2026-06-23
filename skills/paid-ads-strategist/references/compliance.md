@@ -1,9 +1,17 @@
 # Advertising Compliance & Privacy Reference
 
-<!-- Updated: 2026-04-13 | v1.5 -->
-<!-- Sources: Claude Research, Gemini Research -->
+<!-- Updated: 2026-06-23 | v1.6 -->
+<!-- Verify official platform policy pages before regulated-sector recommendations. -->
 
 ## Google Ads Policies
+
+For healthcare, medical services, cosmetic clinics, pharmacy, supplements, telemedicine, fertility, addiction, clinical trials, or any health-sensitive campaign, use the Google-specific medical policy workflow in `../../google-ads-strategist/references/medical-policy-check.md` before final copy, targeting, or landing page recommendations.
+
+Official Google sources to verify when internet access is available:
+- Policy change log: https://support.google.com/adspolicy/topic/3230816
+- Healthcare and medicines: https://support.google.com/adspolicy/answer/176031
+- Restricted targeting in Personalized advertising: https://support.google.com/adspolicy/answer/143465
+- Misrepresentation: https://support.google.com/adspolicy/answer/6020955
 
 ### Enforcement System: Three-Strike Policy
 | Strike | Consequence | Duration |
@@ -215,10 +223,11 @@ FOR ALL REGIONS:
 
 | Rule | Enforcement |
 |------|-------------|
-| No remarketing/retargeting for health services | Google policy: account suspension risk |
-| No targeting by health conditions | Google, Meta, all platforms |
-| Online pharmacy certification | Google: LegitScript required |
-| Telemedicine certification | Google: platform certification |
+| Verify latest Google policy change log before recommendations | Google policies can change by year, region, and product |
+| Do not use sensitive health-condition targeting | Google, Meta, and most platforms restrict personalized health targeting |
+| Be careful with Customer Match, Your Data, remarketing, lookalikes, audience expansion, and custom segments for health-sensitive offers | Google Personalized ads restricted targeting rules |
+| Online pharmacy certification | Google certification and location-specific requirements may apply |
+| Telemedicine certification | Google certification and location-specific requirements may apply |
 | HIPAA considerations | US: no PHI in tracking pixels |
 | Use contextual targeting | Instead of audience targeting |
 

@@ -19,7 +19,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 ## Strategy Routing
 
 - Use `seo-strategist` for organic search strategy, technical SEO, content strategy, cannibalization, SXO, GEO/AI-search visibility, and Search Console-led recommendations.
-- Use `paid-ads-strategist` as the main umbrella for paid media: Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative strategy, tracking/attribution, budget allocation, and channel mix.
+- Use `paid-ads-strategist` as the main umbrella for paid media: Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative strategy, tracking/attribution, budget allocation, and channel mix. For medical, healthcare, cosmetic clinic, pharmacy, supplements, telemedicine, fertility, addiction, or clinical-trial work, require a Google policy check before final copy, targeting, or campaign recommendations.
 - Use `google-ads-strategist` as a supporting deep Google Ads reference when the user needs Google-only launch planning, bidding, keywords, account diagnosis, or client reporting. Do not ask the user to call it separately when `paid-ads-strategist` can load the supporting references.
 - For campaign planning, combine sources in this order: tracking health, business goal, landing page readiness, search intent, paid demand, creative angles, budget rules.
 
@@ -46,7 +46,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 Use these packs unless the user asks for a very small check.
 
 - SEO site audit: GSC performance/pages, GSC index/sitemaps when available, PageSpeed, Mangools overview/backlinks/keywords, Clarity behavior for key pages, GA4 landing/conversion data when available, and rendered DOM/Chrome DevTools when a page-level technical issue is suspected.
-- Google Ads audit: `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit` for priority campaigns, `ads_ad_group_full_audit` for priority ad groups, `ads_search_terms`, `ads_campaign_search_terms`, `ads_keyword_performance`, conversion/recommendation/budget/asset deep reports, GA4 landing/conversion data, and Clarity landing page friction when available.
+- Google Ads audit: `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit` for priority campaigns, `ads_ad_group_full_audit` for priority ad groups, `ads_search_terms`, `ads_campaign_search_terms`, `ads_keyword_performance`, conversion/recommendation/budget/asset deep reports, GA4 landing/conversion data, and Clarity landing page friction when available. For medical/healthcare accounts, also check current official Google Ads policy sources or clearly mark the live policy check as `not checked`.
 - Paid/organic overlap: combine Ads search terms/cost/conversions, GSC queries/pages, GA4 landing conversions, Mangools keyword difficulty/competitors, and landing page readiness.
 
 If a connector is missing or a report fails, explicitly list it under `Data Gaps` and explain how it limits confidence. Also list available local files that were used or intentionally not used.
@@ -56,6 +56,7 @@ For Google Ads audits, automatically include creative/copy, tracking, and target
 - Scripts/copy proposals: if copy, landing page, or funnel messaging is weak, provide ready-to-use ad copy variations and, when relevant, a short call/WhatsApp/video script with hook, proof, objection handling, and CTA.
 - Tracking/UTM: check final URLs, tracking template, final URL suffix, auto-tagging/GCLID, missing or inconsistent UTMs, landing-page query preservation, and GA4/source-medium consistency when available.
 - Targeting reports: audiences/segments, locations, devices, ad schedule, demographics, search terms, negatives, auction insights, budget/impression-share loss, assets/extensions, conversion goals, recommendations, and change history.
+- Medical policy: include policy status, date checked, official source/check-log status, risky claims, safer wording, and audience/targeting constraints before recommending medical ad copy or targeting changes.
 
 ## Output Style
 

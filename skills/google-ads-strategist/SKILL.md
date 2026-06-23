@@ -22,7 +22,7 @@ Essential inputs:
 
 If the user provides a URL, run or request a site readiness check before final campaign recommendations when tooling/context allows.
 
-Before producing ad copy, claims, or landing page wording, run a policy self-check for sensitive claims, medical/personalized claims, guarantees, prohibited products, misleading urgency, trademark risk, redirects, popups, and unsupported superlatives.
+Before producing ad copy, claims, or landing page wording, run a policy self-check for sensitive claims, medical/personalized claims, guarantees, prohibited products, misleading urgency, trademark risk, redirects, popups, and unsupported superlatives. For healthcare, medical, cosmetic clinic, dermatology, hair transplant, pharmacy, supplements, telemedicine, fertility, addiction, clinical trial, or other regulated health offers, read `references/medical-policy-check.md` and verify current official Google policy pages/change log when internet access is available.
 
 Before saying Ads/GA4/CRM data is missing, inspect any user-mentioned local files and likely workspace folders such as `reports/`, `.vscode/`, `exports/`, and `downloads/`. Open editor tabs are only paths, not evidence; read relevant files first. Do not print secrets from local config or token files.
 
@@ -33,6 +33,7 @@ Load only the reference needed for the task:
 - `references/strategic-planner.md`: new client intake and full Campaign Strategy Document before launch.
 - `references/expert-agent-modes.md`: daily execution modes for new campaign planning, landing page analysis, keyword research, tracking checks, campaign diagnosis, and competitor/site audit.
 - `references/reporting-client-presentation.md`: weekly pulse reports, monthly client reports, launch reports, quarterly reviews, emergency reports, client campaign pitches, and specialist report reviews.
+- `references/medical-policy-check.md`: required before medical/healthcare ad copy, landing page wording, targeting, audience, or compliance recommendations.
 
 For broad Google Ads requests, read `master-instructions.md` first, then the specific task reference.
 
@@ -49,6 +50,8 @@ For broad Google Ads requests, read `master-instructions.md` first, then the spe
 6. Return a concrete output with numbers, actions, priorities, and the reason behind each major recommendation.
 
 When listing `Data Gaps`, distinguish `not checked`, `tool failed`, `rate-limited`, `not configured`, and `available but not used`. Do not write "no access" unless an access/config check actually failed.
+
+For medical or healthcare work, include a `Policy Check` block before final recommendations. It must show date checked, official Google sources checked, policy status, risky claims/terms, safer replacements, targeting constraints, certification/location notes, and verification steps. If internet access is unavailable, say that the live policy change log was not checked and use the local medical policy reference as a fallback.
 
 ## Deep Diagnosis Standard
 
@@ -92,6 +95,7 @@ For any existing-account audit, review these by default. Do not wait for the use
   - Flag missing UTMs only when manual tagging is needed; do not replace auto-tagging/GCLID without reason.
 - Targeting and segmentation:
   - Review audiences/segments, remarketing lists, custom audiences, locations/exclusions/proximity, device performance/bid modifiers, age/gender/income when available, ad schedule/day/hour, placements/topics, and search-term intent.
+  - For medical/healthcare accounts, check restricted personalized advertising rules before recommending remarketing, Customer Match, Your Data segments, lookalikes, audience expansion, or custom segments.
   - Review auction insights, impression share, budget lost impression share, recommendations, asset links/extensions, conversion goals, and change history when available.
 - Reporting depth:
   - Use `ads_campaign_full_audit` for priority campaigns and `ads_ad_group_full_audit` for priority ad groups.
@@ -128,5 +132,5 @@ Be direct, data-first, and action-oriented:
 - Do not set micro-conversions as Primary bidding conversions when macro events exist.
 - Do not move to smart bidding until the account has enough real conversion data as defined in the references.
 - Do not judge CPA from leads only when closed-deal data is available; use real business outcomes.
-- Do not write ads for sensitive sectors without policy review.
+- Do not write ads or audience recommendations for sensitive sectors without a current policy review from official Google sources when available.
 - Do not give generic advice when account, site, or report data is available.
