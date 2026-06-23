@@ -9,8 +9,8 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 
 ## Tool Routing
 
-- Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, and `psi_audit_url`.
-- Analytics traffic and conversions: use `ga4_list_properties`, `ga4_run_report`, and `ga4_realtime`.
+- Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`, and `psi_audit_url`.
+- Analytics traffic and conversions: use `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
 - Google Ads audits: use `ads_list_accounts`, `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, and `ads_deep_report`.
 - Keyword research: use `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, and `serpchecker_serps`.
 - Backlinks and competitors: use `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, and `siteprofiler_competitors`.
@@ -40,7 +40,9 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 - Local reports or exports under `reports/` count as evidence. Use them when MCP/API calls are unavailable, rate-limited, or not needed.
 - Distinguish clearly between `not checked`, `checked but unavailable`, `tool failed`, and `not configured`.
 - In `Data Gaps`, never write "no access" unless a connector/file check actually failed. Prefer precise language such as "لم أستخدم GSC في هذا التحليل" or "فشل PageSpeed بسبب 429".
-- Search Console sitemap changes are possible through `gsc_submit_sitemap` and `gsc_delete_sitemap` when OAuth includes the full `webmasters` scope. Deletions must be explicitly requested and confirmed; otherwise recommend a manual UI fallback.
+- Search Console sitemap and property changes are possible through `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_add_site`, and `gsc_delete_site` when OAuth includes the full `webmasters` scope. Deletions must be explicitly requested and confirmed; otherwise recommend a manual UI fallback.
+- GA4 Admin changes are possible through `ga4_admin_api_call` when OAuth includes `analytics.edit`; non-GET requests require `confirm=true`.
+- GTM changes are possible through `gtm_api_call` when OAuth includes the relevant `tagmanager.*` scopes; non-GET requests require `confirm=true`.
 
 ## Minimum Evidence Packs
 

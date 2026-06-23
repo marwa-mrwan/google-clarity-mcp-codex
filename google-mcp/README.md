@@ -12,11 +12,18 @@ It exposes one MCP server, `google-marketing-suite`, with tools for:
 - Google PageSpeed Insights
 - Google Tag Manager
 
+GA4, Search Console, and GTM include named read tools for common audits plus advanced API-call helpers for missing official API functions:
+
+- `ga4_admin_api_call`: GA4 Admin API create/update/delete/archive calls. Non-GET requires `confirm=true`.
+- `gtm_api_call`: GTM API create/update/delete/publish calls. Non-GET requires `confirm=true`.
+- Search Console write/remove tools such as `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_add_site`, and `gsc_delete_site` require explicit confirmation where the action changes account state.
+
 ## Google Ads Tools
 
 For the full MCC setup, OAuth requirements, `login-customer-id` rules, access checks, and MCP validation flow, see:
 
 - [`../docs/google-ads-mcc-mcp-integration.md`](../docs/google-ads-mcc-mcp-integration.md)
+- [`../docs/google-ads-missing-capabilities.md`](../docs/google-ads-missing-capabilities.md)
 
 The Ads tools include account, campaign, ad group, ad, keyword, and keyword idea access:
 
@@ -175,10 +182,18 @@ GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
 After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
 
 - `https://www.googleapis.com/auth/webmasters`
+- `https://www.googleapis.com/auth/analytics.edit`
+- `https://www.googleapis.com/auth/analytics.manage.users`
+- `https://www.googleapis.com/auth/tagmanager.edit.containers`
+- `https://www.googleapis.com/auth/tagmanager.delete.containers`
+- `https://www.googleapis.com/auth/tagmanager.edit.containerversions`
+- `https://www.googleapis.com/auth/tagmanager.publish`
+- `https://www.googleapis.com/auth/tagmanager.manage.users`
+- `https://www.googleapis.com/auth/tagmanager.manage.accounts`
 - `https://www.googleapis.com/auth/business.manage`
 - `https://www.googleapis.com/auth/content`
 
-Older tokens with `https://www.googleapis.com/auth/webmasters.readonly` can read Search Console data but cannot submit or delete sitemaps.
+Older tokens with read-only scopes can read Search Console, GA4, and GTM data but cannot submit/delete sitemaps, change GA4 admin resources, edit GTM containers, publish versions, or manage GTM users/accounts.
 
 ## Local Check
 

@@ -76,6 +76,24 @@ export function getSearchConsoleTools() {
       },
     },
     {
+      name: "gsc_get_sitemap",
+      description: "Get details for one submitted sitemap in Google Search Console.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL, for example https://example.com/ or sc-domain:example.com.",
+          },
+          sitemap_url: {
+            type: "string",
+            description: "Full sitemap URL to inspect, for example https://example.com/sitemap.xml.",
+          },
+        },
+        required: ["site_url", "sitemap_url"],
+      },
+    },
+    {
       name: "gsc_submit_sitemap",
       description: "Submit a sitemap URL to a verified Google Search Console property.",
       inputSchema: {
@@ -114,6 +132,56 @@ export function getSearchConsoleTools() {
           },
         },
         required: ["site_url", "sitemap_url", "confirm"],
+      },
+    },
+    {
+      name: "gsc_get_site",
+      description: "Get Search Console site permission details for one property.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL, for example https://example.com/ or sc-domain:example.com.",
+          },
+        },
+        required: ["site_url"],
+      },
+    },
+    {
+      name: "gsc_add_site",
+      description: "Add a site/property to Google Search Console. Requires confirm=true.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL to add, for example https://example.com/.",
+          },
+          confirm: {
+            type: "boolean",
+            description: "Must be true to add the property.",
+          },
+        },
+        required: ["site_url", "confirm"],
+      },
+    },
+    {
+      name: "gsc_delete_site",
+      description: "Remove a site/property from Google Search Console. Requires confirm=true.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          site_url: {
+            type: "string",
+            description: "Search Console property URL to remove, for example https://example.com/.",
+          },
+          confirm: {
+            type: "boolean",
+            description: "Must be true to remove the property.",
+          },
+        },
+        required: ["site_url", "confirm"],
       },
     },
   ];
@@ -161,6 +229,14 @@ export async function handleSearchConsoleTool(name, args, authClient) {
     return res.data.sitemap || [];
   }
 
+  if (name === "gsc_get_sitemap") {
+    const res = await webmasters.sitemaps.get({
+      siteUrl: args.site_url,
+      feedpath: args.sitemap_url,
+    });
+    return res.data;
+  }
+
   if (name === "gsc_submit_sitemap") {
     await webmasters.sitemaps.submit({
       siteUrl: args.site_url,
@@ -186,6 +262,35 @@ export async function handleSearchConsoleTool(name, args, authClient) {
       deleted: true,
       site_url: args.site_url,
       sitemap_url: args.sitemap_url,
+    };
+  }
+
+  if (name === "gsc_get_site") {
+    const res = await webmasters.sites.get({ siteUrl: args.site_url });
+    return res.data;
+  }
+
+  if (name === "gsc_add_site") {
+    if (args.confirm !== true) {
+      throw new Error("gsc_add_site requires confirm=true.");
+    }
+
+    await webmasters.sites.add({ siteUrl: args.site_url });
+    return {
+      added: true,
+      site_url: args.site_url,
+    };
+  }
+
+  if (name === "gsc_delete_site") {
+    if (args.confirm !== true) {
+      throw new Error("gsc_delete_site requires confirm=true.");
+    }
+
+    await webmasters.sites.delete({ siteUrl: args.site_url });
+    return {
+      deleted: true,
+      site_url: args.site_url,
     };
   }
 
