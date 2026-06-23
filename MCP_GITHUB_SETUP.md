@@ -71,14 +71,13 @@ cd google-mcp
 npm run auth
 ```
 
-6. Open the workspace in VS Code and run `MCP: List Servers`.
+6. Open the workspace in VS Code/Codex and run `MCP: List Servers` if your client exposes that command.
 
-## Agent configs
+## Codex configs
 
-- VS Code / Copilot reads `.vscode/mcp.json`.
-- Claude Code reads `.mcp.json`.
 - Codex reads `.codex/config.toml`.
-- All three start the same local MCP servers and the servers read secrets from one local file: `.vscode/mcp.local.env`.
+- VS Code-compatible MCP clients can read `.vscode/mcp.json`.
+- The local MCP servers read secrets from one local file: `.vscode/mcp.local.env`.
 
 ## VS Code files
 

@@ -131,6 +131,107 @@ const mutationTool = (name, description, properties = {}, required = []) =>
 
 const ADVANCED_READ_TOOLS = [
   readTool(
+    "ads_field_metadata",
+    "Search Google Ads API field metadata so GAQL fields can be discovered before writing custom queries.",
+    {
+      query: {
+        type: "string",
+        description: "GoogleAdsFieldService GAQL query. Defaults to common selectable fields.",
+      },
+    }
+  ),
+  readTool(
+    "ads_validate_gaql",
+    "Validate a read-only GAQL query using Google Ads search validateOnly mode.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      query: {
+        type: "string",
+        description: "Read-only GAQL SELECT query to validate.",
+      },
+    },
+    ["customer_id", "query"]
+  ),
+  readTool(
+    "ads_policy_summary",
+    "Read ad policy approval/review summaries and policy topic entries across ads.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      campaign_id: { type: "string", description: "Optional campaign ID filter." },
+      ad_group_id: { type: "string", description: "Optional ad group ID filter." },
+      ...OPTIONAL_DATE_RANGE_PROPERTIES,
+      limit: { type: "number", description: "Maximum rows. Defaults to 100.", default: 100 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_conversion_action_full_audit",
+    "Read conversion actions plus customer and campaign conversion goals for tracking diagnostics.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      campaign_id: { type: "string", description: "Optional campaign ID filter for campaign goals." },
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 100.", default: 100 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_access_audit",
+    "Read customer user access, invitations, labels, and account metadata for access-risk diagnostics.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 100.", default: 100 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_shared_sets_audit",
+    "Read shared negative keyword sets and list members.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 500.", default: 500 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_experiment_full_audit",
+    "Read experiments, experiment arms, and experiment campaigns.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 200.", default: 200 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_change_summary",
+    "Read change events and group them by user, resource type, and client type.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      ...OPTIONAL_DATE_RANGE_PROPERTIES,
+      limit: { type: "number", description: "Maximum change events. Defaults to 500.", default: 500 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_asset_group_full_audit",
+    "Read Performance Max asset groups, assets, listing groups, and search terms for one campaign or account.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      campaign_id: { type: "string", description: "Optional Performance Max campaign ID filter." },
+      ...OPTIONAL_DATE_RANGE_PROPERTIES,
+      limit: { type: "number", description: "Maximum rows per section. Defaults to 200.", default: 200 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
+    "ads_billing_summary",
+    "Read billing setup diagnostics where the authenticated user and developer token have permission.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      limit: { type: "number", description: "Maximum rows. Defaults to 50.", default: 50 },
+    },
+    ["customer_id"]
+  ),
+  readTool(
     "ads_account_hierarchy",
     "Read the full Google Ads MCC hierarchy recursively from a manager account.",
     {
@@ -180,6 +281,12 @@ const ADVANCED_READ_TOOLS = [
 ];
 
 const WRITE_TOOLS = [
+  mutationTool("ads_create_campaign_budget", "Safely create a campaign budget.", {
+    name: { type: "string", description: "Campaign budget name." },
+    amount: { type: "number", description: "Budget amount in the account currency, not micros." },
+    delivery_method: { type: "string", enum: ["STANDARD", "ACCELERATED"], default: "STANDARD" },
+    explicitly_shared: { type: "boolean", description: "Whether the budget is shared.", default: false },
+  }, ["name", "amount"]),
   mutationTool("ads_pause_campaign", "Safely pause a campaign.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
   }, ["campaign_id"]),
@@ -306,6 +413,17 @@ const WRITE_TOOLS = [
       items: { type: "object" },
     },
   }, ["conversions"]),
+  mutationTool("ads_mutate_operations", "Advanced safe mutate helper for Google Ads create/update operations. Remove operations are rejected.", {
+    endpoint_resource: {
+      type: "string",
+      description: "Resource collection endpoint, for example campaignBudgets, campaigns, campaignCriteria, adGroups, adGroupCriteria, adGroupAds, assets, campaignAssets.",
+    },
+    operations: {
+      type: "array",
+      description: "Raw Google Ads mutate operations. Operations containing remove are rejected.",
+      items: { type: "object" },
+    },
+  }, ["endpoint_resource", "operations"]),
 ];
 
 function getAdsVersions() {
@@ -915,6 +1033,24 @@ export async function handleAdsTool(name, args, authClient) {
   };
 
   const adsMutationRequest = async (endpoint, body) => {
+    const token = (await authClient.getAccessToken()).token;
+    const base = await getWorkingBase(token, developerToken);
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "developer-token": developerToken,
+      "Content-Type": "application/json",
+    };
+    if (loginCustomerId) {
+      headers["login-customer-id"] = loginCustomerId;
+    }
+    const res = await axios.post(`${base}${endpoint}`, body, { headers });
+    return {
+      data: res.data,
+      requestId: res.headers["request-id"] || res.headers["request_id"] || null,
+    };
+  };
+
+  const adsRootPostRequest = async (endpoint, body) => {
     const token = (await authClient.getAccessToken()).token;
     const base = await getWorkingBase(token, developerToken);
     const headers = {
@@ -1745,6 +1881,29 @@ export async function handleAdsTool(name, args, authClient) {
     }
   };
 
+  const summarizeChangeEvents = (rows) => {
+    const byUser = {};
+    const byResourceType = {};
+    const byClientType = {};
+    for (const row of rows) {
+      const event = row.changeEvent || {};
+      const user = event.userEmail || "unknown";
+      const resourceType = event.changeResourceType || "unknown";
+      const clientType = event.clientType || "unknown";
+      byUser[user] = (byUser[user] || 0) + 1;
+      byResourceType[resourceType] = (byResourceType[resourceType] || 0) + 1;
+      byClientType[clientType] = (byClientType[clientType] || 0) + 1;
+    }
+    return { byUser, byResourceType, byClientType };
+  };
+
+  const rejectRemoveOperations = (operations) => {
+    const serialized = JSON.stringify(operations || []);
+    if (/"remove"\s*:/.test(serialized) || /\bremove\b/i.test(serialized)) {
+      throw new Error("ads_mutate_operations rejects remove operations. Use create/update only.");
+    }
+  };
+
   const buildAccountHierarchy = async (managerCustomerId, maxDepth = 5, depth = 0, seen = new Set()) => {
     const normalizedManagerId = normalizeCustomerId(managerCustomerId, "customer_id");
     if (depth >= maxDepth || seen.has(normalizedManagerId)) {
@@ -2180,11 +2339,254 @@ export async function handleAdsTool(name, args, authClient) {
         };
       }
       default:
+        if (toolName === "ads_create_campaign_budget") {
+          return {
+            endpoint: `/customers/${customerId}/campaignBudgets:mutate`,
+            body: {
+              operations: [
+                {
+                  create: {
+                    name: assertNonEmptyString(args.name, "name", 255),
+                    amountMicros: amountToMicros(args.amount),
+                    deliveryMethod: assertEnum(
+                      args.delivery_method,
+                      "delivery_method",
+                      ["STANDARD", "ACCELERATED"],
+                      "STANDARD"
+                    ),
+                    explicitlyShared: args.explicitly_shared === true,
+                  },
+                },
+              ],
+            },
+          };
+        }
+        if (toolName === "ads_mutate_operations") {
+          const endpointResource = assertNonEmptyString(args.endpoint_resource, "endpoint_resource", 80);
+          if (!/^[A-Za-z]+$/.test(endpointResource)) {
+            throw new Error("endpoint_resource must be a Google Ads resource collection name.");
+          }
+          const operations = Array.isArray(args.operations) ? args.operations : [];
+          if (operations.length === 0 || operations.length > 1000) {
+            throw new Error("operations must contain 1-1000 mutate operations.");
+          }
+          rejectRemoveOperations(operations);
+          return {
+            endpoint: `/customers/${customerId}/${endpointResource}:mutate`,
+            body: { operations },
+          };
+        }
         throw new Error(`Unsupported Google Ads mutation tool: ${toolName}`);
     }
   };
 
   const mutationToolNames = new Set(WRITE_TOOLS.map((tool) => tool.name));
+
+  if (name === "ads_field_metadata") {
+    const fieldQuery =
+      args.query ||
+      "SELECT name, category, data_type, selectable, filterable, sortable, selectable_with, metrics, segments, enum_values FROM google_ads_field WHERE selectable = true LIMIT 200";
+    const response = await adsRootPostRequest("/googleAdsFields:search", { query: fieldQuery });
+    return {
+      requestId: response.requestId,
+      results: response.data.results || [],
+    };
+  }
+
+  if (name === "ads_validate_gaql") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    assertReadOnlyGaql(args.query);
+    try {
+      const response = await adsRequest(
+        `/customers/${customerId}/googleAds:search`,
+        { query: args.query, validateOnly: true },
+        authClient,
+        developerToken,
+        loginCustomerId
+      );
+      return { valid: true, response };
+    } catch (error) {
+      return {
+        valid: false,
+        error: error.message,
+        details: error.response?.data || null,
+      };
+    }
+  }
+
+  if (name === "ads_policy_summary") {
+    const { customer_id, campaign_id, ad_group_id, start_date, end_date, limit = 100 } = args;
+    const customerId = normalizeCustomerId(customer_id);
+    const campaignFilter = idFilter("campaign.id", campaign_id);
+    const adGroupFilter = idFilter("ad_group.id", ad_group_id);
+    const dateClause = dateFilter(start_date, end_date);
+    const rowLimit = limitValue(limit, 100, 500);
+    const rows = await query(
+      customerId,
+      `SELECT campaign.id, campaign.name,
+        ad_group.id, ad_group.name,
+        ad_group_ad.ad.id, ad_group_ad.status,
+        ad_group_ad.policy_summary.approval_status,
+        ad_group_ad.policy_summary.review_status,
+        ad_group_ad.policy_summary.policy_topic_entries,
+        ad_group_ad.ad.type,
+        ad_group_ad.ad.final_urls,
+        metrics.clicks, metrics.impressions, metrics.cost_micros, metrics.conversions
+       FROM ad_group_ad
+       WHERE ad_group_ad.status != 'REMOVED' ${campaignFilter} ${adGroupFilter} ${dateClause}
+       ORDER BY metrics.impressions DESC LIMIT ${rowLimit}`
+    );
+    return rows.map((r) => ({
+      campaign: r.campaign,
+      adGroup: r.adGroup,
+      adId: r.adGroupAd?.ad?.id,
+      status: r.adGroupAd?.status,
+      policySummary: r.adGroupAd?.policySummary,
+      finalUrls: r.adGroupAd?.ad?.finalUrls,
+      metrics: performanceMetrics(r.metrics),
+    }));
+  }
+
+  if (name === "ads_conversion_action_full_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const limit = limitValue(args.limit, 100, 500);
+    const sections = await Promise.all([
+      safeReportSection(customerId, "conversion_actions", {
+        report_type: "conversion_actions",
+        limit,
+      }),
+      safeReportSection(customerId, "customer_conversion_goals", {
+        report_type: "customer_conversion_goals",
+        limit,
+      }),
+      safeReportSection(customerId, "campaign_conversion_goals", {
+        report_type: "campaign_conversion_goals",
+        campaign_id: args.campaign_id,
+        limit,
+      }),
+    ]);
+    return { customerId, sections };
+  }
+
+  if (name === "ads_access_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const limit = limitValue(args.limit, 100, 500);
+    const sections = await Promise.all([
+      safeReportSection(customerId, "user_access", {
+        report_type: "customer_user_access",
+        limit,
+      }),
+      safeReportSection(customerId, "user_access_invitations", {
+        report_type: "customer_user_access_invitations",
+        limit,
+      }),
+      safeReportSection(customerId, "customer_labels", {
+        report_type: "customer_labels",
+        limit,
+      }),
+    ]);
+    const customer = await query(
+      customerId,
+      `SELECT customer.id, customer.descriptive_name, customer.manager,
+        customer.test_account, customer.status, customer.auto_tagging_enabled
+       FROM customer LIMIT 1`
+    );
+    return { customer: customer[0]?.customer, sections };
+  }
+
+  if (name === "ads_shared_sets_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const limit = limitValue(args.limit, 500, 1000);
+    const sections = await Promise.all([
+      safeReportSection(customerId, "shared_negative_keyword_sets", {
+        report_type: "shared_negative_keyword_sets",
+        limit,
+      }),
+      safeReportSection(customerId, "negative_keyword_list_members", {
+        report_type: "negative_keyword_list_members",
+        limit,
+      }),
+    ]);
+    return { customerId, sections };
+  }
+
+  if (name === "ads_experiment_full_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const limit = limitValue(args.limit, 200, 1000);
+    const sections = await Promise.all([
+      safeReportSection(customerId, "experiments", {
+        report_type: "experiments",
+        limit,
+      }),
+      safeReportSection(customerId, "experiment_arms", {
+        report_type: "experiment_arms",
+        limit,
+      }),
+      safeReportSection(customerId, "experiment_campaigns", {
+        report_type: "experiment_campaigns",
+        limit,
+      }),
+    ]);
+    return { customerId, sections };
+  }
+
+  if (name === "ads_change_summary") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const rows = await query(
+      customerId,
+      deepReportQuery({
+        report_type: "change_events",
+        start_date: args.start_date,
+        end_date: args.end_date,
+        limit: limitValue(args.limit, 500, 1000),
+      })
+    );
+    return { summary: summarizeChangeEvents(rows), rows };
+  }
+
+  if (name === "ads_asset_group_full_audit") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const baseArgs = {
+      campaign_id: args.campaign_id,
+      start_date: args.start_date,
+      end_date: args.end_date,
+      limit: limitValue(args.limit, 200, 1000),
+    };
+    const sections = await Promise.all(
+      [
+        "pmax_asset_groups",
+        "pmax_asset_group_assets",
+        "pmax_listing_groups",
+        "pmax_search_terms",
+      ].map((reportType) =>
+        safeReportSection(customerId, reportType, { ...baseArgs, report_type: reportType })
+      )
+    );
+    return { customerId, campaignId: args.campaign_id || null, sections };
+  }
+
+  if (name === "ads_billing_summary") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const rowLimit = limitValue(args.limit, 50, 200);
+    try {
+      const rows = await query(
+        customerId,
+        `SELECT billing_setup.id, billing_setup.status,
+          billing_setup.payments_account,
+          billing_setup.payments_account_info.payments_account_id,
+          billing_setup.payments_account_info.payments_account_name,
+          billing_setup.start_time_type, billing_setup.end_time_type
+         FROM billing_setup LIMIT ${rowLimit}`
+      );
+      return rows.map((r) => r.billingSetup);
+    } catch (error) {
+      return {
+        error: error.message,
+        details: error.response?.data || null,
+        note: "Billing setup access depends on Google Ads API permissions and account access.",
+      };
+    }
+  }
 
   if (name === "ads_account_hierarchy") {
     const customerId = normalizeCustomerId(args.customer_id);

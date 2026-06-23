@@ -44,6 +44,16 @@ The Ads tools include account, campaign, ad group, ad, keyword, and keyword idea
 - `ads_customer_details`
 - `ads_campaign_full_audit`
 - `ads_ad_group_full_audit`
+- `ads_field_metadata`
+- `ads_validate_gaql`
+- `ads_policy_summary`
+- `ads_conversion_action_full_audit`
+- `ads_access_audit`
+- `ads_shared_sets_audit`
+- `ads_experiment_full_audit`
+- `ads_change_summary`
+- `ads_asset_group_full_audit`
+- `ads_billing_summary`
 
 Use `ads_list_ads` when you need actual ad creative text such as responsive search ad headlines and descriptions, expanded text ad copy, final URLs, paths, statuses, and performance metrics. Use `ads_list_ad_groups` when you need the campaign > ad group structure with metrics.
 
@@ -58,6 +68,16 @@ Use `ads_gaql_query` for any advanced read-only GAQL report that is not covered 
 | `ads_campaign_full_audit` | Multi-section campaign audit: settings, budget, bidding, targeting, assets, goals, recommendations, and performance. |
 | `ads_ad_group_full_audit` | Multi-section ad group audit: keywords, negatives, audiences, placements, topics, ads, assets, and performance. |
 | `ads_deep_report` | Use `report_type` for specific advanced reports. |
+| `ads_field_metadata` | Search Google Ads API field metadata before writing custom GAQL. |
+| `ads_validate_gaql` | Validate read-only GAQL before running a report. |
+| `ads_policy_summary` | Ad approval/review status and policy topic entries. |
+| `ads_conversion_action_full_audit` | Conversion actions plus customer/campaign conversion goals. |
+| `ads_access_audit` | User access, invitations, labels, and account metadata. |
+| `ads_shared_sets_audit` | Shared negative keyword sets and members. |
+| `ads_experiment_full_audit` | Experiments, arms, and experiment campaigns. |
+| `ads_change_summary` | Change events grouped by user/resource/client type. |
+| `ads_asset_group_full_audit` | Performance Max asset groups, assets, listings, and search terms. |
+| `ads_billing_summary` | Billing setup read-only diagnostics where allowed. |
 
 New `ads_deep_report` report types include: `customer_labels`, `customer_user_access`, `customer_user_access_invitations`, `campaign_settings`, `bidding_strategies`, `campaign_conversion_goals`, `customer_conversion_goals`, `campaign_labels`, `ad_group_labels`, `keyword_quality`, `device_bid_modifiers`, `placements`, `topics`, `campaign_asset_links`, `ad_group_asset_links`, `customer_asset_links`, `asset_details`, `pmax_listing_groups`, `pmax_search_terms`, `shopping_listing_groups`, `demand_gen_campaigns`, and `video_campaigns`.
 
@@ -68,6 +88,7 @@ Write tools are available but blocked by default. Every write tool defaults to `
 | Tool | Purpose |
 | --- | --- |
 | `ads_pause_campaign`, `ads_enable_campaign` | Change campaign status. |
+| `ads_create_campaign_budget` | Create a campaign budget. |
 | `ads_update_campaign_budget` | Update a campaign budget amount. |
 | `ads_update_campaign_dates` | Update campaign start/end date. |
 | `ads_update_campaign_bidding`, `ads_update_target_cpa`, `ads_update_target_roas` | Update campaign bidding settings. |
@@ -78,6 +99,7 @@ Write tools are available but blocked by default. Every write tool defaults to `
 | `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply or dismiss recommendations. |
 | `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
 | `ads_upload_offline_conversion` | Upload click conversions with explicit conversion payloads. |
+| `ads_mutate_operations` | Advanced create/update helper for raw Google Ads mutate operations. It rejects any `remove` operation. |
 
 To execute any mutation, all safety checks must pass:
 
@@ -87,6 +109,8 @@ To execute any mutation, all safety checks must pass:
 4. Tool argument `dry_run=false`
 
 Optional `validate_only=true` asks Google Ads to validate the request without applying it after the guardrails pass.
+
+Do not use Google Ads remove/delete operations by default. This MCP intentionally supports create/update/status changes and rejects raw remove operations in `ads_mutate_operations`.
 
 For remarketing and retargeting analysis, use `ads_deep_report` with:
 

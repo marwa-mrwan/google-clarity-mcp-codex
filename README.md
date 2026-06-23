@@ -1,6 +1,6 @@
 # Marketing Intelligence MCP
 
-Marketing Intelligence MCP is a local marketing analysis workspace for Codex and Claude Code. It connects Google Search Console, GA4, Google Ads, Microsoft Clarity, and Mangools with strategy skills for SEO, paid media, and campaign planning.
+Marketing Intelligence MCP is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Microsoft Clarity, and Mangools with strategy skills for SEO, paid media, and campaign planning.
 
 Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let the skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 
@@ -17,7 +17,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 - Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`, `psi_audit_url`.
 - Analytics traffic and conversions: `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
-- Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`.
+- Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`, `ads_field_metadata`, `ads_validate_gaql`, `ads_policy_summary`, and the full audit tools.
 - Keyword research: `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, `serpchecker_serps`.
 - Backlinks and competitors: `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, `siteprofiler_competitors`.
 - UX friction and behavior: `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, `clarity_compare_projects`.
@@ -148,7 +148,7 @@ node scripts/verify-mcp-servers.mjs
 Expected result:
 
 ```text
-google-marketing-suite: 106 tools
+google-marketing-suite: 118 tools
 microsoft-clarity: 8 tools
 mangools: 82 tools
 ```

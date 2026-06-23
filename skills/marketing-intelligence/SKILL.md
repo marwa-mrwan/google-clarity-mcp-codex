@@ -11,7 +11,7 @@ Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the l
 
 - Site health and SEO performance: use `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`, and `psi_audit_url`.
 - Analytics traffic and conversions: use `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
-- Google Ads audits: use `ads_list_accounts`, `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, and `ads_deep_report`.
+- Google Ads audits: use `ads_list_accounts`, `ads_account_hierarchy`, `ads_customer_details`, `ads_list_campaigns`, `ads_list_ads`, `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_field_metadata`, `ads_validate_gaql`, `ads_deep_report`, `ads_policy_summary`, `ads_conversion_action_full_audit`, `ads_access_audit`, `ads_shared_sets_audit`, `ads_experiment_full_audit`, `ads_change_summary`, `ads_asset_group_full_audit`, and `ads_billing_summary`.
 - Keyword research: use `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, and `serpchecker_serps`.
 - Backlinks and competitors: use `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, and `siteprofiler_competitors`.
 - UX friction and behavior: use `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, and `clarity_compare_projects`.
@@ -60,6 +60,7 @@ For Google Ads audits, automatically include creative/copy, tracking, and target
 - Tracking/UTM: check final URLs, tracking template, final URL suffix, auto-tagging/GCLID, missing or inconsistent UTMs, landing-page query preservation, and GA4/source-medium consistency when available.
 - Targeting reports: audiences/segments, locations, devices, ad schedule, demographics, search terms, negatives, auction insights, budget/impression-share loss, assets/extensions, conversion goals, recommendations, and change history.
 - Medical policy: include policy status, date checked, official source/check-log status, risky claims, safer wording, and audience/targeting constraints before recommending medical ad copy or targeting changes.
+- Advanced Ads writes are possible through guarded tools such as `ads_create_campaign_budget` and `ads_mutate_operations`; never use remove/delete Ads operations. Any write must stay dry-run unless the user explicitly approves, `confirm=true`, `dry_run=false`, and the account allowlist/env guardrails are configured.
 
 ## Output Style
 

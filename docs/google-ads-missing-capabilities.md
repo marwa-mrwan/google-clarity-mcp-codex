@@ -16,22 +16,33 @@ All Google Ads writes are blocked unless:
 3. `confirm=true`
 4. `dry_run=false`
 
-## Missing Read Tools Worth Adding
+## Added Read Tools
 
 - `ads_field_metadata`: query the Google Ads Field Service so GAQL fields can be validated before running custom reports.
 - `ads_validate_gaql`: validate GAQL syntax/field compatibility before report execution.
-- `ads_policy_summary`: pull policy findings/disapproval details across ads, assets, and keywords.
+- `ads_policy_summary`: pull policy findings/disapproval details across ads.
 - `ads_asset_group_full_audit`: richer Performance Max asset-group diagnostics.
-- `ads_conversion_action_full_audit`: full conversion action configuration, enhanced conversion flags, upload settings, and attribution details.
-- `ads_billing_summary`: billing setup/account budget read-only diagnostics where permissions allow.
-- `ads_access_audit`: users, invitations, manager links, linked product accounts, and access risk summary.
-- `ads_shared_sets_audit`: shared negative keyword lists and placements across campaigns.
-- `ads_experiment_full_audit`: experiments, arms, split, status, metrics, and migration readiness.
-- `ads_change_summary`: change-event grouping by user/resource/action over a date range.
+- `ads_conversion_action_full_audit`: conversion action and conversion goal diagnostics.
+- `ads_billing_summary`: billing setup diagnostics where permissions allow.
+- `ads_access_audit`: users, invitations, labels, and access risk summary.
+- `ads_shared_sets_audit`: shared negative keyword lists and members.
+- `ads_experiment_full_audit`: experiments, arms, and experiment campaigns.
+- `ads_change_summary`: change-event grouping by user/resource/client type over a date range.
 
-## Missing Write Tools Worth Adding, Without Remove
+## Remaining Read Tools Worth Adding Later
 
-- Create campaign budgets.
+- Asset-level policy summaries where Google Ads exposes reliable fields for each asset type.
+- Linked product accounts beyond currently queried customer details.
+- Account budget proposals where the authenticated user has billing permission.
+- More specialized Demand Gen, Video, and Shopping creative diagnostics.
+
+## Added Write Tools, Without Remove
+
+- `ads_create_campaign_budget`: create a campaign budget.
+- `ads_mutate_operations`: advanced create/update mutate helper. It rejects any operation containing `remove`.
+
+## Remaining Write Tools Worth Adding, Without Remove
+
 - Update tracking templates and final URL suffixes at customer, campaign, ad group, keyword, and ad levels.
 - Add/update location targets, excluded locations, proximity targets, and ad schedules.
 - Add/update campaign and ad group audience targets.
