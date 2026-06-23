@@ -131,6 +131,15 @@ For serious paid media audits or campaign plans, use:
 7. Budget Plan:
    - Keep, cut, shift, scale, or test budget with reasoning.
 
+## Google Ads Deep-Audit Requirements
+
+When the paid audit includes Google Ads, automatically review:
+- Ads and creative: RSA headlines/descriptions, final URLs, paths, policy status, ad strength/asset coverage where available, CTA strength, intent match, message duplication, local language quality, and claim/policy risk.
+- Copy/script output: if weak messaging is found, provide ready ad copy variations and, when useful, a call/WhatsApp/video script with hook, proof, objection handling, and CTA.
+- Tracking and UTM: auto-tagging/GCLID, tracking templates, final URL suffix, UTMs, landing page query preservation, GA4 source/medium consistency, and conversion action quality.
+- Targeting and reports: audiences/segments, remarketing, custom audiences, locations/exclusions, devices, demographics, ad schedule, placements/topics, search terms, negatives, auction insights, impression share, budget loss, assets/extensions, conversion goals, recommendations, and change history.
+- Tool routing: prefer `ads_campaign_full_audit`, `ads_ad_group_full_audit`, `ads_list_ads`, `ads_search_terms`, `ads_keyword_performance`, and relevant `ads_deep_report` reports. If a report fails, mark it as `tool failed` and continue.
+
 ## Hard Rules
 
 - Tracking comes before bidding changes. Do not optimize automated bidding when conversion data is broken or low quality.

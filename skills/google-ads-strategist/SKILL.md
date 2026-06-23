@@ -79,6 +79,25 @@ For Google Ads audits, use this structure:
 6. Testing Plan:
    - Hypothesis, variant/control, KPI, minimum conversion volume, and decision rule.
 
+## Mandatory Google Ads Audit Checks
+
+For any existing-account audit, review these by default. Do not wait for the user to ask separately unless the data/tool is unavailable.
+
+- Ad copy and creative:
+  - Review `ads_list_ads` output for RSA headlines, descriptions, final URLs, display paths, policy approval status, ad strength/asset coverage when available, duplication, weak CTAs, missing offer/proof, mismatch with keyword intent, overused generic phrases, and Arabic/local-market wording quality.
+  - If copy is weak, provide ready-to-use replacement headlines/descriptions grouped by intent or ad group. Include why each angle should improve CTR/CVR.
+  - If the funnel needs human follow-up, WhatsApp, calls, video, or landing-page messaging, include a ready script: hook, qualifying question, proof point, objection handling, CTA, and follow-up message.
+- UTM and tracking:
+  - Check final URLs, account/campaign tracking template, final URL suffix, auto-tagging/GCLID, UTM naming consistency, landing page query preservation, and GA4 source/medium consistency when available.
+  - Flag missing UTMs only when manual tagging is needed; do not replace auto-tagging/GCLID without reason.
+- Targeting and segmentation:
+  - Review audiences/segments, remarketing lists, custom audiences, locations/exclusions/proximity, device performance/bid modifiers, age/gender/income when available, ad schedule/day/hour, placements/topics, and search-term intent.
+  - Review auction insights, impression share, budget lost impression share, recommendations, asset links/extensions, conversion goals, and change history when available.
+- Reporting depth:
+  - Use `ads_campaign_full_audit` for priority campaigns and `ads_ad_group_full_audit` for priority ad groups.
+  - Use `ads_deep_report` report types for `campaign_audience_targets`, `ad_group_audience_targets`, `targeted_location_performance`, `location_targets`, `excluded_locations`, `ad_schedules`, `day_of_week_performance`, `hour_of_day_performance`, `device_performance`, `auction_insights_campaign`, `auction_insights_keyword`, `asset_performance`, `campaign_asset_links`, `conversion_actions`, `campaign_conversion_goals`, `recommendations`, and `change_events`.
+  - If one report is unavailable, say exactly which report failed and continue with the rest.
+
 ## Mode Shortcuts
 
 Use these shortcuts from `expert-agent-modes.md`:
