@@ -1,6 +1,6 @@
-# Marketing Intelligence MCP
+# Codex MCP For Google/Clarity/Mangools
 
-Marketing Intelligence MCP is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Microsoft Clarity, and Mangools with strategy skills for SEO, paid media, and campaign planning.
+Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools with strategy skills for SEO, paid media, and campaign planning.
 
 Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let the skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 

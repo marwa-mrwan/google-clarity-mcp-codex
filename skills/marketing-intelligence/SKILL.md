@@ -3,9 +3,9 @@ name: marketing-intelligence
 description: Use when the user asks to analyze a website, check Google Search Console, audit Google Ads, review PageSpeed or GA4, inspect Microsoft Clarity behavior, or do Mangools keyword research.
 ---
 
-# Marketing Intelligence MCP
+# Codex MCP For Google/Clarity/Mangools
 
-Use this skill as the routing layer for Marketing Intelligence MCP. Prefer the local MCP tools when available, then synthesize the findings into a practical action plan.
+Use this skill as the routing layer for Codex MCP For Google/Clarity/Mangools. Prefer the local MCP tools when available, then synthesize the findings into a practical action plan.
 
 ## Tool Routing
 

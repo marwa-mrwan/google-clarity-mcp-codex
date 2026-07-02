@@ -1,5 +1,5 @@
 {
-  "name": "marketing-intelligence-mcp",
+  "name": "codex-mcp-for-google-clarity-mangools",
   "private": true,
   "devDependencies": {
     "chrome-devtools-mcp": "1.3.0"

@@ -1,7 +1,7 @@
 {
-  "name": "marketing-intelligence-mcp",
+  "name": "codex-mcp-for-google-clarity-mangools",
   "version": "1.0.0",
-  "description": "Marketing intelligence MCP plugin for SEO, Google Search Console, Google Ads, GA4, PageSpeed, Microsoft Clarity, and Mangools keyword research.",
+  "description": "Codex MCP plugin for Google Search Console, GA4, Google Ads, GTM, PageSpeed, Microsoft Clarity, and Mangools keyword research.",
   "author": {
     "name": "marwa-mrwan",
     "url": "https://github.com/marwa-mrwan"
@@ -22,9 +22,9 @@
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "Marketing Intelligence MCP",
-    "shortDescription": "SEO, Ads, Clarity, and keyword research.",
-    "longDescription": "Local MCP tools and routing skill for site audits, Search Console checks, Google Ads analysis, PageSpeed reviews, Clarity UX insights, and Mangools keyword research.",
+    "displayName": "Codex MCP For Google/Clarity/Mangools",
+    "shortDescription": "Codex MCP for Google, Clarity, and Mangools.",
+    "longDescription": "Local Codex MCP tools and routing skills for Google Search Console, GA4, Google Ads, GTM, PageSpeed reviews, Clarity UX insights, and Mangools keyword research.",
     "developerName": "marwa-mrwan",
     "category": "Marketing",
     "capabilities": ["MCP", "Research", "Analysis"],

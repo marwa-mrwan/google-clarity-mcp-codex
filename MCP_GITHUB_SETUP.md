@@ -1,4 +1,4 @@
-# Marketing Intelligence MCP GitHub setup
+# Codex MCP For Google/Clarity/Mangools GitHub setup
 
 This workspace is prepared so source code can be pushed to GitHub while local tokens stay off Git.
 
