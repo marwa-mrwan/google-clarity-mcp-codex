@@ -79,6 +79,7 @@ Load only the reference needed for the task:
 - `references/specialized/premium-report-standard.md`: client-ready report quality bar.
 - `references/specialized/shared-data-cache.md`: shared evidence/cache conventions for multi-step audits.
 - `references/specialized/thinking-framework.md`: strategic reasoning checks before final recommendations.
+- Use `seo-report-sheet-builder` when the user wants an execution Google Sheet or checklist-style SEO report after a technical audit. It contains the workbook tab schema, non-duplication rules, checklist columns, and sheet formatting rules.
 
 For broad SEO requests, read `master-instructions.md` first, then the specific task reference.
 
@@ -111,9 +112,10 @@ Do not ask the user to call a separate SEO skill when a specialized pack covers 
 2. Complete session initialization.
 3. Choose the relevant reference file.
 4. Pull or request the minimum data required for that workflow.
-5. Separate confirmed findings from hypotheses.
-6. Prioritize by business impact, severity, effort, and dependency order.
-7. Return actions with source labels such as `[GSC]`, `[Analytics]`, `[Clarity]`, `[Mangools]`, `[Crawl]`, `[GTM]`, `[Ads]`, or `[Manual]`.
+5. For `SEO Reporting` that should become a spreadsheet, use `seo-report-sheet-builder` after technical audit evidence is collected.
+6. Separate confirmed findings from hypotheses.
+7. Prioritize by business impact, severity, effort, and dependency order.
+8. Return actions with source labels such as `[GSC]`, `[Analytics]`, `[Clarity]`, `[Mangools]`, `[Crawl]`, `[GTM]`, `[Ads]`, or `[Manual]`.
 
 ## Analysis Depth Standard
 

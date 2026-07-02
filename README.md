@@ -26,6 +26,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 - `marketing-intelligence`: main router for deciding which MCP tools and strategy skill should be used.
 - `seo-strategist`: organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
+- `seo-report-sheet-builder`: turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
 - `google-ads-strategist`: Google Ads planning, diagnosis, bidding, keywords, conversion tracking, landing page readiness, and client reports.
 - `paid-ads-strategist`: multi-platform paid media strategy across Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative, tracking, budget allocation, and launch planning.
 
