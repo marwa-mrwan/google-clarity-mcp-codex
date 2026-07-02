@@ -45,8 +45,8 @@ Do not commit local token, credential, account, or `.env` files.
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/marwa-mrwan/marketing-intelligence-mcp.git
-cd marketing-intelligence-mcp
+git clone https://github.com/marwa-mrwan/codex-mcp-for-google-clarity-mangools.git
+cd codex-mcp-for-google-clarity-mangools
 
 npm install
 cd google-mcp && npm install

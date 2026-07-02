@@ -114,7 +114,7 @@ GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
 من داخل فولدر `google-mcp`:
 
 ```bash
-cd marketing-intelligence-mcp/google-mcp
+cd codex-mcp-for-google-clarity-mangools/google-mcp
 npm install
 npm run auth
 ```

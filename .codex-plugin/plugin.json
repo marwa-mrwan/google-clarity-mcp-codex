@@ -6,8 +6,8 @@
     "name": "marwa-mrwan",
     "url": "https://github.com/marwa-mrwan"
   },
-  "homepage": "https://github.com/marwa-mrwan/marketing-intelligence-mcp",
-  "repository": "https://github.com/marwa-mrwan/marketing-intelligence-mcp",
+  "homepage": "https://github.com/marwa-mrwan/codex-mcp-for-google-clarity-mangools",
+  "repository": "https://github.com/marwa-mrwan/codex-mcp-for-google-clarity-mangools",
   "license": "MIT",
   "keywords": [
     "seo",
@@ -28,7 +28,7 @@
     "developerName": "marwa-mrwan",
     "category": "Marketing",
     "capabilities": ["MCP", "Research", "Analysis"],
-    "websiteURL": "https://github.com/marwa-mrwan/marketing-intelligence-mcp",
+    "websiteURL": "https://github.com/marwa-mrwan/codex-mcp-for-google-clarity-mangools",
     "defaultPrompt": [
       "Analyze this site using Search Console and PageSpeed.",
       "Audit Google Ads performance and search terms.",
