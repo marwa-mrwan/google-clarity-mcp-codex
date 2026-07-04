@@ -54,6 +54,7 @@ async function main() {
     line("GOOGLE_ADS_DEVELOPER_TOKEN", googleAdsDeveloperToken),
     line("GOOGLE_ADS_LOGIN_CUSTOMER_ID", googleAdsLoginCustomerId),
     "GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json",
+    "MARKETING_ACCOUNTS_FILE=../.vscode/marketing.accounts.local.json",
     line("MANGOOLS_API_KEY", mangoolsApiKey),
   ].filter(Boolean);
 

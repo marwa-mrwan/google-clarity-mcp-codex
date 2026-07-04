@@ -11,7 +11,7 @@ const envFile = args.env;
 const outputFile = args.output || path.join(rootDir, ".vscode", "marketing.accounts.local.json");
 
 if (!analyticsFile) {
-  throw new Error("Missing --analytics path/to/google.analytics.properties.local.json");
+  throw new Error("Missing --analytics path/to/legacy-ga4-properties.json");
 }
 
 const analyticsAccounts = readAnalyticsAccounts(analyticsFile);

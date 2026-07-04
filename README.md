@@ -134,7 +134,7 @@ To migrate from an existing GA4 properties file and an old env file with `CLARIT
 
 ```bash
 node scripts/build-marketing-accounts.mjs \
-  --analytics /path/to/google.analytics.properties.local.json \
+  --analytics /path/to/legacy-ga4-properties.json \
   --env /path/to/mcp.local.env
 ```
 

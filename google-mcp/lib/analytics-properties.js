@@ -16,8 +16,8 @@ function decodeBase64Env(value) {
 
 function readConfiguredFile() {
   const configPath =
-    process.env.GOOGLE_ANALYTICS_PROPERTIES_FILE ||
-    process.env.MARKETING_ACCOUNTS_FILE;
+    process.env.MARKETING_ACCOUNTS_FILE ||
+    process.env.GOOGLE_ANALYTICS_PROPERTIES_FILE;
   if (!configPath) {
     return undefined;
   }
@@ -25,7 +25,7 @@ function readConfiguredFile() {
   const resolvedPath = resolveConfigPath(configPath);
 
   if (!fs.existsSync(resolvedPath)) {
-    throw new Error(`Configured GA4 properties file does not exist: ${resolvedPath}`);
+    throw new Error(`Configured marketing accounts/GA4 properties file does not exist: ${resolvedPath}`);
   }
 
   return fs.readFileSync(resolvedPath, "utf8");
