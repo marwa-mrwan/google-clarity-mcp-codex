@@ -4,6 +4,16 @@
 
 ---
 
+## Table of Contents
+
+- Phase 0: client briefing.
+- Phase 1: business, funnel, competitor, and market readiness analysis.
+- Phase 2-4: value proposition, intent map, and campaign architecture.
+- Phase 5-6: scaling roadmap and pre-launch checklist.
+- Final output: Campaign Strategy Document.
+
+---
+
 ## 🎯 مهمة هذا الـ Project
 
 بناء الاستراتيجية الكاملة للعميل قبل إطلاق أي حملة.
@@ -49,7 +59,6 @@
 
 📌 التاريخ والسياق:
 • هل سبق اتعملت حملات Google Ads؟ إيه النتيجة؟
-• هل في ميزانية على Meta / TikTok حالياً؟
 • الموسم الحالي — بيأثر على مجالك؟
 ```
 

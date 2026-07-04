@@ -1,6 +1,6 @@
 # Codex MCP For Google/Clarity/Mangools
 
-Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools with strategy skills for SEO, paid media, and campaign planning.
+Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools with strategy skills for SEO, Google Ads, and campaign planning.
 
 Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let the skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 
@@ -27,8 +27,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 - `marketing-intelligence`: main router for deciding which MCP tools and strategy skill should be used.
 - `seo-strategist`: organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
 - `seo-report-sheet-builder`: turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
-- `google-ads-strategist`: Google Ads planning, diagnosis, bidding, keywords, conversion tracking, landing page readiness, and client reports.
-- `paid-ads-strategist`: multi-platform paid media strategy across Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative, tracking, budget allocation, and launch planning.
+- `google-ads-strategist`: Google Ads planning, Search, PMax, Demand Gen, YouTube, diagnosis, bidding, keywords, conversion tracking, creative/copy, landing page readiness, and client reports.
 
 ## Local Files
 

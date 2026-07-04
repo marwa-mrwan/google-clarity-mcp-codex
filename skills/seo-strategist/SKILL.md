@@ -28,9 +28,11 @@ Before analysis, complete session setup:
 - Website URL
 - Session goal
 - Site type: E-commerce, Content, B2B SaaS, Local, Mixed, or other
-- Available data connectors/files: GSC, Analytics/GA4, Ads, Clarity, Mangools, GTM, crawl export, backlink export, report draft, or manual screenshots
+- Available data connectors/files: GSC, Analytics/GA4, Ads, Clarity, Mangools, GTM, SEMrush full report, Screaming Frog crawl/export, crawl export, backlink export, report draft, or manual screenshots
 
 Before saying data is missing, inspect any user-mentioned local files and likely workspace folders such as `reports/`, `.vscode/`, `exports/`, and `downloads/`. Open editor tabs are only paths, not evidence; read the file first if it is relevant. Do not print secrets from local config files.
+
+For website-wide technical audits or SEO reporting, ask for a full Screaming Frog crawl export and/or SEMrush Site Audit/Organic Research/Backlink report when available. Do not block the work if they are unavailable; label them `not provided` and continue with available crawl, GSC, GA4, Mangools, and manual evidence.
 
 Then ask goal-specific follow-up questions from `references/master-instructions.md`. Summarize the setup and wait for explicit confirmation before starting the analysis unless the user has already provided all needed context and clearly asked to proceed.
 
@@ -70,7 +72,7 @@ Load only the reference needed for the task:
 - `references/specialized/content-briefs/page-type-templates.md`, `references/specialized/content-briefs/keyword-density.md`, and `references/specialized/content-briefs/excluded-domains.md`: SEO content briefs, competitor exclusions, and optimization guardrails.
 - `references/specialized/drift/comparison-rules.md`: content drift, ranking drift, and before/after comparisons.
 - `references/specialized/ecommerce/marketplace-endpoints.md` and `references/specialized/ecommerce/ucp-universal-commerce-protocol.md`: ecommerce marketplace and feed-style analysis supplements.
-- `references/specialized/google-apis/*.md`: Google API readiness, auth, rate limits, GA4, GSC, PageSpeed/CrUX, Indexing API, Keyword Planner, NLP, and YouTube source planning.
+- `references/specialized/google-apis/index.md`: Google API readiness, auth, rate limits, GA4, GSC, PageSpeed/CrUX, Indexing API, Keyword Planner, NLP, and YouTube source planning.
 - `references/specialized/schema/deprecated-types-2024-2026.md`: deprecated schema and implementation risk checks.
 - `references/specialized/sxo/wireframe-templates.md`: page layout and SXO wireframe patterns.
 - `references/specialized/technical/agent-friendly-pages.md`: agent-friendly pages, crawler accessibility, and AI assistant readability.
@@ -111,8 +113,8 @@ Do not ask the user to call a separate SEO skill when a specialized pack covers 
    - Site Launch / Delivery QA
 2. Complete session initialization.
 3. Choose the relevant reference file.
-4. Pull or request the minimum data required for that workflow.
-5. For `SEO Reporting` that should become a spreadsheet, use `seo-report-sheet-builder` after technical audit evidence is collected.
+4. Pull or request the minimum data required for that workflow. For website-wide audits, prefer full-site crawl data from Screaming Frog, SEMrush, or another crawl export when available, then enrich it with GSC, GA4, Mangools, Clarity, GTM, and manual evidence.
+5. For `SEO Reporting` that should become a spreadsheet, use `seo-report-sheet-builder` after technical audit evidence is collected. Pass SEMrush/Screaming Frog URLs and issues into the sheet plan as evidence, but deduplicate so one URL has one primary recommendation per issue type and is routed to the most specific tab.
 6. Separate confirmed findings from hypotheses.
 7. Prioritize by business impact, severity, effort, and dependency order.
 8. Return actions with source labels such as `[GSC]`, `[Analytics]`, `[Clarity]`, `[Mangools]`, `[Crawl]`, `[GTM]`, `[Ads]`, or `[Manual]`.
@@ -213,7 +215,3 @@ Every SEO plan must be organized by dependency order:
 7. Testing and monitoring.
 
 For each action, specify owner type: developer, SEO, content, design, paid media, analytics, or client.
-
-## Attribution
-
-Selected SEO frameworks, advanced packs, and reference material are adapted from the MIT-licensed `codex-seo` and `claude-seo` projects by AgriciDaniel.

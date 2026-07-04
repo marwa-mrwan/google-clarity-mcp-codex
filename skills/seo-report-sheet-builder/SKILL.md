@@ -13,14 +13,14 @@ The output should be an execution workbook: clear tabs, clear owners, evidence, 
 
 Gather the available sources before creating or editing the sheet:
 
-- Crawl data: URL, status, final URL, title, meta, H1, canonical, noindex, word count, images, alt text, JSON-LD, schema validity, sitemap membership, redirect signals, robots.txt.
+- Crawl data from Screaming Frog, SEMrush, site crawler, or custom export: URL, status, final URL, title, meta, H1, canonical, noindex, word count, images, alt text, JSON-LD, schema validity, sitemap membership, redirect signals, robots.txt.
 - GSC page/query performance: clicks, impressions, CTR, average position, query overlap, owner page candidates.
 - GA4 landing page sessions, engagement, conversions, and key events where available.
 - Sitemap and redirect checks.
 - Service, category, product, article, or landing page lists.
 - Optional: Google Doc/report draft to compare coverage against the sheet.
 - Optional: GTM/GA4 tracking audit output for measurement gaps.
-- Optional: Mangools/backlink/keyword-gap exports for opportunity tabs.
+- Optional: SEMrush Site Audit/Organic Research/Backlink reports, Screaming Frog exports, Mangools/backlink/keyword-gap exports for opportunity tabs.
 
 If live Google Sheets is involved, use the Google Sheets skill and read its live-read/edit references first.
 
@@ -57,6 +57,8 @@ Read `references/tab-schema.md` for the complete tab and column plan.
 ## Non-Duplication Rules
 
 - If a problem is already covered in `Service Page Needs`, `Article Page Needs`, `Service Internal Links`, `Article Internal Link`, or `Cannibalization Decisions`, do not repeat it in generic issue tabs.
+- If multiple sources report the same issue for the same URL, merge them into one row with combined evidence/source labels instead of creating duplicate recommendations.
+- A single URL can appear in multiple tabs only when each tab has a genuinely different action type, such as content rewrite, schema fix, image fix, and redirect cleanup. Do not create several competing recommendations for the same URL and issue type.
 - Keep service/category/product page improvement work in the relevant needs tab.
 - Keep service-to-service, category-to-product, and hub-to-supporting-page links in `Service Internal Links`.
 - Keep article-to-owner and article-to-article links in `Article Internal Link`.
@@ -94,8 +96,8 @@ Read `references/tab-schema.md` for the complete tab and column plan.
 ## Workflow
 
 1. Confirm the audit site, date range, country/language, and available sources.
-2. Run or inspect a page-level technical audit first: crawlability, indexability, sitemap, redirects, canonical, metadata, headings, schema, images, thin pages, and speed/CWV.
-3. Pull or inspect GSC/GA4/Mangools/backlink data where available.
+2. Run or inspect a website-wide technical audit first: crawlability, indexability, sitemap, redirects, canonical, metadata, headings, schema, images, thin pages, and speed/CWV for every URL discovered on the website.
+3. Pull or inspect GSC/GA4/Mangools/backlink data where available, and merge SEMrush/Screaming Frog issues with the same URL-level records.
 4. Build normalized source data and classify rows into tab-specific buckets.
 5. Split broad findings into dedicated tabs; remove duplicate rows across execution tabs.
 6. Add exact recommendations, priority, owner/dependency, verification KPI, and source labels.
@@ -115,7 +117,7 @@ Before final response:
 - Confirm technical findings are separated from service/content/cannibalization actions.
 - Confirm data sources and date ranges are recorded in the sheet or final summary.
 - Confirm remaining gaps are labeled precisely: `not checked`, `tool failed`, `rate-limited`, `not configured`, or `available but not used`.
-- Confirm every page has been checked for crawlability, indexability, sitemap membership, redirects, canonical, metadata, headings, schema, images, thin pages, and speed/CWV.
+- Confirm every URL in the website has been checked for crawlability, indexability, sitemap membership, redirects, canonical, metadata, headings, schema, images, thin pages, and speed/CWV, or explicitly list any URL discovery gaps such as blocked crawl, missing sitemap, export limit, or tool failure.
 
 ## Helper Script
 

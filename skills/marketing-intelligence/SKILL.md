@@ -19,8 +19,7 @@ Use this skill as the routing layer for Codex MCP For Google/Clarity/Mangools. P
 ## Strategy Routing
 
 - Use `seo-strategist` for organic search strategy, technical SEO, content strategy, cannibalization, SXO, GEO/AI-search visibility, and Search Console-led recommendations.
-- Use `paid-ads-strategist` as the main umbrella for paid media: Google, Meta, TikTok, LinkedIn, Microsoft, YouTube, creative strategy, tracking/attribution, budget allocation, and channel mix. For medical, healthcare, cosmetic clinic, pharmacy, supplements, telemedicine, fertility, addiction, or clinical-trial work, require a Google policy check before final copy, targeting, or campaign recommendations.
-- Use `google-ads-strategist` as a supporting deep Google Ads reference when the user needs Google-only launch planning, bidding, keywords, account diagnosis, or client reporting. Do not ask the user to call it separately when `paid-ads-strategist` can load the supporting references.
+- Use `google-ads-strategist` as the main paid strategy skill for Google Ads planning, Search, PMax, Demand Gen, YouTube, bidding, keywords, conversion tracking, account diagnosis, creative/copy, and client reporting. For medical, healthcare, cosmetic clinic, pharmacy, supplements, telemedicine, fertility, addiction, or clinical-trial work, require a Google policy check before final copy, targeting, or campaign recommendations.
 - For campaign planning, combine sources in this order: tracking health, business goal, landing page readiness, search intent, paid demand, creative angles, budget rules.
 
 ## Workflow

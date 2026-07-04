@@ -4,6 +4,16 @@
 
 ---
 
+## Table of Contents
+
+- Report types and monthly report structure.
+- Campaign pitch structure.
+- Specialist report review workflow.
+- Client-facing data rules and writing style.
+- Weekly pulse and emergency report templates.
+
+---
+
 ## 🎯 مهمة هذا الـ Project
 
 تحويل البيانات الخام إلى تقرير واضح يقنع العميل ويبني الثقة،
@@ -273,4 +283,3 @@ Legend:
 📞 محتاج قرار من العميل؟ نعم / لا
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
-

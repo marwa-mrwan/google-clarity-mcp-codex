@@ -34,6 +34,11 @@ Load only the reference needed for the task:
 - `references/expert-agent-modes.md`: daily execution modes for new campaign planning, landing page analysis, keyword research, tracking checks, campaign diagnosis, and competitor/site audit.
 - `references/reporting-client-presentation.md`: weekly pulse reports, monthly client reports, launch reports, quarterly reviews, emergency reports, client campaign pitches, and specialist report reviews.
 - `references/medical-policy-check.md`: required before medical/healthcare ad copy, landing page wording, targeting, audience, or compliance recommendations.
+- `references/google-audit.md`: detailed Google Ads audit checklist for Search, PMax, Demand Gen, tracking, wasted spend, account structure, keywords, assets, settings, and quick wins.
+- `references/google-conversion-tracking.md`: Google-only conversion action quality, enhanced conversions, duplicate counting, offline imports, attribution, and verification.
+- `references/google-creative-specs.md`: Google creative and asset requirements for PMax, Demand Gen, YouTube, image assets, logos, and RSA limits.
+- `references/google-copy-frameworks.md`: Google ad copy frameworks, RSA review checklist, sensitive-copy guardrails, and message-angle structure.
+- `references/gaql-notes.md`: Google Ads API/GAQL compatibility, deduplication, filtering, and false-positive prevention.
 
 For broad Google Ads requests, read `master-instructions.md` first, then the specific task reference.
 
@@ -43,6 +48,9 @@ For broad Google Ads requests, read `master-instructions.md` first, then the spe
    - New client or pre-launch strategy: strategic planner.
    - Execution, optimization, keyword research, tracking, site audit, or campaign diagnosis: expert modes.
    - Monthly/weekly reporting, client presentation, pitch, or report review: reporting.
+   - Existing account audit with enough data: Google audit checklist.
+   - Tracking or conversion-quality diagnosis: Google conversion tracking.
+   - Copy, creative, PMax, Demand Gen, or YouTube assets: creative specs and copy frameworks.
    - Define the target audience, segments, campaign theme, campaign type, and bidding strategy using the decision tree in `master-instructions.md`.
 2. Check whether essential inputs are complete.
 3. If incomplete, ask all missing questions in one concise Egyptian Arabic message and stop.
@@ -101,6 +109,7 @@ For any existing-account audit, review these by default. Do not wait for the use
 - Reporting depth:
   - Use `ads_campaign_full_audit` for priority campaigns and `ads_ad_group_full_audit` for priority ad groups.
   - Use `ads_deep_report` report types for `campaign_audience_targets`, `ad_group_audience_targets`, `targeted_location_performance`, `location_targets`, `excluded_locations`, `ad_schedules`, `day_of_week_performance`, `hour_of_day_performance`, `device_performance`, `auction_insights_campaign`, `auction_insights_keyword`, `asset_performance`, `campaign_asset_links`, `conversion_actions`, `campaign_conversion_goals`, `recommendations`, and `change_events`.
+  - Use `gaql-notes.md` before writing custom GAQL or interpreting API edge cases.
   - If one report is unavailable, say exactly which report failed and continue with the rest.
 
 ## Mode Shortcuts
