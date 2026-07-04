@@ -1,6 +1,6 @@
-# Codex MCP For Google/Clarity/Mangools
+# google-clarity-mangools-mcp-codex
 
-Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools for SEO, Google Ads, and campaign analysis.
+google-clarity-mangools-mcp-codex is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools for SEO, Google Ads, and campaign analysis.
 
 Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let separate Codex skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 
@@ -48,8 +48,8 @@ Do not commit local token, credential, account, or `.env` files.
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/marwa-mrwan/codex-mcp-for-google-clarity-mangools.git
-cd codex-mcp-for-google-clarity-mangools
+git clone https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex.git
+cd google-clarity-mangools-mcp-codex
 
 npm install
 cd google-mcp && npm install
