@@ -25,10 +25,10 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 The strategy skills are maintained separately from this MCP repo so they can be reused across projects through `~/.codex/skills`:
 
-- `marketing-intelligence`: main router for deciding which MCP tools and strategy skill should be used.
-- `seo-strategist`: organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
-- `seo-report-sheet-builder`: turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
-- `google-ads-strategist`: Google Ads planning, Search, PMax, Demand Gen, YouTube, diagnosis, bidding, keywords, conversion tracking, creative/copy, landing page readiness, and client reports.
+- [`marketing-intelligence`](https://github.com/marwa-mrwan/marketing-intelligence): main router for deciding which MCP tools and strategy skill should be used.
+- [`seo-strategist`](https://github.com/marwa-mrwan/seo-strategist): organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
+- [`seo-report-sheet-builder`](https://github.com/marwa-mrwan/seo-report-sheet-builder): turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
+- [`google-ads-strategist`](https://github.com/marwa-mrwan/google-ads-strategist): Google Ads planning, Search, PMax, Demand Gen, YouTube, diagnosis, bidding, keywords, conversion tracking, creative/copy, landing page readiness, and client reports.
 
 Install or update them by copying each skill folder into `~/.codex/skills/`, then restart Codex so the session reloads the skill list.
 
