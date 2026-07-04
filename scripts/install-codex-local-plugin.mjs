@@ -14,6 +14,7 @@ const codexConfigPath = path.join(home, ".codex", "config.toml");
 const mcpRoot = repoRoot;
 const secretsFile = path.join(mcpRoot, ".vscode", "mcp.local.env");
 const googleTokenFile = path.join(mcpRoot, ".vscode", "google.tokens.local.json");
+const marketingAccountsFile = path.join(mcpRoot, ".vscode", "marketing.accounts.local.json");
 
 function buildLocalMcpConfig() {
   return {
@@ -24,6 +25,7 @@ function buildLocalMcpConfig() {
         env: {
           MCP_SECRETS_ENV_FILE: secretsFile,
           GOOGLE_TOKEN_FILE: googleTokenFile,
+          MARKETING_ACCOUNTS_FILE: marketingAccountsFile,
         },
       },
       "microsoft-clarity": {
@@ -31,6 +33,7 @@ function buildLocalMcpConfig() {
         args: [path.join(mcpRoot, "clarity-mcp", "index.js")],
         env: {
           MCP_SECRETS_ENV_FILE: secretsFile,
+          MARKETING_ACCOUNTS_FILE: marketingAccountsFile,
         },
       },
       mangools: {
@@ -50,9 +53,12 @@ function installLocalPluginFiles() {
   fs.cpSync(path.join(repoRoot, ".codex-plugin"), path.join(targetPlugin, ".codex-plugin"), {
     recursive: true,
   });
-  fs.cpSync(path.join(repoRoot, "skills"), path.join(targetPlugin, "skills"), {
-    recursive: true,
-  });
+  const skillsDir = path.join(repoRoot, "skills");
+  if (fs.existsSync(skillsDir)) {
+    fs.cpSync(skillsDir, path.join(targetPlugin, "skills"), {
+      recursive: true,
+    });
+  }
   fs.writeFileSync(
     path.join(targetPlugin, ".mcp.json"),
     `${JSON.stringify(buildLocalMcpConfig(), null, 2)}\n`
@@ -71,7 +77,7 @@ function upsertMarketplace() {
   };
 
   if (fs.existsSync(marketplacePath)) {
-    marketplace = JSON.parse(fs.readFileSync(marketplacePath, "utf8"));
+    marketplace = JSON.parse(fs.readFileSync(marketplacePath, "utf8").replace(/^\uFEFF/, ""));
     marketplace.plugins ??= [];
     marketplace.interface ??= { displayName: "Marwa Local Plugins" };
   }
@@ -138,12 +144,12 @@ function upsertCodexConfig() {
     {
       name: "google-marketing-suite",
       script: path.join(mcpRoot, "google-mcp", "index.js"),
-      env: { GOOGLE_TOKEN_FILE: googleTokenFile },
+      env: { GOOGLE_TOKEN_FILE: googleTokenFile, MARKETING_ACCOUNTS_FILE: marketingAccountsFile },
     },
     {
       name: "microsoft-clarity",
       script: path.join(mcpRoot, "clarity-mcp", "index.js"),
-      env: {},
+      env: { MARKETING_ACCOUNTS_FILE: marketingAccountsFile },
     },
     {
       name: "mangools",

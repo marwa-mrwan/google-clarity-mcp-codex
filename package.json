@@ -1,7 +1,4 @@
 {
   "name": "google-clarity-mangools-mcp-codex",
-  "private": true,
-  "devDependencies": {
-    "chrome-devtools-mcp": "1.3.0"
-  }
+  "private": true
 }
