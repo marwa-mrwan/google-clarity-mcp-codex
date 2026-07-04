@@ -1,4 +1,4 @@
-# 📊 Project 3 — Google Ads Reporting & Client Presentation
+# 📊 Google Ads Reporting & Client Presentation
 **النوع:** يُضاف فوق Master Instructions
 **متى تستخدمه:** تقارير شهرية + عروض للعملاء + مراجعة متخصصة
 

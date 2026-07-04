@@ -6,7 +6,7 @@ Use this reference when building a client-ready SEO execution workbook after a t
 
 Columns: Metric, Latest Crawl, Previous Report Figure, Decision Note.
 
-Include totals for crawled URLs, failed fetch, redirected URLs, long titles, missing/long meta, missing/multiple H1, thin pages, invalid JSON-LD, missing image alt, canonical mismatch, noindex pages, issue rows, cluster rows, and missing data.
+Include totals for crawled URLs, failed fetch, redirected URLs, long titles, missing/long meta, missing/multiple H1, thin pages, invalid JSON-LD, missing image alt, canonical mismatch, noindex pages, issue rows, cluster rows, missing data, tools used and the period of time checked.
 
 ## Fix Playbook
 
@@ -20,6 +20,12 @@ Columns: Cluster, URL, Clicks, Impressions, CTR, Avg Position, Proposed Owner, I
 
 Actions: Protect Owner, Merge, De-optimize, Differentiate, Noindex/Redirect.
 
+## Article Page Needs
+
+Columns: Article, Article URL, Clicks, Impressions, CTR, Avg Position, Top Queries, Primary Keywords, Search Intent, What The Page Needs, Exact Content/UX Fix, Schema Needed, Priority, Verification KPI, Checklist.
+
+Use for article improvement work that is not already assigned to Merge, Noindex, Redirect, or Protect Owner in `Cannibalization Decisions`: content blocks, UX, proof, FAQ, CTAs, internal links, schema, and measurement.
+
 ## Service Page Needs
 
 Columns: Service, Service URL, Clicks, Impressions, CTR, Avg Position, Top Queries, Primary Keywords, Search Intent, What The Page Needs, Exact Content/UX Fix, Schema Needed, Priority, Verification KPI, Checklist.
@@ -31,6 +37,8 @@ Use for service, category, product, or money-page improvement work: content bloc
 Columns: Service, Link Direction, Source URL, Source Clicks, Source Impressions, Target URL(internal link), Internal Link Anchor Text, Why Add This Link, Placement Recommendation, Priority, Checklist.
 
 Use for hub/supporting page links, category/product links, and service-to-related-service links.
+
+Color or group rows by source URL or service so repeated recommendations are easy to execute.
 
 ## Article Internal Link
 
@@ -67,8 +75,9 @@ Decision rules:
 - Improve/expand if GSC or GA4 shows meaningful demand.
 - Noindex if the page has no search goal and no conversion role.
 - 301 redirect if a close owner page exists and the page has no distinct intent.
+- Do not duplicate rows that are already handled in `Article Page Needs` or `Service Page Needs`.
 
-## Issue - Image Alt
+## Issue - Image
 
 Columns: Page URL, Image URL, Alt Status, Current Alt Text, File Type, Size KB, Needs WebP/AVIF?, Needs Compression?, Exact Recommendation, Priority, Checklist.
 
@@ -80,11 +89,15 @@ Columns: Redirected URL, Final URL, HTTP Status, Sitemap Fix, Internal Links Fix
 
 Keep useful redirects, but remove redirected URLs from XML sitemaps and internal links.
 
-## Issue - Noindex Sitemap
+## Issue - Links in Sitemap
 
 Columns: URL, Type, Current Indexability, Sitemap Action, Recommended Robots Action, Why, Redirect Needed?, Priority, Verification, Checklist.
 
 Use for thank-you pages, landing tests, sliders, feature pages, tags, low-value categories, faceted/parameter URLs, and archive pages.
+
+## Issue - Robots.txt
+
+Columns: Rule/Path, Current Directive, Affected URL Pattern, Risk, Recommended Fix, Verification, Checklist.
 
 ## Pages Audit
 

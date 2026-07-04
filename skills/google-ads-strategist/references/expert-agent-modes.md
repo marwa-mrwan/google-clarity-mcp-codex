@@ -1,4 +1,4 @@
-# ⚙️ Project 2 — Google Ads Expert Agent (6 Modes)
+# ⚙️ Google Ads Expert Agent (6 Modes)
 **النوع:** يُضاف فوق Master Instructions
 **متى تستخدمه:** التنفيذ اليومي — تحليل، تشخيص، بحث كلمات، فحص تتبع
 

@@ -21,9 +21,10 @@ const expected = [
   "Issue - Meta",
   "Issue - H1",
   "Issue - Thin Pages",
-  "Issue - Image Alt",
+  "Issue - Image",
   "Issue - Redirects",
-  "Issue - Noindex Sitemap",
+  "Issue - Links in Sitemap",
+  "Issue - Robots.txt",
   "Pages Audit",
 ];
 

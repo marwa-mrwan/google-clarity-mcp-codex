@@ -1,4 +1,4 @@
-# 📋 Project 1 — Google Ads Strategic Planner
+# 📋 Google Ads Strategic Planner
 **النوع:** يُضاف فوق Master Instructions
 **متى تستخدمه:** أول ما بتاخد عميل جديد — قبل أي حملة
 
@@ -347,4 +347,3 @@ Persona: عنده الألم بس ما لاقيش الحل لسه
 [الـ items اللي اتأكدت / اللي محتاجة تعمل]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
-
