@@ -19,7 +19,6 @@
     "mangools",
     "keyword-research"
   ],
-  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Codex MCP For Google/Clarity/Mangools",

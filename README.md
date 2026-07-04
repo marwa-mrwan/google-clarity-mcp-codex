@@ -1,8 +1,8 @@
 # Codex MCP For Google/Clarity/Mangools
 
-Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools with strategy skills for SEO, Google Ads, and campaign planning.
+Codex MCP For Google/Clarity/Mangools is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools for SEO, Google Ads, and campaign analysis.
 
-Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let the skills use the MCP tools as evidence for audits, reports, and campaign strategy.
+Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let separate Codex skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 
 ## What Is Included
 
@@ -10,7 +10,6 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 - `clarity-mcp`: Microsoft Clarity project lookup, live insights, metrics, and project analysis.
 - `mangools-mcp`: KWFinder, SERPChecker, LinkMiner, and SiteProfiler research.
 - `chrome-devtools`: local Chrome DevTools MCP for rendered-page checks, console errors, network inspection, screenshots, and landing page QA.
-- `skills/`: strategy skills for SEO, Google Ads, paid media, and marketing intelligence routing.
 - `scripts/`: setup and migration helpers for local account mapping.
 
 ## Tool Routing
@@ -22,12 +21,16 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 - Backlinks and competitors: `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, `siteprofiler_competitors`.
 - UX friction and behavior: `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, `clarity_compare_projects`.
 
-## Strategy Skills
+## Related Strategy Skills
+
+The strategy skills are maintained separately from this MCP repo so they can be reused across projects through `~/.codex/skills`:
 
 - `marketing-intelligence`: main router for deciding which MCP tools and strategy skill should be used.
 - `seo-strategist`: organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
 - `seo-report-sheet-builder`: turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
 - `google-ads-strategist`: Google Ads planning, Search, PMax, Demand Gen, YouTube, diagnosis, bidding, keywords, conversion tracking, creative/copy, landing page readiness, and client reports.
+
+Install or update them by copying each skill folder into `~/.codex/skills/`, then restart Codex so the session reloads the skill list.
 
 ## Local Files
 

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Marketing Intelligence"
-  short_description: "Route Google, Clarity, and Mangools analysis"
-  default_prompt: "Use $marketing-intelligence to analyze a site or account with Google, Clarity, and Mangools MCP tools."

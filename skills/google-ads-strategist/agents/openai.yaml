@@ -1,4 +1,0 @@
-interface:
-  display_name: "Google Ads Strategist"
-  short_description: "Plan, audit, optimize, and report Google Ads"
-  default_prompt: "Use $google-ads-strategist to build a Google Ads strategy, audit a campaign, or write a client report."
