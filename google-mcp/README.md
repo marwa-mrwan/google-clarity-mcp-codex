@@ -95,9 +95,12 @@ Write tools are available but blocked by default. Every write tool defaults to `
 | `ads_set_campaign_locations`, `ads_set_campaign_languages`, `ads_set_campaign_ad_schedules` | Add campaign location, language, and ad schedule criteria. |
 | `ads_add_campaign_negative_keywords`, `ads_add_ad_group_negative_keywords` | Add negative keywords. |
 | `ads_add_keywords`, `ads_pause_keywords`, `ads_enable_keywords`, `ads_update_keyword_bid` | Manage ad group keywords. |
+| `ads_add_display_keywords`, `ads_add_display_placements`, `ads_add_display_topics` | Add Display contextual targeting to ad groups. |
 | `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad`, `ads_create_responsive_display_ad`, `ads_create_video_responsive_ad`, `ads_create_shopping_product_ad` | Manage search, display, video, and shopping ads from explicit inputs/assets. |
 | `ads_create_ad_group`, `ads_create_search_campaign` | Create ad groups across supported Search, Display, Shopping, Hotel, Smart, Travel, and Video types, plus a Search campaign shortcut. |
-| `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group` | Create/update Performance Max asset groups and link existing assets to them. |
+| `ads_create_text_asset`, `ads_upload_image_asset`, `ads_create_youtube_video_asset` | Create real reusable text, image/logo, and YouTube video assets instead of placeholders. |
+| `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group`, `ads_add_pmax_search_themes`, `ads_add_pmax_audience_signal` | Create/update Performance Max asset groups, link existing assets, and add signals. |
+| `ads_create_custom_audience`, `ads_create_audience_from_custom_audiences`, `ads_add_custom_audience_to_ad_group`, `ads_add_audience_to_ad_group` | Create custom audiences, wrap them in Audience resources, and target ad groups. |
 | `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply or dismiss recommendations. |
 | `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
 | `ads_upload_offline_conversion` | Upload click conversions with explicit conversion payloads. |

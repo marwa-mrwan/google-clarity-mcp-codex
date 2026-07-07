@@ -89,6 +89,7 @@ const EU_POLITICAL_ADVERTISING_STATUS = [
   "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING",
   "CONTAINS_EU_POLITICAL_ADVERTISING",
 ];
+const CUSTOM_AUDIENCE_TYPES = ["SEARCH", "BROWSING", "APPS"];
 
 const ADS_DEEP_REPORT_TYPES = [
   "device_performance",
@@ -387,6 +388,19 @@ const WRITE_TOOLS = [
     match_type: { type: "string", enum: ["BROAD", "PHRASE", "EXACT"], default: "PHRASE" },
     cpc_bid: { type: "number", description: "Optional CPC bid in account currency." },
   }, ["ad_group_id", "keywords"]),
+  mutationTool("ads_add_display_keywords", "Safely add Display contextual keyword targeting to an ad group.", {
+    ad_group_id: { type: "string", description: "Display ad group ID without dashes." },
+    keywords: { type: "array", items: { type: "string" }, description: "Contextual keyword texts." },
+    match_type: { type: "string", enum: ["BROAD", "PHRASE", "EXACT"], default: "BROAD" },
+  }, ["ad_group_id", "keywords"]),
+  mutationTool("ads_add_display_placements", "Safely add Display managed placement URL targeting to an ad group.", {
+    ad_group_id: { type: "string", description: "Display ad group ID without dashes." },
+    placement_urls: { type: "array", items: { type: "string" }, description: "Placement URLs/domains." },
+  }, ["ad_group_id", "placement_urls"]),
+  mutationTool("ads_add_display_topics", "Safely add Display topic targeting to an ad group.", {
+    ad_group_id: { type: "string", description: "Display ad group ID without dashes." },
+    topic_ids: { type: "array", items: { type: "string" }, description: "Topic constant IDs." },
+  }, ["ad_group_id", "topic_ids"]),
   mutationTool("ads_pause_keywords", "Safely pause ad group keywords by criterion IDs.", {
     ad_group_id: { type: "string", description: "Ad group ID without dashes." },
     criterion_ids: { type: "array", items: { type: "string" }, description: "Keyword criterion IDs." },
@@ -543,6 +557,38 @@ const WRITE_TOOLS = [
     },
     status: { type: "string", enum: ASSET_GROUP_STATUSES, default: "ENABLED" },
   }, ["asset_group_id", "asset_id", "field_type"]),
+  mutationTool("ads_create_custom_audience", "Safely create a Google Ads custom audience from explicit keywords, URLs, apps, or place categories.", {
+    name: { type: "string", description: "Custom audience name." },
+    type: { type: "string", enum: CUSTOM_AUDIENCE_TYPES, default: "SEARCH" },
+    description: { type: "string", description: "Optional custom audience description." },
+    keywords: { type: "array", items: { type: "string" }, description: "Optional intent keywords." },
+    urls: { type: "array", items: { type: "string" }, description: "Optional interest URLs." },
+    app_package_names: { type: "array", items: { type: "string" }, description: "Optional Android app package names." },
+    place_category_ids: { type: "array", items: { type: "string" }, description: "Optional Google place category IDs." },
+  }, ["name"]),
+  mutationTool("ads_create_audience_from_custom_audiences", "Safely create an Audience resource from existing custom audiences for ad group targeting or PMax signals.", {
+    name: { type: "string", description: "Audience name. Required for CUSTOMER scope; ignored for ASSET_GROUP scope." },
+    custom_audience_ids: { type: "array", items: { type: "string" }, description: "Custom audience IDs without dashes." },
+    description: { type: "string", description: "Optional audience description." },
+    scope: { type: "string", enum: ["CUSTOMER", "ASSET_GROUP"], default: "CUSTOMER" },
+    asset_group_id: { type: "string", description: "Required only when scope is ASSET_GROUP." },
+  }, ["custom_audience_ids"]),
+  mutationTool("ads_add_custom_audience_to_ad_group", "Safely target an existing custom audience in an ad group.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    custom_audience_id: { type: "string", description: "Custom audience ID without dashes." },
+  }, ["ad_group_id", "custom_audience_id"]),
+  mutationTool("ads_add_audience_to_ad_group", "Safely target an existing audience resource in an ad group.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    audience_id: { type: "string", description: "Audience ID without dashes." },
+  }, ["ad_group_id", "audience_id"]),
+  mutationTool("ads_add_pmax_search_themes", "Safely add Performance Max search theme signals to an asset group.", {
+    asset_group_id: { type: "string", description: "Asset group ID without dashes." },
+    search_themes: { type: "array", items: { type: "string" }, description: "Search theme texts." },
+  }, ["asset_group_id", "search_themes"]),
+  mutationTool("ads_add_pmax_audience_signal", "Safely add an existing audience as a Performance Max asset group signal.", {
+    asset_group_id: { type: "string", description: "Asset group ID without dashes." },
+    audience_id: { type: "string", description: "Audience ID without dashes." },
+  }, ["asset_group_id", "audience_id"]),
   mutationTool("ads_set_campaign_locations", "Safely add included or excluded location targets to a campaign.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
     geo_target_ids: { type: "array", items: { type: "string" }, description: "Geo target constant IDs, e.g. 2818 for Egypt." },
@@ -572,6 +618,16 @@ const WRITE_TOOLS = [
     description1: { type: "string", description: "Optional description line 1." },
     description2: { type: "string", description: "Optional description line 2." },
   }, ["link_text", "final_urls"]),
+  mutationTool("ads_create_text_asset", "Safely create a reusable Google Ads text asset for PMax or asset links.", {
+    text: { type: "string", description: "Asset text." },
+  }, ["text"]),
+  mutationTool("ads_upload_image_asset", "Safely upload a real image/logo asset from base64 image bytes.", {
+    name: { type: "string", description: "Asset name." },
+    image_data_base64: { type: "string", description: "Base64 encoded image bytes, without a data URL prefix." },
+  }, ["name", "image_data_base64"]),
+  mutationTool("ads_create_youtube_video_asset", "Safely create a reusable YouTube video asset from a YouTube video ID.", {
+    youtube_video_id: { type: "string", description: "YouTube video ID, not the full URL." },
+  }, ["youtube_video_id"]),
   mutationTool("ads_link_asset_to_campaign", "Safely link an existing asset to a campaign.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
     asset_id: { type: "string", description: "Asset ID without dashes." },
@@ -1191,11 +1247,20 @@ export async function handleAdsTool(name, args, authClient) {
   const assetResource = (customerId, assetId) =>
     `customers/${customerId}/assets/${assertNumericId(assetId, "asset_id")}`;
 
+  const customAudienceResource = (customerId, customAudienceId) =>
+    `customers/${customerId}/customAudiences/${assertNumericId(customAudienceId, "custom_audience_id")}`;
+
+  const audienceResource = (customerId, audienceId) =>
+    `customers/${customerId}/audiences/${assertNumericId(audienceId, "audience_id")}`;
+
   const geoTargetConstantResource = (geoTargetId) =>
     `geoTargetConstants/${assertNumericId(geoTargetId, "geo_target_id")}`;
 
   const languageConstantResource = (languageId) =>
     `languageConstants/${assertNumericId(languageId, "language_id")}`;
+
+  const topicConstantResource = (topicId) =>
+    `topicConstants/${assertNumericId(topicId, "topic_id")}`;
 
   const allowedMutationCustomerIds = () =>
     new Set(
@@ -2235,6 +2300,46 @@ export async function handleAdsTool(name, args, authClient) {
       },
     }));
 
+  const buildCustomAudienceMembers = (args) => {
+    const members = [];
+    if (args.keywords) {
+      members.push(
+        ...assertStringArray(args.keywords, "keywords", { min: 1, max: 500, itemMax: 80 }).map((keyword) => ({
+          memberType: "KEYWORD",
+          keyword,
+        }))
+      );
+    }
+    if (args.urls) {
+      members.push(
+        ...assertStringArray(args.urls, "urls", { min: 1, max: 500, itemMax: 2048 }).map((url) => ({
+          memberType: "URL",
+          url,
+        }))
+      );
+    }
+    if (args.app_package_names) {
+      members.push(
+        ...assertStringArray(args.app_package_names, "app_package_names", { min: 1, max: 500, itemMax: 255 }).map((app) => ({
+          memberType: "APP",
+          app,
+        }))
+      );
+    }
+    if (args.place_category_ids) {
+      members.push(
+        ...assertStringArray(args.place_category_ids, "place_category_ids", { min: 1, max: 500, itemMax: 32 }).map((placeCategoryId) => ({
+          memberType: "PLACE_CATEGORY",
+          placeCategory: Number(assertNumericId(placeCategoryId, "place_category_id")),
+        }))
+      );
+    }
+    if (members.length === 0) {
+      throw new Error("ads_create_custom_audience requires at least one keyword, URL, app package name, or place category ID.");
+    }
+    return members;
+  };
+
   const buildMutation = (toolName, args, customerId) => {
     switch (toolName) {
       case "ads_pause_campaign":
@@ -2365,6 +2470,45 @@ export async function handleAdsTool(name, args, authClient) {
               negative: false,
               cpcBid: args.cpc_bid,
             }),
+          },
+        };
+      case "ads_add_display_keywords":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: buildKeywordOperations({
+              customerId,
+              adGroupId: args.ad_group_id,
+              keywords: args.keywords,
+              matchType: args.match_type || "BROAD",
+              negative: false,
+            }),
+          },
+        };
+      case "ads_add_display_placements":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.placement_urls, "placement_urls", { min: 1, max: 100, itemMax: 2048 }).map((url) => ({
+              create: {
+                adGroup: adGroupResource(customerId, args.ad_group_id),
+                status: "ENABLED",
+                placement: { url },
+              },
+            })),
+          },
+        };
+      case "ads_add_display_topics":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.topic_ids, "topic_ids", { min: 1, max: 100, itemMax: 32 }).map((topicId) => ({
+              create: {
+                adGroup: adGroupResource(customerId, args.ad_group_id),
+                status: "ENABLED",
+                topic: { topicConstant: topicConstantResource(topicId) },
+              },
+            })),
           },
         };
       case "ads_pause_keywords":
@@ -2728,6 +2872,115 @@ export async function handleAdsTool(name, args, authClient) {
             ],
           },
         };
+      case "ads_create_custom_audience": {
+        const customAudience = {
+          name: assertNonEmptyString(args.name, "name", 255),
+          type: assertEnum(args.type, "type", CUSTOM_AUDIENCE_TYPES, "SEARCH"),
+          members: buildCustomAudienceMembers(args),
+        };
+        if (args.description) {
+          customAudience.description = assertNonEmptyString(args.description, "description", 255);
+        }
+        return {
+          endpoint: `/customers/${customerId}/customAudiences:mutate`,
+          body: { operations: [{ create: customAudience }] },
+        };
+      }
+      case "ads_create_audience_from_custom_audiences": {
+        const scope = assertEnum(args.scope, "scope", ["CUSTOMER", "ASSET_GROUP"], "CUSTOMER");
+        const audience = {
+          scope,
+          dimensions: [
+            {
+              audienceSegments: {
+                segments: assertStringArray(args.custom_audience_ids, "custom_audience_ids", {
+                  min: 1,
+                  max: 100,
+                  itemMax: 32,
+                }).map((customAudienceId) => ({
+                  customAudience: {
+                    customAudience: customAudienceResource(customerId, customAudienceId),
+                  },
+                })),
+              },
+            },
+          ],
+        };
+        if (scope === "CUSTOMER") {
+          audience.name = assertNonEmptyString(args.name, "name", 255);
+        } else {
+          audience.assetGroup = assetGroupResource(customerId, args.asset_group_id);
+        }
+        if (args.description) {
+          audience.description = assertNonEmptyString(args.description, "description", 255);
+        }
+        return {
+          endpoint: `/customers/${customerId}/audiences:mutate`,
+          body: { operations: [{ create: audience }] },
+        };
+      }
+      case "ads_add_custom_audience_to_ad_group":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: "ENABLED",
+                  customAudience: {
+                    customAudience: customAudienceResource(customerId, args.custom_audience_id),
+                  },
+                },
+              },
+            ],
+          },
+        };
+      case "ads_add_audience_to_ad_group":
+        return {
+          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: "ENABLED",
+                  audience: {
+                    audience: audienceResource(customerId, args.audience_id),
+                  },
+                },
+              },
+            ],
+          },
+        };
+      case "ads_add_pmax_search_themes":
+        return {
+          endpoint: `/customers/${customerId}/assetGroupSignals:mutate`,
+          body: {
+            operations: assertStringArray(args.search_themes, "search_themes", { min: 1, max: 25, itemMax: 80 }).map((text) => ({
+              create: {
+                assetGroup: assetGroupResource(customerId, args.asset_group_id),
+                searchTheme: { text },
+              },
+            })),
+          },
+        };
+      case "ads_add_pmax_audience_signal":
+        return {
+          endpoint: `/customers/${customerId}/assetGroupSignals:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  assetGroup: assetGroupResource(customerId, args.asset_group_id),
+                  audience: {
+                    audience: audienceResource(customerId, args.audience_id),
+                  },
+                },
+              },
+            ],
+          },
+        };
       case "ads_set_campaign_locations":
         return {
           endpoint: `/customers/${customerId}/campaignCriteria:mutate`,
@@ -2780,6 +3033,57 @@ export async function handleAdsTool(name, args, authClient) {
           body: {
             operations: [
               { resourceName: assertNonEmptyString(args.recommendation_resource_name, "recommendation_resource_name") },
+            ],
+          },
+        };
+      case "ads_create_text_asset":
+        return {
+          endpoint: `/customers/${customerId}/assets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  textAsset: {
+                    text: assertNonEmptyString(args.text, "text", 90),
+                  },
+                },
+              },
+            ],
+          },
+        };
+      case "ads_upload_image_asset": {
+        const imageData = assertNonEmptyString(args.image_data_base64, "image_data_base64");
+        if (!/^[A-Za-z0-9+/]+={0,2}$/.test(imageData)) {
+          throw new Error("image_data_base64 must be base64 bytes without a data URL prefix.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/assets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  name: assertNonEmptyString(args.name, "name", 255),
+                  imageAsset: {
+                    data: imageData,
+                  },
+                },
+              },
+            ],
+          },
+        };
+      }
+      case "ads_create_youtube_video_asset":
+        return {
+          endpoint: `/customers/${customerId}/assets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  youtubeVideoAsset: {
+                    youtubeVideoId: assertNonEmptyString(args.youtube_video_id, "youtube_video_id", 64),
+                  },
+                },
+              },
             ],
           },
         };
