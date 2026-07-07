@@ -41,6 +41,55 @@ const MUTATION_SAFETY_PROPERTIES = {
   },
 };
 
+const CAMPAIGN_CHANNEL_TYPES = [
+  "SEARCH",
+  "DISPLAY",
+  "SHOPPING",
+  "HOTEL",
+  "VIDEO",
+  "MULTI_CHANNEL",
+  "LOCAL",
+  "SMART",
+  "PERFORMANCE_MAX",
+  "LOCAL_SERVICES",
+  "TRAVEL",
+  "DEMAND_GEN",
+];
+const CAMPAIGN_STATUSES = ["ENABLED", "PAUSED"];
+const ASSET_GROUP_STATUSES = ["ENABLED", "PAUSED"];
+const AD_GROUP_TYPES = [
+  "SEARCH_STANDARD",
+  "SEARCH_DYNAMIC_ADS",
+  "DISPLAY_STANDARD",
+  "SHOPPING_PRODUCT_ADS",
+  "SHOPPING_SMART_ADS",
+  "SHOPPING_COMPARISON_LISTING_ADS",
+  "HOTEL_ADS",
+  "PROMOTED_HOTEL_ADS",
+  "SMART_CAMPAIGN_ADS",
+  "TRAVEL_ADS",
+  "VIDEO_BUMPER",
+  "VIDEO_EFFICIENT_REACH",
+  "VIDEO_NON_SKIPPABLE_IN_STREAM",
+  "VIDEO_RESPONSIVE",
+  "VIDEO_TRUE_VIEW_IN_DISPLAY",
+  "VIDEO_TRUE_VIEW_IN_STREAM",
+  "YOUTUBE_AUDIO",
+];
+const BIDDING_STRATEGY_TYPES = [
+  "MANUAL_CPC",
+  "MAXIMIZE_CONVERSIONS",
+  "MAXIMIZE_CONVERSION_VALUE",
+  "TARGET_CPA",
+  "TARGET_ROAS",
+];
+const WEEK_DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+const MINUTE_OF_HOUR = ["ZERO", "FIFTEEN", "THIRTY", "FORTY_FIVE"];
+const EU_POLITICAL_ADVERTISING_STATUS = [
+  "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING",
+  "CONTAINS_EU_POLITICAL_ADVERTISING",
+];
+
 const ADS_DEEP_REPORT_TYPES = [
   "device_performance",
   "geo_performance",
@@ -278,25 +327,28 @@ const ADVANCED_READ_TOOLS = [
     },
     ["customer_id", "ad_group_id"]
   ),
+  readTool(
+    "ads_suggest_campaign_budget",
+    "Suggest campaign budget amounts without creating or modifying any Google Ads budget.",
+    {
+      customer_id: CUSTOMER_ID_PROPERTY,
+      monthly_budget: { type: "number", description: "Optional planned monthly budget in account currency." },
+      daily_budget: { type: "number", description: "Optional planned daily budget in account currency." },
+      expected_cpc: { type: "number", description: "Optional expected CPC in account currency." },
+      target_clicks: { type: "number", description: "Optional target clicks per month." },
+      days_per_month: { type: "number", description: "Planning days per month. Defaults to 30.4.", default: 30.4 },
+    },
+    ["customer_id"]
+  ),
 ];
 
 const WRITE_TOOLS = [
-  mutationTool("ads_create_campaign_budget", "Safely create a campaign budget.", {
-    name: { type: "string", description: "Campaign budget name." },
-    amount: { type: "number", description: "Budget amount in the account currency, not micros." },
-    delivery_method: { type: "string", enum: ["STANDARD", "ACCELERATED"], default: "STANDARD" },
-    explicitly_shared: { type: "boolean", description: "Whether the budget is shared.", default: false },
-  }, ["name", "amount"]),
   mutationTool("ads_pause_campaign", "Safely pause a campaign.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
   }, ["campaign_id"]),
   mutationTool("ads_enable_campaign", "Safely enable a campaign.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
   }, ["campaign_id"]),
-  mutationTool("ads_update_campaign_budget", "Safely update a campaign budget amount.", {
-    budget_id: { type: "string", description: "Campaign budget ID without dashes." },
-    amount: { type: "number", description: "Budget amount in the account currency, not micros." },
-  }, ["budget_id", "amount"]),
   mutationTool("ads_update_campaign_dates", "Safely update campaign start and/or end dates.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
     start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
@@ -306,7 +358,7 @@ const WRITE_TOOLS = [
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
     bidding_strategy_type: {
       type: "string",
-      enum: ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS", "MAXIMIZE_CONVERSION_VALUE", "TARGET_CPA", "TARGET_ROAS"],
+      enum: BIDDING_STRATEGY_TYPES,
     },
     target_cpa: { type: "number", description: "Optional target CPA in account currency." },
     target_roas: { type: "number", description: "Optional target ROAS as a decimal, e.g. 3.5." },
@@ -365,6 +417,35 @@ const WRITE_TOOLS = [
     path2: { type: "string", description: "Optional path 2." },
     status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
   }, ["ad_group_id", "final_urls", "headlines", "descriptions"]),
+  mutationTool("ads_create_responsive_display_ad", "Safely create a responsive display ad using existing Google Ads image/logo asset IDs.", {
+    ad_group_id: { type: "string", description: "Display ad group ID without dashes." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
+    marketing_image_asset_ids: { type: "array", items: { type: "string" }, description: "Landscape marketing image asset IDs." },
+    square_marketing_image_asset_ids: { type: "array", items: { type: "string" }, description: "Optional square marketing image asset IDs." },
+    logo_image_asset_ids: { type: "array", items: { type: "string" }, description: "Optional logo image asset IDs." },
+    square_logo_image_asset_ids: { type: "array", items: { type: "string" }, description: "Optional square logo image asset IDs." },
+    headlines: { type: "array", items: { type: "string" }, description: "Short headlines." },
+    long_headline: { type: "string", description: "Long headline." },
+    descriptions: { type: "array", items: { type: "string" }, description: "Descriptions." },
+    business_name: { type: "string", description: "Advertiser business name." },
+    call_to_action_text: { type: "string", description: "Optional call to action text." },
+    status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
+  }, ["ad_group_id", "final_urls", "marketing_image_asset_ids", "headlines", "long_headline", "descriptions", "business_name"]),
+  mutationTool("ads_create_video_responsive_ad", "Safely create a YouTube/video responsive ad using existing video and logo asset IDs.", {
+    ad_group_id: { type: "string", description: "Video ad group ID without dashes." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
+    video_asset_ids: { type: "array", items: { type: "string" }, description: "YouTube video asset IDs." },
+    logo_image_asset_ids: { type: "array", items: { type: "string" }, description: "Logo image asset IDs." },
+    companion_banner_asset_ids: { type: "array", items: { type: "string" }, description: "Optional companion banner image asset IDs." },
+    headlines: { type: "array", items: { type: "string" }, description: "Short headline. Google currently supports one." },
+    long_headlines: { type: "array", items: { type: "string" }, description: "Long headline. Google currently supports one." },
+    descriptions: { type: "array", items: { type: "string" }, description: "Description. Google currently supports one." },
+    business_name: { type: "string", description: "Advertiser or brand name." },
+    call_to_actions: { type: "array", items: { type: "string" }, description: "CTA text. Google currently supports one." },
+    breadcrumb1: { type: "string", description: "Optional display URL breadcrumb 1." },
+    breadcrumb2: { type: "string", description: "Optional display URL breadcrumb 2." },
+    status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
+  }, ["ad_group_id", "final_urls", "video_asset_ids", "logo_image_asset_ids", "headlines", "long_headlines", "descriptions", "business_name", "call_to_actions"]),
   mutationTool("ads_update_responsive_search_ad", "Safely update a responsive search ad.", {
     ad_group_id: { type: "string", description: "Ad group ID without dashes." },
     ad_id: { type: "string", description: "Ad ID without dashes." },
@@ -374,13 +455,42 @@ const WRITE_TOOLS = [
     path1: { type: "string", description: "Optional path 1." },
     path2: { type: "string", description: "Optional path 2." },
   }, ["ad_group_id", "ad_id"]),
-  mutationTool("ads_create_ad_group", "Safely create a search ad group.", {
+  mutationTool("ads_create_shopping_product_ad", "Safely create a Shopping product ad in an existing Shopping ad group.", {
+    ad_group_id: { type: "string", description: "Shopping ad group ID without dashes." },
+    status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
+  }, ["ad_group_id"]),
+  mutationTool("ads_create_ad_group", "Safely create an ad group for supported Search, Display, Shopping, Hotel, Smart, Travel, and Video campaign types.", {
     campaign_id: { type: "string", description: "Campaign ID without dashes." },
     name: { type: "string", description: "Ad group name." },
-    status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
-    type: { type: "string", enum: ["SEARCH_STANDARD"], default: "SEARCH_STANDARD" },
+    status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
+    type: { type: "string", enum: AD_GROUP_TYPES, default: "SEARCH_STANDARD" },
     cpc_bid: { type: "number", description: "Optional CPC bid in account currency." },
   }, ["campaign_id", "name"]),
+  mutationTool("ads_create_campaign", "Safely create a Google Ads campaign shell for common channel types using an existing budget ID.", {
+    name: { type: "string", description: "Campaign name." },
+    budget_id: { type: "string", description: "Existing campaign budget ID without dashes. The MCP never creates or edits budgets." },
+    advertising_channel_type: { type: "string", enum: CAMPAIGN_CHANNEL_TYPES, default: "SEARCH" },
+    advertising_channel_sub_type: { type: "string", description: "Optional Google Ads channel subtype, for example VIDEO_ACTION." },
+    status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
+    start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
+    end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
+    bidding_strategy_type: { type: "string", enum: BIDDING_STRATEGY_TYPES, default: "MANUAL_CPC" },
+    target_cpa: { type: "number", description: "Optional target CPA in account currency." },
+    target_roas: { type: "number", description: "Optional target ROAS as a decimal, e.g. 3.5." },
+    target_google_search: { type: "boolean", description: "Search campaigns only. Defaults to true.", default: true },
+    target_search_network: { type: "boolean", description: "Search campaigns only. Defaults to true.", default: true },
+    target_content_network: { type: "boolean", description: "Search campaigns only. Defaults to false.", default: false },
+    target_partner_search_network: { type: "boolean", description: "Search campaigns only. Defaults to false.", default: false },
+    merchant_id: { type: "string", description: "Shopping campaigns only. Merchant Center ID." },
+    sales_country: { type: "string", description: "Shopping campaigns only. Two-letter country code, e.g. EG or US." },
+    campaign_priority: { type: "number", description: "Shopping campaigns only. Priority 0-2.", default: 0 },
+    enable_local: { type: "boolean", description: "Shopping campaigns only. Enable local inventory ads.", default: false },
+    contains_eu_political_advertising: {
+      type: "string",
+      enum: EU_POLITICAL_ADVERTISING_STATUS,
+      default: "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING",
+    },
+  }, ["name", "budget_id"]),
   mutationTool("ads_create_search_campaign", "Safely create a search campaign using an existing explicit budget.", {
     name: { type: "string", description: "Campaign name." },
     budget_id: { type: "string", description: "Existing campaign budget ID without dashes." },
@@ -388,7 +498,68 @@ const WRITE_TOOLS = [
     start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
     end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
     bidding_strategy_type: { type: "string", enum: ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS"], default: "MANUAL_CPC" },
+    contains_eu_political_advertising: {
+      type: "string",
+      enum: EU_POLITICAL_ADVERTISING_STATUS,
+      default: "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING",
+    },
   }, ["name", "budget_id"]),
+  mutationTool("ads_update_campaign_settings", "Safely update common campaign settings such as name, status, dates, tracking, and search network flags. It never changes campaign budgets.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    name: { type: "string", description: "Optional new campaign name." },
+    status: { type: "string", enum: CAMPAIGN_STATUSES },
+    start_date: { type: "string", description: "Optional start date in YYYY-MM-DD format." },
+    end_date: { type: "string", description: "Optional end date in YYYY-MM-DD format." },
+    tracking_url_template: { type: "string", description: "Optional tracking URL template." },
+    final_url_suffix: { type: "string", description: "Optional final URL suffix." },
+    target_google_search: { type: "boolean", description: "Search campaigns only." },
+    target_search_network: { type: "boolean", description: "Search campaigns only." },
+    target_content_network: { type: "boolean", description: "Search campaigns only." },
+    target_partner_search_network: { type: "boolean", description: "Search campaigns only." },
+  }, ["campaign_id"]),
+  mutationTool("ads_create_pmax_asset_group", "Safely create a Performance Max asset group using existing campaign and final URLs.", {
+    campaign_id: { type: "string", description: "Performance Max campaign ID without dashes." },
+    name: { type: "string", description: "Asset group name." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
+    final_mobile_urls: { type: "array", items: { type: "string" }, description: "Optional final mobile URLs." },
+    path1: { type: "string", description: "Optional display URL path 1." },
+    path2: { type: "string", description: "Optional display URL path 2." },
+    status: { type: "string", enum: ASSET_GROUP_STATUSES, default: "PAUSED" },
+  }, ["campaign_id", "name", "final_urls"]),
+  mutationTool("ads_update_asset_group", "Safely update a Performance Max asset group's status, URLs, or display paths.", {
+    asset_group_id: { type: "string", description: "Asset group ID without dashes." },
+    status: { type: "string", enum: ASSET_GROUP_STATUSES },
+    final_urls: { type: "array", items: { type: "string" }, description: "Optional replacement final URLs." },
+    final_mobile_urls: { type: "array", items: { type: "string" }, description: "Optional replacement final mobile URLs." },
+    path1: { type: "string", description: "Optional display URL path 1." },
+    path2: { type: "string", description: "Optional display URL path 2." },
+  }, ["asset_group_id"]),
+  mutationTool("ads_link_asset_to_asset_group", "Safely link an existing asset to a Performance Max asset group.", {
+    asset_group_id: { type: "string", description: "Asset group ID without dashes." },
+    asset_id: { type: "string", description: "Asset ID without dashes." },
+    field_type: {
+      type: "string",
+      description: "Asset field type, for example HEADLINE, LONG_HEADLINE, DESCRIPTION, BUSINESS_NAME, MARKETING_IMAGE, SQUARE_MARKETING_IMAGE, LOGO, or YOUTUBE_VIDEO.",
+    },
+    status: { type: "string", enum: ASSET_GROUP_STATUSES, default: "ENABLED" },
+  }, ["asset_group_id", "asset_id", "field_type"]),
+  mutationTool("ads_set_campaign_locations", "Safely add included or excluded location targets to a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    geo_target_ids: { type: "array", items: { type: "string" }, description: "Geo target constant IDs, e.g. 2818 for Egypt." },
+    negative: { type: "boolean", description: "Set true to exclude locations.", default: false },
+  }, ["campaign_id", "geo_target_ids"]),
+  mutationTool("ads_set_campaign_languages", "Safely add language targets to a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    language_ids: { type: "array", items: { type: "string" }, description: "Language constant IDs, e.g. 1000 English, 1019 Arabic." },
+  }, ["campaign_id", "language_ids"]),
+  mutationTool("ads_set_campaign_ad_schedules", "Safely add ad schedule targets to a campaign.", {
+    campaign_id: { type: "string", description: "Campaign ID without dashes." },
+    schedules: {
+      type: "array",
+      items: { type: "object" },
+      description: "Schedule objects with day_of_week, start_hour, start_minute, end_hour, and end_minute.",
+    },
+  }, ["campaign_id", "schedules"]),
   mutationTool("ads_apply_recommendation", "Safely apply a Google Ads recommendation.", {
     recommendation_resource_name: { type: "string", description: "Full recommendation resource name." },
   }, ["recommendation_resource_name"]),
@@ -881,6 +1052,22 @@ export async function handleAdsTool(name, args, authClient) {
     return text;
   };
 
+  const assertBoolean = (value, field, fallback) => {
+    if (value === undefined || value === null) return fallback;
+    if (typeof value !== "boolean") {
+      throw new Error(`${field} must be a boolean.`);
+    }
+    return value;
+  };
+
+  const assertHour = (value, field) => {
+    const number = Number(value);
+    if (!Number.isInteger(number) || number < 0 || number > 24) {
+      throw new Error(`${field} must be an integer from 0 to 24.`);
+    }
+    return number;
+  };
+
   const stringContainsFilter = (field, value) => {
     if (!value) return "";
     return `AND ${field} LIKE '%${String(value).replaceAll("'", "\\'")}%'`;
@@ -998,8 +1185,17 @@ export async function handleAdsTool(name, args, authClient) {
   const adGroupAdResource = (customerId, adGroupId, adId) =>
     `customers/${customerId}/adGroupAds/${assertNumericId(adGroupId, "ad_group_id")}~${assertNumericId(adId, "ad_id")}`;
 
+  const assetGroupResource = (customerId, assetGroupId) =>
+    `customers/${customerId}/assetGroups/${assertNumericId(assetGroupId, "asset_group_id")}`;
+
   const assetResource = (customerId, assetId) =>
     `customers/${customerId}/assets/${assertNumericId(assetId, "asset_id")}`;
+
+  const geoTargetConstantResource = (geoTargetId) =>
+    `geoTargetConstants/${assertNumericId(geoTargetId, "geo_target_id")}`;
+
+  const languageConstantResource = (languageId) =>
+    `languageConstants/${assertNumericId(languageId, "language_id")}`;
 
   const allowedMutationCustomerIds = () =>
     new Set(
@@ -1071,9 +1267,9 @@ export async function handleAdsTool(name, args, authClient) {
   const executeMutation = async ({ tool, customerId, endpoint, body, args }) => {
     const normalizedCustomerId = normalizeCustomerId(customerId);
     const requestBody = {
-      partialFailure: args.partial_failure === true,
-      validateOnly: args.validate_only === true,
       ...body,
+      ...(args.partial_failure === true && { partialFailure: true }),
+      ...(args.validate_only === true && { validateOnly: true }),
     };
     const preview = {
       tool,
@@ -1927,6 +2123,104 @@ export async function handleAdsTool(name, args, authClient) {
       text,
     }));
 
+  const makeAssetRefs = (customerId, assetIds, field, { min = 1, max = 20 } = {}) =>
+    assertStringArray(assetIds, field, { min, max, itemMax: 32 }).map((assetId) => ({
+      asset: assetResource(customerId, assetId),
+    }));
+
+  const optionalAssetRefs = (customerId, assetIds, field, max = 20) =>
+    assetIds ? makeAssetRefs(customerId, assetIds, field, { min: 1, max }) : undefined;
+
+  const applyBiddingStrategy = (campaign, args, defaultType = "MANUAL_CPC") => {
+    const biddingType = assertEnum(args.bidding_strategy_type, "bidding_strategy_type", BIDDING_STRATEGY_TYPES, defaultType);
+    if (biddingType === "MANUAL_CPC") {
+      campaign.manualCpc = {};
+    } else if (biddingType === "MAXIMIZE_CONVERSIONS") {
+      campaign.maximizeConversions = {};
+      if (args.target_cpa !== undefined) {
+        campaign.maximizeConversions.targetCpaMicros = amountToMicros(args.target_cpa, "target_cpa");
+      }
+    } else if (biddingType === "MAXIMIZE_CONVERSION_VALUE") {
+      campaign.maximizeConversionValue = {};
+      if (args.target_roas !== undefined) {
+        campaign.maximizeConversionValue.targetRoas = assertFiniteNumber(args.target_roas, "target_roas", 0);
+      }
+    } else if (biddingType === "TARGET_CPA") {
+      campaign.targetCpa = { targetCpaMicros: amountToMicros(args.target_cpa, "target_cpa") };
+    } else if (biddingType === "TARGET_ROAS") {
+      campaign.targetRoas = { targetRoas: assertFiniteNumber(args.target_roas, "target_roas", 0) };
+    }
+  };
+
+  const defaultBiddingForChannel = (channelType) => {
+    if (channelType === "PERFORMANCE_MAX") return "MAXIMIZE_CONVERSION_VALUE";
+    if (channelType === "DEMAND_GEN" || channelType === "VIDEO") return "MAXIMIZE_CONVERSIONS";
+    return "MANUAL_CPC";
+  };
+
+  const buildCampaignCreate = (args, customerId, forcedChannelType) => {
+    const channelType = assertEnum(
+      forcedChannelType || args.advertising_channel_type,
+      "advertising_channel_type",
+      CAMPAIGN_CHANNEL_TYPES,
+      "SEARCH"
+    );
+    const campaign = {
+      name: assertNonEmptyString(args.name, "name", 255),
+      status: assertEnum(args.status, "status", CAMPAIGN_STATUSES, "PAUSED"),
+      advertisingChannelType: channelType,
+      campaignBudget: budgetResource(customerId, args.budget_id),
+      containsEuPoliticalAdvertising: assertEnum(
+        args.contains_eu_political_advertising,
+        "contains_eu_political_advertising",
+        EU_POLITICAL_ADVERTISING_STATUS,
+        "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
+      ),
+    };
+    if (args.advertising_channel_sub_type) {
+      campaign.advertisingChannelSubType = assertNonEmptyString(
+        args.advertising_channel_sub_type,
+        "advertising_channel_sub_type",
+        80
+      );
+    }
+    const startDate = assertDate(args.start_date, "start_date");
+    const endDate = assertDate(args.end_date, "end_date");
+    if (startDate) campaign.startDate = startDate;
+    if (endDate) campaign.endDate = endDate;
+    if (channelType === "SEARCH") {
+      campaign.networkSettings = {
+        targetGoogleSearch: assertBoolean(args.target_google_search, "target_google_search", true),
+        targetSearchNetwork: assertBoolean(args.target_search_network, "target_search_network", true),
+        targetContentNetwork: assertBoolean(args.target_content_network, "target_content_network", false),
+        targetPartnerSearchNetwork: assertBoolean(args.target_partner_search_network, "target_partner_search_network", false),
+      };
+    }
+    if (channelType === "SHOPPING") {
+      campaign.shoppingSetting = {
+        merchantId: assertNonEmptyString(args.merchant_id, "merchant_id", 32),
+        salesCountry: assertNonEmptyString(args.sales_country, "sales_country", 2).toUpperCase(),
+        campaignPriority: Math.min(Math.max(Number(args.campaign_priority ?? 0), 0), 2),
+        enableLocal: assertBoolean(args.enable_local, "enable_local", false),
+      };
+    }
+    applyBiddingStrategy(campaign, args, defaultBiddingForChannel(channelType));
+    return campaign;
+  };
+
+  const scheduleOperation = (customerId, campaignId, schedule, index) => ({
+    create: {
+      campaign: campaignResource(customerId, campaignId),
+      adSchedule: {
+        dayOfWeek: assertEnum(schedule.day_of_week, `schedules[${index}].day_of_week`, WEEK_DAYS),
+        startHour: assertHour(schedule.start_hour, `schedules[${index}].start_hour`),
+        startMinute: assertEnum(schedule.start_minute, `schedules[${index}].start_minute`, MINUTE_OF_HOUR, "ZERO"),
+        endHour: assertHour(schedule.end_hour, `schedules[${index}].end_hour`),
+        endMinute: assertEnum(schedule.end_minute, `schedules[${index}].end_minute`, MINUTE_OF_HOUR, "ZERO"),
+      },
+    },
+  });
+
   const buildKeywordOperations = ({ customerId, adGroupId, keywords, matchType, negative, cpcBid }) =>
     assertStringArray(keywords, "keywords", { min: 1, max: 100, itemMax: 80 }).map((keyword) => ({
       create: {
@@ -1959,20 +2253,7 @@ export async function handleAdsTool(name, args, authClient) {
         };
       }
       case "ads_update_campaign_budget":
-        return {
-          endpoint: `/customers/${customerId}/campaignBudgets:mutate`,
-          body: {
-            operations: [
-              {
-                update: {
-                  resourceName: budgetResource(customerId, args.budget_id),
-                  amountMicros: amountToMicros(args.amount),
-                },
-                updateMask: "amount_micros",
-              },
-            ],
-          },
-        };
+        throw new Error("Budget mutations are disabled. Use ads_suggest_campaign_budget and edit budgets manually in Google Ads.");
       case "ads_update_campaign_dates": {
         const update = { resourceName: campaignResource(customerId, args.campaign_id) };
         const masks = [];
@@ -2155,6 +2436,91 @@ export async function handleAdsTool(name, args, authClient) {
             ],
           },
         };
+      case "ads_create_responsive_display_ad": {
+        const responsiveDisplayAd = {
+          marketingImages: makeAssetRefs(customerId, args.marketing_image_asset_ids, "marketing_image_asset_ids", {
+            min: 1,
+            max: 15,
+          }),
+          headlines: makeTextAssets(args.headlines, "headlines", 5),
+          longHeadline: { text: assertNonEmptyString(args.long_headline, "long_headline", 90) },
+          descriptions: makeTextAssets(args.descriptions, "descriptions", 5),
+          businessName: assertNonEmptyString(args.business_name, "business_name", 25),
+        };
+        const squareMarketingImages = optionalAssetRefs(
+          customerId,
+          args.square_marketing_image_asset_ids,
+          "square_marketing_image_asset_ids",
+          15
+        );
+        const logoImages = optionalAssetRefs(customerId, args.logo_image_asset_ids, "logo_image_asset_ids", 5);
+        const squareLogoImages = optionalAssetRefs(
+          customerId,
+          args.square_logo_image_asset_ids,
+          "square_logo_image_asset_ids",
+          5
+        );
+        if (squareMarketingImages) responsiveDisplayAd.squareMarketingImages = squareMarketingImages;
+        if (logoImages) responsiveDisplayAd.logoImages = logoImages;
+        if (squareLogoImages) responsiveDisplayAd.squareLogoImages = squareLogoImages;
+        if (args.call_to_action_text) {
+          responsiveDisplayAd.callToActionText = assertNonEmptyString(args.call_to_action_text, "call_to_action_text", 30);
+        }
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: assertEnum(args.status, "status", CAMPAIGN_STATUSES, "PAUSED"),
+                  ad: {
+                    finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+                    responsiveDisplayAd,
+                  },
+                },
+              },
+            ],
+          },
+        };
+      }
+      case "ads_create_video_responsive_ad": {
+        const videoResponsiveAd = {
+          videos: makeAssetRefs(customerId, args.video_asset_ids, "video_asset_ids", { min: 1, max: 1 }),
+          logoImages: makeAssetRefs(customerId, args.logo_image_asset_ids, "logo_image_asset_ids", { min: 1, max: 1 }),
+          headlines: makeTextAssets(args.headlines, "headlines", 1),
+          longHeadlines: makeTextAssets(args.long_headlines, "long_headlines", 1),
+          descriptions: makeTextAssets(args.descriptions, "descriptions", 1),
+          businessName: { text: assertNonEmptyString(args.business_name, "business_name", 25) },
+          callToActions: makeTextAssets(args.call_to_actions, "call_to_actions", 1),
+        };
+        const companionBanners = optionalAssetRefs(
+          customerId,
+          args.companion_banner_asset_ids,
+          "companion_banner_asset_ids",
+          1
+        );
+        if (companionBanners) videoResponsiveAd.companionBanners = companionBanners;
+        if (args.breadcrumb1) videoResponsiveAd.breadcrumb1 = assertNonEmptyString(args.breadcrumb1, "breadcrumb1", 15);
+        if (args.breadcrumb2) videoResponsiveAd.breadcrumb2 = assertNonEmptyString(args.breadcrumb2, "breadcrumb2", 15);
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: assertEnum(args.status, "status", CAMPAIGN_STATUSES, "PAUSED"),
+                  ad: {
+                    finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+                    videoResponsiveAd,
+                  },
+                },
+              },
+            ],
+          },
+        };
+      }
       case "ads_update_responsive_search_ad": {
         const ad = {};
         const masks = [];
@@ -2200,6 +2566,23 @@ export async function handleAdsTool(name, args, authClient) {
           },
         };
       }
+      case "ads_create_shopping_product_ad":
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  adGroup: adGroupResource(customerId, args.ad_group_id),
+                  status: assertEnum(args.status, "status", CAMPAIGN_STATUSES, "PAUSED"),
+                  ad: {
+                    shoppingProductAd: {},
+                  },
+                },
+              },
+            ],
+          },
+        };
       case "ads_create_ad_group":
         return {
           endpoint: `/customers/${customerId}/adGroups:mutate`,
@@ -2209,42 +2592,177 @@ export async function handleAdsTool(name, args, authClient) {
                 create: {
                   campaign: campaignResource(customerId, args.campaign_id),
                   name: assertNonEmptyString(args.name, "name", 255),
-                  status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
-                  type: assertEnum(args.type, "type", ["SEARCH_STANDARD"], "SEARCH_STANDARD"),
+                  status: assertEnum(args.status, "status", CAMPAIGN_STATUSES, "PAUSED"),
+                  type: assertEnum(args.type, "type", AD_GROUP_TYPES, "SEARCH_STANDARD"),
                   ...(args.cpc_bid !== undefined && { cpcBidMicros: amountToMicros(args.cpc_bid, "cpc_bid") }),
                 },
               },
             ],
           },
         };
-      case "ads_create_search_campaign": {
-        const campaign = {
-          name: assertNonEmptyString(args.name, "name", 255),
-          status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
-          advertisingChannelType: "SEARCH",
-          campaignBudget: budgetResource(customerId, args.budget_id),
-          networkSettings: {
-            targetGoogleSearch: true,
-            targetSearchNetwork: true,
-            targetContentNetwork: false,
-            targetPartnerSearchNetwork: false,
-          },
-        };
-        const startDate = assertDate(args.start_date, "start_date");
-        const endDate = assertDate(args.end_date, "end_date");
-        if (startDate) campaign.startDate = startDate;
-        if (endDate) campaign.endDate = endDate;
-        const biddingType = assertEnum(
-          args.bidding_strategy_type,
-          "bidding_strategy_type",
-          ["MANUAL_CPC", "MAXIMIZE_CONVERSIONS"],
-          "MANUAL_CPC"
-        );
-        if (biddingType === "MANUAL_CPC") campaign.manualCpc = {};
-        if (biddingType === "MAXIMIZE_CONVERSIONS") campaign.maximizeConversions = {};
+      case "ads_create_campaign":
         return {
           endpoint: `/customers/${customerId}/campaigns:mutate`,
-          body: { operations: [{ create: campaign }] },
+          body: { operations: [{ create: buildCampaignCreate(args, customerId) }] },
+        };
+      case "ads_create_search_campaign": {
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: { operations: [{ create: buildCampaignCreate(args, customerId, "SEARCH") }] },
+        };
+      }
+      case "ads_update_campaign_settings": {
+        const update = { resourceName: campaignResource(customerId, args.campaign_id) };
+        const masks = [];
+        if (args.name) {
+          update.name = assertNonEmptyString(args.name, "name", 255);
+          masks.push("name");
+        }
+        if (args.status) {
+          update.status = assertEnum(args.status, "status", CAMPAIGN_STATUSES);
+          masks.push("status");
+        }
+        const startDate = assertDate(args.start_date, "start_date");
+        const endDate = assertDate(args.end_date, "end_date");
+        if (startDate) {
+          update.startDate = startDate;
+          masks.push("start_date");
+        }
+        if (endDate) {
+          update.endDate = endDate;
+          masks.push("end_date");
+        }
+        if (args.tracking_url_template) {
+          update.trackingUrlTemplate = assertNonEmptyString(args.tracking_url_template, "tracking_url_template", 2048);
+          masks.push("tracking_url_template");
+        }
+        if (args.final_url_suffix) {
+          update.finalUrlSuffix = assertNonEmptyString(args.final_url_suffix, "final_url_suffix", 2048);
+          masks.push("final_url_suffix");
+        }
+        const networkSettings = {};
+        for (const [argName, apiName, maskName] of [
+          ["target_google_search", "targetGoogleSearch", "network_settings.target_google_search"],
+          ["target_search_network", "targetSearchNetwork", "network_settings.target_search_network"],
+          ["target_content_network", "targetContentNetwork", "network_settings.target_content_network"],
+          ["target_partner_search_network", "targetPartnerSearchNetwork", "network_settings.target_partner_search_network"],
+        ]) {
+          if (args[argName] !== undefined) {
+            networkSettings[apiName] = assertBoolean(args[argName], argName);
+            masks.push(maskName);
+          }
+        }
+        if (Object.keys(networkSettings).length > 0) update.networkSettings = networkSettings;
+        if (masks.length === 0) {
+          throw new Error("ads_update_campaign_settings requires at least one editable field.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/campaigns:mutate`,
+          body: { operations: [{ update, updateMask: masks.join(",") }] },
+        };
+      }
+      case "ads_create_pmax_asset_group": {
+        const assetGroup = {
+          campaign: campaignResource(customerId, args.campaign_id),
+          name: assertNonEmptyString(args.name, "name", 128),
+          status: assertEnum(args.status, "status", ASSET_GROUP_STATUSES, "PAUSED"),
+          finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+        };
+        if (args.final_mobile_urls) {
+          assetGroup.finalMobileUrls = assertStringArray(args.final_mobile_urls, "final_mobile_urls", {
+            min: 1,
+            max: 10,
+          });
+        }
+        if (args.path1) assetGroup.path1 = assertNonEmptyString(args.path1, "path1", 15);
+        if (args.path2) assetGroup.path2 = assertNonEmptyString(args.path2, "path2", 15);
+        return {
+          endpoint: `/customers/${customerId}/assetGroups:mutate`,
+          body: { operations: [{ create: assetGroup }] },
+        };
+      }
+      case "ads_update_asset_group": {
+        const update = { resourceName: assetGroupResource(customerId, args.asset_group_id) };
+        const masks = [];
+        if (args.status) {
+          update.status = assertEnum(args.status, "status", ASSET_GROUP_STATUSES);
+          masks.push("status");
+        }
+        if (args.final_urls) {
+          update.finalUrls = assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 });
+          masks.push("final_urls");
+        }
+        if (args.final_mobile_urls) {
+          update.finalMobileUrls = assertStringArray(args.final_mobile_urls, "final_mobile_urls", { min: 1, max: 10 });
+          masks.push("final_mobile_urls");
+        }
+        if (args.path1) {
+          update.path1 = assertNonEmptyString(args.path1, "path1", 15);
+          masks.push("path1");
+        }
+        if (args.path2) {
+          update.path2 = assertNonEmptyString(args.path2, "path2", 15);
+          masks.push("path2");
+        }
+        if (masks.length === 0) {
+          throw new Error("ads_update_asset_group requires at least one editable field.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/assetGroups:mutate`,
+          body: { operations: [{ update, updateMask: masks.join(",") }] },
+        };
+      }
+      case "ads_link_asset_to_asset_group":
+        return {
+          endpoint: `/customers/${customerId}/assetGroupAssets:mutate`,
+          body: {
+            operations: [
+              {
+                create: {
+                  assetGroup: assetGroupResource(customerId, args.asset_group_id),
+                  asset: assetResource(customerId, args.asset_id),
+                  fieldType: assertNonEmptyString(args.field_type, "field_type", 80),
+                  status: assertEnum(args.status, "status", ASSET_GROUP_STATUSES, "ENABLED"),
+                },
+              },
+            ],
+          },
+        };
+      case "ads_set_campaign_locations":
+        return {
+          endpoint: `/customers/${customerId}/campaignCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.geo_target_ids, "geo_target_ids", { min: 1, max: 100, itemMax: 32 }).map((geoTargetId) => ({
+              create: {
+                campaign: campaignResource(customerId, args.campaign_id),
+                negative: args.negative === true,
+                location: { geoTargetConstant: geoTargetConstantResource(geoTargetId) },
+              },
+            })),
+          },
+        };
+      case "ads_set_campaign_languages":
+        return {
+          endpoint: `/customers/${customerId}/campaignCriteria:mutate`,
+          body: {
+            operations: assertStringArray(args.language_ids, "language_ids", { min: 1, max: 50, itemMax: 32 }).map((languageId) => ({
+              create: {
+                campaign: campaignResource(customerId, args.campaign_id),
+                language: { languageConstant: languageConstantResource(languageId) },
+              },
+            })),
+          },
+        };
+      case "ads_set_campaign_ad_schedules": {
+        const schedules = Array.isArray(args.schedules) ? args.schedules : [];
+        if (schedules.length === 0 || schedules.length > 49) {
+          throw new Error("schedules must contain 1-49 schedule objects.");
+        }
+        return {
+          endpoint: `/customers/${customerId}/campaignCriteria:mutate`,
+          body: {
+            operations: schedules.map((schedule, index) => scheduleOperation(customerId, args.campaign_id, schedule, index)),
+          },
         };
       }
       case "ads_apply_recommendation":
@@ -2340,26 +2858,7 @@ export async function handleAdsTool(name, args, authClient) {
       }
       default:
         if (toolName === "ads_create_campaign_budget") {
-          return {
-            endpoint: `/customers/${customerId}/campaignBudgets:mutate`,
-            body: {
-              operations: [
-                {
-                  create: {
-                    name: assertNonEmptyString(args.name, "name", 255),
-                    amountMicros: amountToMicros(args.amount),
-                    deliveryMethod: assertEnum(
-                      args.delivery_method,
-                      "delivery_method",
-                      ["STANDARD", "ACCELERATED"],
-                      "STANDARD"
-                    ),
-                    explicitlyShared: args.explicitly_shared === true,
-                  },
-                },
-              ],
-            },
-          };
+          throw new Error("Budget mutations are disabled. Use ads_suggest_campaign_budget and create budgets manually in Google Ads.");
         }
         if (toolName === "ads_mutate_operations") {
           const endpointResource = assertNonEmptyString(args.endpoint_resource, "endpoint_resource", 80);
@@ -2381,6 +2880,40 @@ export async function handleAdsTool(name, args, authClient) {
   };
 
   const mutationToolNames = new Set(WRITE_TOOLS.map((tool) => tool.name));
+
+  if (name === "ads_suggest_campaign_budget") {
+    const customerId = normalizeCustomerId(args.customer_id);
+    const daysPerMonth = assertFiniteNumber(args.days_per_month ?? 30.4, "days_per_month", 1);
+    const monthlyBudget =
+      args.monthly_budget !== undefined
+        ? assertFiniteNumber(args.monthly_budget, "monthly_budget", 0)
+        : args.daily_budget !== undefined
+          ? assertFiniteNumber(args.daily_budget, "daily_budget", 0) * daysPerMonth
+          : args.target_clicks !== undefined && args.expected_cpc !== undefined
+            ? assertFiniteNumber(args.target_clicks, "target_clicks", 0) *
+              assertFiniteNumber(args.expected_cpc, "expected_cpc", 0)
+            : undefined;
+    const dailyBudget =
+      args.daily_budget !== undefined
+        ? assertFiniteNumber(args.daily_budget, "daily_budget", 0)
+        : monthlyBudget !== undefined
+          ? monthlyBudget / daysPerMonth
+          : undefined;
+
+    return {
+      customerId,
+      mutation: "none",
+      note: "Budget changes are intentionally manual-only. Create or edit the budget in Google Ads, then pass its budget_id to campaign creation tools.",
+      recommendation:
+        monthlyBudget === undefined
+          ? "Provide monthly_budget, daily_budget, or target_clicks with expected_cpc to calculate a budget suggestion."
+          : {
+              monthlyBudget: Number(monthlyBudget.toFixed(2)),
+              dailyBudget: Number(dailyBudget.toFixed(2)),
+              daysPerMonth,
+            },
+    };
+  }
 
   if (name === "ads_field_metadata") {
     const fieldQuery =

@@ -88,18 +88,22 @@ Write tools are available but blocked by default. Every write tool defaults to `
 | Tool | Purpose |
 | --- | --- |
 | `ads_pause_campaign`, `ads_enable_campaign` | Change campaign status. |
-| `ads_create_campaign_budget` | Create a campaign budget. |
-| `ads_update_campaign_budget` | Update a campaign budget amount. |
 | `ads_update_campaign_dates` | Update campaign start/end date. |
 | `ads_update_campaign_bidding`, `ads_update_target_cpa`, `ads_update_target_roas` | Update campaign bidding settings. |
+| `ads_create_campaign`, `ads_update_campaign_settings` | Create common Search/Display/Shopping/Demand Gen/Video/PMax campaign shells and update common settings. |
+| `ads_suggest_campaign_budget` | Suggest budget values only. It never creates or updates Google Ads budgets. |
+| `ads_set_campaign_locations`, `ads_set_campaign_languages`, `ads_set_campaign_ad_schedules` | Add campaign location, language, and ad schedule criteria. |
 | `ads_add_campaign_negative_keywords`, `ads_add_ad_group_negative_keywords` | Add negative keywords. |
 | `ads_add_keywords`, `ads_pause_keywords`, `ads_enable_keywords`, `ads_update_keyword_bid` | Manage ad group keywords. |
-| `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad` | Manage ads. |
-| `ads_create_ad_group`, `ads_create_search_campaign` | Create search structures from explicit inputs. |
+| `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad`, `ads_create_responsive_display_ad`, `ads_create_video_responsive_ad`, `ads_create_shopping_product_ad` | Manage search, display, video, and shopping ads from explicit inputs/assets. |
+| `ads_create_ad_group`, `ads_create_search_campaign` | Create ad groups across supported Search, Display, Shopping, Hotel, Smart, Travel, and Video types, plus a Search campaign shortcut. |
+| `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group` | Create/update Performance Max asset groups and link existing assets to them. |
 | `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply or dismiss recommendations. |
 | `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
 | `ads_upload_offline_conversion` | Upload click conversions with explicit conversion payloads. |
 | `ads_mutate_operations` | Advanced create/update helper for raw Google Ads mutate operations. It rejects any `remove` operation. |
+
+Budget creation and edits are intentionally manual-only. Use `ads_suggest_campaign_budget` for suggestions, create or edit budgets in Google Ads yourself, then pass the existing `budget_id` to campaign creation tools. If you reuse one budget across campaigns, create it with `explicitly_shared=true` in Google Ads. Google Ads v24 also requires the campaign-level `contains_eu_political_advertising` field; the tools default it to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` unless you set it explicitly.
 
 To execute any mutation, all safety checks must pass:
 

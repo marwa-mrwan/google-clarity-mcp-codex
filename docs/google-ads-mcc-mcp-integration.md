@@ -165,7 +165,7 @@ npm run auth
 - `ads_account_performance`: account-level performance.
 - `ads_gaql_query`: read-only GAQL query لأي report غير مغطى.
 - `ads_deep_report`: تقارير تحليلية جاهزة مثل devices, locations, budgets, recommendations, change history, negative keywords, assets, PMax asset groups, shopping products.
-- Write tools مثل `ads_update_campaign_budget`, `ads_pause_campaign`, `ads_add_keywords`, و`ads_create_responsive_search_ad` موجودة لكنها محمية بـ dry-run/allowlist/confirm.
+- Write tools مثل `ads_pause_campaign`, `ads_add_keywords`, و`ads_create_responsive_search_ad` موجودة لكنها محمية بـ dry-run/allowlist/confirm. Budget tools are suggestion-only.
 
 ## 10. Access Validation Checklist
 
@@ -287,17 +287,26 @@ npm run auth
 | Tool | Purpose |
 | --- | --- |
 | `ads_pause_campaign`, `ads_enable_campaign` | Pause/enable campaigns. |
-| `ads_update_campaign_budget` | Update budget amount with exact micros conversion. |
 | `ads_update_campaign_dates` | Update campaign start/end dates. |
 | `ads_update_campaign_bidding`, `ads_update_target_cpa`, `ads_update_target_roas` | Update bidding settings. |
+| `ads_create_campaign`, `ads_update_campaign_settings` | Create common Search/Display/Shopping/Demand Gen/Video/PMax campaign shells and update common settings. |
+| `ads_suggest_campaign_budget` | Suggest budget values only; no budget mutations are exposed. |
+| `ads_set_campaign_locations`, `ads_set_campaign_languages`, `ads_set_campaign_ad_schedules` | Add location, language, and ad schedule targeting. |
 | `ads_add_campaign_negative_keywords`, `ads_add_ad_group_negative_keywords` | Add negative keywords. |
 | `ads_add_keywords`, `ads_pause_keywords`, `ads_enable_keywords`, `ads_update_keyword_bid` | Manage ad group keywords. |
 | `ads_pause_ad`, `ads_enable_ad` | Pause/enable ads. |
-| `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad` | Create/update RSAs. |
-| `ads_create_ad_group`, `ads_create_search_campaign` | Create search ad groups/campaigns from explicit IDs. |
+| `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad`, `ads_create_responsive_display_ad`, `ads_create_video_responsive_ad`, `ads_create_shopping_product_ad` | Create/update search ads and create display, video, and shopping ads from existing assets or explicit IDs. |
+| `ads_create_ad_group`, `ads_create_search_campaign` | Create ad groups across supported Search, Display, Shopping, Hotel, Smart, Travel, and Video types, plus a Search campaign shortcut. |
+| `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group` | Create/update Performance Max asset groups and link existing assets to them. |
 | `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply/dismiss recommendations. |
 | `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
 | `ads_upload_offline_conversion` | Upload click conversions with explicit payload. |
+
+Campaign creation notes:
+
+- Budget creation and edits are manual-only. Use `ads_suggest_campaign_budget` for recommendations, then create/edit budgets in Google Ads and pass the existing `budget_id` to campaign creation tools.
+- Reused budgets must be created with `explicitly_shared=true`; otherwise Google Ads rejects reuse of an implicitly shared budget.
+- Google Ads v24 requires `contains_eu_political_advertising`. The write tools default it to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` unless explicitly provided.
 
 ### Safety requirements
 
@@ -352,31 +361,15 @@ Campaign full audit:
 }
 ```
 
-Budget dry-run:
+Budget suggestion:
 
 ```json
 {
-  "tool": "ads_update_campaign_budget",
+  "tool": "ads_suggest_campaign_budget",
   "arguments": {
     "customer_id": "CLIENT_ACCOUNT_ID_WITHOUT_DASHES",
-    "budget_id": "BUDGET_ID",
-    "amount": 250,
-    "dry_run": true
-  }
-}
-```
-
-Budget confirmed mutation:
-
-```json
-{
-  "tool": "ads_update_campaign_budget",
-  "arguments": {
-    "customer_id": "CLIENT_ACCOUNT_ID_WITHOUT_DASHES",
-    "budget_id": "BUDGET_ID",
-    "amount": 250,
-    "dry_run": false,
-    "confirm": true
+    "monthly_budget": 30000,
+    "expected_cpc": 12
   }
 }
 ```
