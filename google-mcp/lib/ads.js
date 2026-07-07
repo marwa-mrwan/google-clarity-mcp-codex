@@ -573,10 +573,6 @@ const WRITE_TOOLS = [
     scope: { type: "string", enum: ["CUSTOMER", "ASSET_GROUP"], default: "CUSTOMER" },
     asset_group_id: { type: "string", description: "Required only when scope is ASSET_GROUP." },
   }, ["custom_audience_ids"]),
-  mutationTool("ads_add_custom_audience_to_ad_group", "Safely target an existing custom audience in an ad group.", {
-    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
-    custom_audience_id: { type: "string", description: "Custom audience ID without dashes." },
-  }, ["ad_group_id", "custom_audience_id"]),
   mutationTool("ads_add_audience_to_ad_group", "Safely target an existing audience resource in an ad group.", {
     ad_group_id: { type: "string", description: "Ad group ID without dashes." },
     audience_id: { type: "string", description: "Audience ID without dashes." },
@@ -2919,23 +2915,6 @@ export async function handleAdsTool(name, args, authClient) {
           body: { operations: [{ create: audience }] },
         };
       }
-      case "ads_add_custom_audience_to_ad_group":
-        return {
-          endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,
-          body: {
-            operations: [
-              {
-                create: {
-                  adGroup: adGroupResource(customerId, args.ad_group_id),
-                  status: "ENABLED",
-                  customAudience: {
-                    customAudience: customAudienceResource(customerId, args.custom_audience_id),
-                  },
-                },
-              },
-            ],
-          },
-        };
       case "ads_add_audience_to_ad_group":
         return {
           endpoint: `/customers/${customerId}/adGroupCriteria:mutate`,

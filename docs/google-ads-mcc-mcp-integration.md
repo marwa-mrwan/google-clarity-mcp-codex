@@ -300,7 +300,7 @@ npm run auth
 | `ads_create_ad_group`, `ads_create_search_campaign` | Create ad groups across supported Search, Display, Shopping, Hotel, Smart, Travel, and Video types, plus a Search campaign shortcut. |
 | `ads_create_text_asset`, `ads_upload_image_asset`, `ads_create_youtube_video_asset` | Create real reusable text, image/logo, and YouTube video assets instead of placeholders. |
 | `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group`, `ads_add_pmax_search_themes`, `ads_add_pmax_audience_signal` | Create/update Performance Max asset groups, link existing assets, and add signals. |
-| `ads_create_custom_audience`, `ads_create_audience_from_custom_audiences`, `ads_add_custom_audience_to_ad_group`, `ads_add_audience_to_ad_group` | Create custom audiences, wrap them in Audience resources, and target ad groups. |
+| `ads_create_custom_audience`, `ads_create_audience_from_custom_audiences`, `ads_add_audience_to_ad_group` | Create custom audiences, wrap them in Audience resources, and target ad groups. |
 | `ads_apply_recommendation`, `ads_dismiss_recommendation` | Apply/dismiss recommendations. |
 | `ads_add_sitelink_asset`, `ads_link_asset_to_campaign` | Create/link sitelink assets. |
 | `ads_upload_offline_conversion` | Upload click conversions with explicit payload. |
@@ -318,7 +318,7 @@ Campaign creation notes:
 - `dry_run=true` by default.
 - `confirm=false` by default.
 - `validate_only=false` optional.
-- `partial_failure=false` optional.
+- `partial_failure=true` optional. It is omitted by default because some Google Ads mutate endpoints reject an explicit false flag.
 
 لا يتم تنفيذ mutation إلا إذا:
 
