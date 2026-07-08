@@ -83,7 +83,7 @@ New `ads_deep_report` report types include: `customer_labels`, `customer_user_ac
 
 ### Safe Write Tools
 
-Write tools are available but blocked by default. Every write tool defaults to `dry_run=true` and returns a preview without calling Google Ads mutate endpoints.
+Write tools are available only for customers listed in `GOOGLE_ADS_MUTATION_CUSTOMER_IDS`. For allowlisted customers, write tools execute by default; pass `dry_run=true` when you want a preview only.
 
 | Tool | Purpose |
 | --- | --- |
@@ -108,13 +108,12 @@ Write tools are available but blocked by default. Every write tool defaults to `
 
 Budget creation and edits are intentionally manual-only. Use `ads_suggest_campaign_budget` for suggestions, create or edit budgets in Google Ads yourself, then pass the existing `budget_id` to campaign creation tools. If you reuse one budget across campaigns, create it with `explicitly_shared=true` in Google Ads. Google Ads v24 also requires the campaign-level `contains_eu_political_advertising` field; the tools default it to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` unless you set it explicitly.
 
-To execute any mutation, all safety checks must pass:
+To execute any mutation, the target customer must be allowlisted:
 
-1. `GOOGLE_ADS_ENABLE_MUTATIONS=true`
-2. `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` includes the target `customer_id`
-3. Tool argument `dry_run=false`
+1. `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` includes the target `customer_id`
+2. Do not pass `dry_run=true`
 
-Customers listed in `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` are treated as implicitly confirmed. The older `confirm=true` argument is still accepted, but it is no longer required for allowlisted customers.
+Customers listed in `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` are treated as implicitly confirmed and mutation-enabled. `GOOGLE_ADS_ENABLE_MUTATIONS=true` and the older `confirm=true` argument are still accepted for compatibility, but they are no longer required for allowlisted customers.
 
 Optional `validate_only=true` asks Google Ads to validate the request without applying it after the guardrails pass.
 
@@ -203,13 +202,12 @@ GOOGLE_REFRESH_TOKEN=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
 GOOGLE_ADS_API_VERSION=v24
-GOOGLE_ADS_ENABLE_MUTATIONS=false
 GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
 ```
 
 `GOOGLE_ADS_DEVELOPER_TOKEN` and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` are only needed for Google Ads tools.
 `GOOGLE_ADS_API_VERSION` is optional; omit it to let the MCP try supported versions automatically.
-`GOOGLE_ADS_ENABLE_MUTATIONS` defaults to disabled. Only add customer IDs to `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` when you intentionally allow write tools for those accounts.
+Only add customer IDs to `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` when you intentionally allow write tools for those accounts. This allowlist is the write approval switch for Google Ads.
 
 After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
 

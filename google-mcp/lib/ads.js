@@ -21,8 +21,8 @@ const OPTIONAL_DATE_RANGE_PROPERTIES = {
 const MUTATION_SAFETY_PROPERTIES = {
   dry_run: {
     type: "boolean",
-    description: "Preview the mutation without calling Google Ads mutate endpoints. Defaults to true.",
-    default: true,
+    description: "Preview the mutation without calling Google Ads mutate endpoints. Defaults to false for allowlisted customers.",
+    default: false,
   },
   confirm: {
     type: "boolean",
@@ -1267,16 +1267,16 @@ export async function handleAdsTool(name, args, authClient) {
     );
 
   const mutationSafety = (args, customerId, preview) => {
-    const dryRun = args.dry_run !== false;
-    const mutationsEnabled = process.env.GOOGLE_ADS_ENABLE_MUTATIONS === "true";
     const allowlist = allowedMutationCustomerIds();
     const customerAllowed = allowlist.has(customerId);
+    const dryRun = args.dry_run === true || !customerAllowed;
+    const mutationsEnabled = process.env.GOOGLE_ADS_ENABLE_MUTATIONS === "true" || customerAllowed;
     const explicitConfirm = args.confirm === true;
     const confirmed = explicitConfirm || customerAllowed;
     const blockedReasons = [];
 
     if (dryRun) blockedReasons.push("dry_run is true");
-    if (!mutationsEnabled) blockedReasons.push("GOOGLE_ADS_ENABLE_MUTATIONS is not true");
+    if (!mutationsEnabled) blockedReasons.push("GOOGLE_ADS_ENABLE_MUTATIONS is not true and customer_id is not allowlisted");
     if (!customerAllowed) blockedReasons.push("customer_id is not in GOOGLE_ADS_MUTATION_CUSTOMER_IDS");
     if (!confirmed) blockedReasons.push("customer_id is not confirmed by GOOGLE_ADS_MUTATION_CUSTOMER_IDS or confirm=true");
 
