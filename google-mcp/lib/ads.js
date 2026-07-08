@@ -26,7 +26,7 @@ const MUTATION_SAFETY_PROPERTIES = {
   },
   confirm: {
     type: "boolean",
-    description: "Must be true together with dry_run=false and env guardrails before any write executes.",
+    description: "Optional legacy confirmation. Allowed customer IDs in GOOGLE_ADS_MUTATION_CUSTOMER_IDS are treated as implicit confirmation.",
     default: false,
   },
   validate_only: {
@@ -1271,19 +1271,21 @@ export async function handleAdsTool(name, args, authClient) {
     const mutationsEnabled = process.env.GOOGLE_ADS_ENABLE_MUTATIONS === "true";
     const allowlist = allowedMutationCustomerIds();
     const customerAllowed = allowlist.has(customerId);
-    const confirmed = args.confirm === true;
+    const explicitConfirm = args.confirm === true;
+    const confirmed = explicitConfirm || customerAllowed;
     const blockedReasons = [];
 
     if (dryRun) blockedReasons.push("dry_run is true");
     if (!mutationsEnabled) blockedReasons.push("GOOGLE_ADS_ENABLE_MUTATIONS is not true");
     if (!customerAllowed) blockedReasons.push("customer_id is not in GOOGLE_ADS_MUTATION_CUSTOMER_IDS");
-    if (!confirmed) blockedReasons.push("confirm is not true");
+    if (!confirmed) blockedReasons.push("customer_id is not confirmed by GOOGLE_ADS_MUTATION_CUSTOMER_IDS or confirm=true");
 
     return {
       dryRun,
       mutationsEnabled,
       customerAllowed,
       confirmed,
+      confirmationSource: explicitConfirm ? "tool_argument" : customerAllowed ? "customer_allowlist" : "none",
       blockedReasons,
       preview,
     };

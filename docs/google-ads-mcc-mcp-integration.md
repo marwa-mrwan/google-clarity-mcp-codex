@@ -165,7 +165,7 @@ npm run auth
 - `ads_account_performance`: account-level performance.
 - `ads_gaql_query`: read-only GAQL query لأي report غير مغطى.
 - `ads_deep_report`: تقارير تحليلية جاهزة مثل devices, locations, budgets, recommendations, change history, negative keywords, assets, PMax asset groups, shopping products.
-- Write tools مثل `ads_pause_campaign`, `ads_add_keywords`, و`ads_create_responsive_search_ad` موجودة لكنها محمية بـ dry-run/allowlist/confirm. Budget tools are suggestion-only.
+- Write tools مثل `ads_pause_campaign`, `ads_add_keywords`, و`ads_create_responsive_search_ad` موجودة لكنها محمية بـ dry-run و allowlist. Budget tools are suggestion-only.
 
 ## 10. Access Validation Checklist
 
@@ -316,7 +316,7 @@ Campaign creation notes:
 كل write tool يدعم:
 
 - `dry_run=true` by default.
-- `confirm=false` by default.
+- `confirm=false` by default. الحسابات الموجودة في `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` تعتبر confirmed ضمنيا.
 - `validate_only=false` optional.
 - `partial_failure=true` optional. It is omitted by default because some Google Ads mutate endpoints reject an explicit false flag.
 
@@ -324,8 +324,9 @@ Campaign creation notes:
 
 1. `GOOGLE_ADS_ENABLE_MUTATIONS=true`
 2. `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` يحتوي `customer_id` المطلوب بدون شرطات
-3. tool argument فيه `confirm=true`
-4. tool argument فيه `dry_run=false`
+3. tool argument فيه `dry_run=false`
+
+`confirm=true` ما زال مدعوما كـ legacy flag، لكنه غير مطلوب للحسابات الموجودة في allowlist.
 
 لو أي شرط غير متحقق، يرجع الـ MCP `preview` للـ request و`blockedReasons` ولا يضرب mutate endpoint.
 

@@ -112,8 +112,9 @@ To execute any mutation, all safety checks must pass:
 
 1. `GOOGLE_ADS_ENABLE_MUTATIONS=true`
 2. `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` includes the target `customer_id`
-3. Tool argument `confirm=true`
-4. Tool argument `dry_run=false`
+3. Tool argument `dry_run=false`
+
+Customers listed in `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` are treated as implicitly confirmed. The older `confirm=true` argument is still accepted, but it is no longer required for allowlisted customers.
 
 Optional `validate_only=true` asks Google Ads to validate the request without applying it after the guardrails pass.
 
