@@ -431,6 +431,16 @@ const WRITE_TOOLS = [
     path2: { type: "string", description: "Optional path 2." },
     status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
   }, ["ad_group_id", "final_urls", "headlines", "descriptions"]),
+  mutationTool("ads_replace_responsive_search_ad", "Safely replace RSA copy by creating a new RSA and optionally pausing the old ad.", {
+    ad_group_id: { type: "string", description: "Ad group ID without dashes." },
+    old_ad_id: { type: "string", description: "Optional old RSA ad ID to pause in the same request." },
+    final_urls: { type: "array", items: { type: "string" }, description: "Final URLs for the new RSA." },
+    headlines: { type: "array", items: { type: "string" }, description: "New RSA headlines." },
+    descriptions: { type: "array", items: { type: "string" }, description: "New RSA descriptions." },
+    path1: { type: "string", description: "Optional path 1." },
+    path2: { type: "string", description: "Optional path 2." },
+    status: { type: "string", enum: ["ENABLED", "PAUSED"], default: "PAUSED" },
+  }, ["ad_group_id", "final_urls", "headlines", "descriptions"]),
   mutationTool("ads_create_responsive_display_ad", "Safely create a responsive display ad using existing Google Ads image/logo asset IDs.", {
     ad_group_id: { type: "string", description: "Display ad group ID without dashes." },
     final_urls: { type: "array", items: { type: "string" }, description: "Final URLs." },
@@ -460,14 +470,10 @@ const WRITE_TOOLS = [
     breadcrumb2: { type: "string", description: "Optional display URL breadcrumb 2." },
     status: { type: "string", enum: CAMPAIGN_STATUSES, default: "PAUSED" },
   }, ["ad_group_id", "final_urls", "video_asset_ids", "logo_image_asset_ids", "headlines", "long_headlines", "descriptions", "business_name", "call_to_actions"]),
-  mutationTool("ads_update_responsive_search_ad", "Safely update a responsive search ad.", {
+  mutationTool("ads_update_responsive_search_ad", "Safely update mutable responsive search ad fields only. Use ads_replace_responsive_search_ad for headline/description changes.", {
     ad_group_id: { type: "string", description: "Ad group ID without dashes." },
     ad_id: { type: "string", description: "Ad ID without dashes." },
     final_urls: { type: "array", items: { type: "string" }, description: "Optional replacement final URLs." },
-    headlines: { type: "array", items: { type: "string" }, description: "Optional replacement headlines." },
-    descriptions: { type: "array", items: { type: "string" }, description: "Optional replacement descriptions." },
-    path1: { type: "string", description: "Optional path 1." },
-    path2: { type: "string", description: "Optional path 2." },
   }, ["ad_group_id", "ad_id"]),
   mutationTool("ads_create_shopping_product_ad", "Safely create a Shopping product ad in an existing Shopping ad group.", {
     ad_group_id: { type: "string", description: "Shopping ad group ID without dashes." },
@@ -2578,6 +2584,37 @@ export async function handleAdsTool(name, args, authClient) {
             ],
           },
         };
+      case "ads_replace_responsive_search_ad": {
+        const operations = [];
+        if (args.old_ad_id) {
+          operations.push({
+            update: {
+              resourceName: adGroupAdResource(customerId, args.ad_group_id, args.old_ad_id),
+              status: "PAUSED",
+            },
+            updateMask: "status",
+          });
+        }
+        operations.push({
+          create: {
+            adGroup: adGroupResource(customerId, args.ad_group_id),
+            status: assertEnum(args.status, "status", ["ENABLED", "PAUSED"], "PAUSED"),
+            ad: {
+              finalUrls: assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 }),
+              responsiveSearchAd: {
+                headlines: makeTextAssets(args.headlines, "headlines", 15),
+                descriptions: makeTextAssets(args.descriptions, "descriptions", 4),
+                ...(args.path1 && { path1: assertNonEmptyString(args.path1, "path1", 15) }),
+                ...(args.path2 && { path2: assertNonEmptyString(args.path2, "path2", 15) }),
+              },
+            },
+          },
+        });
+        return {
+          endpoint: `/customers/${customerId}/adGroupAds:mutate`,
+          body: { operations },
+        };
+      }
       case "ads_create_responsive_display_ad": {
         const responsiveDisplayAd = {
           marketingImages: makeAssetRefs(customerId, args.marketing_image_asset_ids, "marketing_image_asset_ids", {
@@ -2670,28 +2707,8 @@ export async function handleAdsTool(name, args, authClient) {
           ad.finalUrls = assertStringArray(args.final_urls, "final_urls", { min: 1, max: 10 });
           masks.push("ad.final_urls");
         }
-        const rsa = {};
-        if (args.headlines) {
-          rsa.headlines = makeTextAssets(args.headlines, "headlines", 15);
-          masks.push("ad.responsive_search_ad.headlines");
-        }
-        if (args.descriptions) {
-          rsa.descriptions = makeTextAssets(args.descriptions, "descriptions", 4);
-          masks.push("ad.responsive_search_ad.descriptions");
-        }
-        if (args.path1) {
-          rsa.path1 = assertNonEmptyString(args.path1, "path1", 15);
-          masks.push("ad.responsive_search_ad.path1");
-        }
-        if (args.path2) {
-          rsa.path2 = assertNonEmptyString(args.path2, "path2", 15);
-          masks.push("ad.responsive_search_ad.path2");
-        }
-        if (Object.keys(rsa).length > 0) {
-          ad.responsiveSearchAd = rsa;
-        }
         if (masks.length === 0) {
-          throw new Error("ads_update_responsive_search_ad requires at least one editable field.");
+          throw new Error("ads_update_responsive_search_ad only supports mutable fields such as final_urls. Use ads_replace_responsive_search_ad to change RSA headlines/descriptions.");
         }
         return {
           endpoint: `/customers/${customerId}/adGroupAds:mutate`,
@@ -3033,7 +3050,7 @@ export async function handleAdsTool(name, args, authClient) {
           },
         };
       case "ads_upload_image_asset": {
-        const imageData = assertNonEmptyString(args.image_data_base64, "image_data_base64");
+        const imageData = assertNonEmptyString(args.image_data_base64, "image_data_base64", 8_000_000);
         if (!/^[A-Za-z0-9+/]+={0,2}$/.test(imageData)) {
           throw new Error("image_data_base64 must be base64 bytes without a data URL prefix.");
         }

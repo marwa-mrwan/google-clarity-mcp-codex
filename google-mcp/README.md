@@ -96,7 +96,7 @@ Write tools are available only for customers listed in `GOOGLE_ADS_MUTATION_CUST
 | `ads_add_campaign_negative_keywords`, `ads_add_ad_group_negative_keywords` | Add negative keywords. |
 | `ads_add_keywords`, `ads_pause_keywords`, `ads_enable_keywords`, `ads_update_keyword_bid` | Manage ad group keywords. |
 | `ads_add_display_keywords`, `ads_add_display_placements`, `ads_add_display_topics` | Add Display contextual targeting to ad groups. |
-| `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_update_responsive_search_ad`, `ads_create_responsive_display_ad`, `ads_create_video_responsive_ad`, `ads_create_shopping_product_ad` | Manage search, display, video, and shopping ads from explicit inputs/assets. |
+| `ads_pause_ad`, `ads_enable_ad`, `ads_create_responsive_search_ad`, `ads_replace_responsive_search_ad`, `ads_update_responsive_search_ad`, `ads_create_responsive_display_ad`, `ads_create_video_responsive_ad`, `ads_create_shopping_product_ad` | Manage search, display, video, and shopping ads from explicit inputs/assets. RSA text changes use replacement: create a new RSA and optionally pause the old ad. |
 | `ads_create_ad_group`, `ads_create_search_campaign` | Create ad groups across supported Search, Display, Shopping, Hotel, Smart, Travel, and Video types, plus a Search campaign shortcut. |
 | `ads_create_text_asset`, `ads_upload_image_asset`, `ads_create_youtube_video_asset` | Create real reusable text, image/logo, and YouTube video assets instead of placeholders. |
 | `ads_create_pmax_asset_group`, `ads_update_asset_group`, `ads_link_asset_to_asset_group`, `ads_add_pmax_search_themes`, `ads_add_pmax_audience_signal` | Create/update Performance Max asset groups, link existing assets, and add signals. |
