@@ -91,6 +91,44 @@ const EU_POLITICAL_ADVERTISING_STATUS = [
 ];
 const CUSTOM_AUDIENCE_TYPES = ["SEARCH", "BROWSING", "APPS"];
 
+const PERMISSION_GATED_DEEP_REPORT_TYPES = new Set([
+  "auction_insights_campaign",
+  "auction_insights_keyword",
+]);
+
+const googleAdsErrorSummary = (error) => {
+  const status = error?.response?.status;
+  const data = error?.response?.data;
+  const apiError = data?.error;
+  return {
+    status,
+    code: apiError?.code,
+    statusText: apiError?.status,
+    message: apiError?.message || error?.message || "Google Ads API request failed.",
+  };
+};
+
+const isGoogleAdsPermissionError = (error) => {
+  const summary = googleAdsErrorSummary(error);
+  const haystack = JSON.stringify({ summary, data: error?.response?.data }).toLowerCase();
+  return (
+    summary.status === 403 ||
+    haystack.includes("permission") ||
+    haystack.includes("access_denied") ||
+    haystack.includes("authorization") ||
+    haystack.includes("developer token")
+  );
+};
+
+const unavailableDeepReport = (reportType, query, error, reason) => ({
+  reportType,
+  query,
+  rows: [],
+  unavailable: true,
+  reason,
+  error: googleAdsErrorSummary(error),
+});
+
 const ADS_DEEP_REPORT_TYPES = [
   "device_performance",
   "geo_performance",
@@ -1508,10 +1546,7 @@ export async function handleAdsTool(name, args, authClient) {
         ORDER BY conversion_action.name ASC LIMIT ${rowLimit}`,
 
       recommendations: `SELECT recommendation.type, recommendation.resource_name,
-          recommendation.campaign, recommendation.impact.base_metrics.conversions,
-          recommendation.impact.base_metrics.cost_micros,
-          recommendation.impact.potential_metrics.conversions,
-          recommendation.impact.potential_metrics.cost_micros
+          recommendation.campaign, recommendation.dismissed
         FROM recommendation
         LIMIT ${rowLimit}`,
 
@@ -3220,7 +3255,7 @@ export async function handleAdsTool(name, args, authClient) {
   if (name === "ads_field_metadata") {
     const fieldQuery =
       args.query ||
-      "SELECT name, category, data_type, selectable, filterable, sortable, selectable_with, metrics, segments, enum_values FROM google_ads_field WHERE selectable = true LIMIT 200";
+      "SELECT name, category, data_type, selectable, filterable, sortable, selectable_with, metrics, segments, enum_values, is_repeated WHERE selectable = true LIMIT 200";
     const response = await adsRootPostRequest("/googleAdsFields:search", { query: fieldQuery });
     return {
       requestId: response.requestId,
@@ -3895,20 +3930,42 @@ export async function handleAdsTool(name, args, authClient) {
   if (name === "ads_deep_report") {
     const { customer_id } = args;
     const gaqlQuery = deepReportQuery(args);
-    const results = await query(customer_id, gaqlQuery);
-    const rows = [
-      "targeted_location_performance",
-      "location_targets",
-      "excluded_locations",
-    ].includes(args.report_type)
-      ? await withResolvedGeoTargets(customer_id, results)
-      : results;
+    try {
+      const results = await query(customer_id, gaqlQuery);
+      const rows = [
+        "targeted_location_performance",
+        "location_targets",
+        "excluded_locations",
+      ].includes(args.report_type)
+        ? await withResolvedGeoTargets(customer_id, results)
+        : results;
 
-    return {
-      reportType: args.report_type,
-      query: gaqlQuery,
-      rows,
-    };
+      return {
+        reportType: args.report_type,
+        query: gaqlQuery,
+        rows,
+      };
+    } catch (error) {
+      if (PERMISSION_GATED_DEEP_REPORT_TYPES.has(args.report_type) && isGoogleAdsPermissionError(error)) {
+        return unavailableDeepReport(
+          args.report_type,
+          gaqlQuery,
+          error,
+          "Google Ads API denied this Auction Insights report for the current developer token or customer access."
+        );
+      }
+
+      if (args.report_type === "recommendations" && error?.response?.status === 400) {
+        return unavailableDeepReport(
+          args.report_type,
+          gaqlQuery,
+          error,
+          "Google Ads API rejected the recommendations GAQL query for this account/API version."
+        );
+      }
+
+      throw error;
+    }
   }
 
   if (name === "ads_account_performance") {
