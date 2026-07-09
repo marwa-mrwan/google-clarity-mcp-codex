@@ -6,7 +6,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 ## What Is Included
 
-- `google-mcp`: Google Search Console, GA4, Google Ads, PageSpeed Insights, Google Tag Manager, Google Business Profile, Merchant Center, and combined marketing reports.
+- `google-mcp`: Google Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
 - `clarity-mcp`: Microsoft Clarity project lookup, live insights, metrics, and project analysis.
 - `mangools-mcp`: KWFinder, SERPChecker, LinkMiner, and SiteProfiler research.
 - `chrome-devtools`: local Chrome DevTools MCP for rendered-page checks, console errors, network inspection, screenshots, and landing page QA.
@@ -14,7 +14,7 @@ Use this repo as the local MCP layer. Keep secrets and client account IDs in loc
 
 ## Tool Routing
 
-- Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`, `psi_audit_url`.
+- Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`.
 - Analytics traffic and conversions: `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
 - Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`, `ads_field_metadata`, `ads_validate_gaql`, `ads_policy_summary`, and the full audit tools.
 - Keyword research: `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, `serpchecker_serps`.

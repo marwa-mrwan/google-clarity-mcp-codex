@@ -4,8 +4,6 @@ import { getAdsTools } from "../google-mcp/lib/ads.js";
 import { getTagManagerTools } from "../google-mcp/lib/tag-manager.js";
 import { getBusinessProfileTools } from "../google-mcp/lib/business-profile.js";
 import { getMerchantCenterTools } from "../google-mcp/lib/merchant-center.js";
-import { getPageSpeedTools } from "../google-mcp/lib/pagespeed.js";
-import { getReportingTools } from "../google-mcp/lib/reporting.js";
 import { ALL_TOOLS as clarityTools } from "../clarity-mcp/index.js";
 import { ALL_TOOLS as mangoolsTools } from "../mangools-mcp/index.js";
 
@@ -16,8 +14,6 @@ const googleTools = [
   ...getTagManagerTools(),
   ...getBusinessProfileTools(),
   ...getMerchantCenterTools(),
-  ...getPageSpeedTools(),
-  ...getReportingTools(),
 ];
 
 const results = [

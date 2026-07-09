@@ -3,8 +3,8 @@
   "name": "google-mcp",
   "display_name": "Google Marketing Suite",
   "version": "1.0.0",
-  "description": "Google Search Console, GA4, Google Ads, Business Profile, Merchant Center, PageSpeed Insights, and Tag Manager",
-  "long_description": "Connect to Google marketing APIs via OAuth2: Search Console for SEO data, GA4 for analytics, Google Ads for campaign management, Business Profile for local performance, Merchant Center for product and issue reporting, PageSpeed Insights for technical audits, and Tag Manager for tag auditing.",
+  "description": "Google Search Console, GA4, Google Ads, Business Profile, Merchant Center, and Tag Manager",
+  "long_description": "Connect to Google marketing APIs via OAuth2: Search Console for SEO data, GA4 for analytics, Google Ads for campaign management, Business Profile for local performance, Merchant Center for product and issue reporting, and Tag Manager for tag auditing.",
   "author": {
     "name": "Custom"
   },

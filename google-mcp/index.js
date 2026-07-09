@@ -23,8 +23,6 @@ import {
   handleBusinessProfileTool,
 } from "./lib/business-profile.js";
 import { getMerchantCenterTools, handleMerchantCenterTool } from "./lib/merchant-center.js";
-import { getPageSpeedTools, handlePageSpeedTool } from "./lib/pagespeed.js";
-import { getReportingTools, handleReportingTool } from "./lib/reporting.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 for (const envFile of [
@@ -43,13 +41,10 @@ const ALL_TOOLS = [
   ...getTagManagerTools(),
   ...getBusinessProfileTools(),
   ...getMerchantCenterTools(),
-  ...getPageSpeedTools(),
-  ...getReportingTools(),
 ];
 
 const AUTHLESS_TOOLS = new Set([
   "ga4_list_configured_properties",
-  "psi_audit_url",
 ]);
 
 const server = new Server(
@@ -88,10 +83,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       result = await handleBusinessProfileTool(name, args, authClient);
     } else if (name.startsWith("merchant_")) {
       result = await handleMerchantCenterTool(name, args, authClient);
-    } else if (name.startsWith("psi_")) {
-      result = await handlePageSpeedTool(name, args, authClient);
-    } else if (name.startsWith("marketing_")) {
-      result = await handleReportingTool(name, args, authClient);
     } else {
       throw new Error(`Unknown tool: ${name}`);
     }
@@ -127,8 +118,6 @@ async function main() {
   console.error("   - Tag Manager:", getTagManagerTools().length);
   console.error("   - Business Profile:", getBusinessProfileTools().length);
   console.error("   - Merchant Center:", getMerchantCenterTools().length);
-  console.error("   - PageSpeed:", getPageSpeedTools().length);
-  console.error("   - Reporting:", getReportingTools().length);
 }
 
 main().catch((err) => {

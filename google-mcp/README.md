@@ -9,7 +9,6 @@ It exposes one MCP server, `google-marketing-suite`, with tools for:
 - Google Ads
 - Google Business Profile
 - Google Merchant Center
-- Google PageSpeed Insights
 - Google Tag Manager
 
 GA4, Search Console, and GTM include named read tools for common audits plus advanced API-call helpers for missing official API functions:
@@ -179,10 +178,6 @@ Use `targeted_location_performance` for the Google Ads "Targeted locations" tabl
   - `merchant_list_products`
   - `merchant_list_issues`
   - `merchant_search_report`
-- PageSpeed Insights:
-  - `psi_audit_url`
-- Cross-channel reporting:
-  - `marketing_full_report`
 
 ## Files Codex Uses
 
