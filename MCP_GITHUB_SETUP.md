@@ -1,4 +1,4 @@
-# google-clarity-mangools-mcp-codex GitHub setup
+# google-clarity-mcp-codex GitHub setup
 
 This workspace is prepared so source code can be pushed to GitHub while local tokens stay off Git.
 
