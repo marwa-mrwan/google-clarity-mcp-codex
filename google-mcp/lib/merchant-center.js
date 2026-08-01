@@ -1,4 +1,5 @@
 import axios from "axios";
+import { enhanceMerchantError } from "./google-api-errors.js";
 
 const MERCHANT_SERVICES = Object.freeze({
   accounts: "https://merchantapi.googleapis.com/accounts/v1",
@@ -119,14 +120,19 @@ async function merchantRequest(
     if (safety.blockedReasons.length > 0) return { executed: false, safety };
   }
 
-  const response = await axios.request({
-    url: `${base}${safePath}`,
-    method: normalizedMethod,
-    headers: await getHeaders(authClient),
-    params,
-    paramsSerializer: { indexes: null },
-    ...(body !== undefined ? { data: body } : {}),
-  });
+  let response;
+  try {
+    response = await axios.request({
+      url: `${base}${safePath}`,
+      method: normalizedMethod,
+      headers: await getHeaders(authClient),
+      params,
+      paramsSerializer: { indexes: null },
+      ...(body !== undefined ? { data: body } : {}),
+    });
+  } catch (error) {
+    throw enhanceMerchantError(error);
+  }
   return {
     executed: true,
     service,
@@ -144,6 +150,15 @@ export function getMerchantCenterTools() {
     tool("merchant_get_account", "Get one Merchant Center account.", {
       account_name: resource("accounts/{accountId}"),
     }, ["account_name"]),
+    tool("merchant_get_developer_registration", "Get the Google Cloud project registration for a Merchant Center account.", {
+      account_name: resource("accounts/{accountId}"),
+      account_id: resource("Legacy shorthand Merchant Center account ID."),
+    }),
+    tool("merchant_register_gcp", "Register the current Google Cloud project and developer contact with a Merchant Center account.", {
+      account_name: resource("accounts/{accountId}"),
+      account_id: resource("Legacy shorthand Merchant Center account ID."),
+      developer_email: { type: "string", format: "email", description: "Developer contact that will receive the API_DEVELOPER role or invitation." },
+    }, ["developer_email"], true),
     tool("merchant_list_subaccounts", "List subaccounts under an advanced account.", {
       account_name: resource("accounts/{accountId}"),
       account_id: resource("Legacy shorthand Merchant Center account ID."),
@@ -328,6 +343,15 @@ export async function handleMerchantCenterTool(name, args, authClient) {
       return get("accounts", "/accounts", page(500));
     case "merchant_get_account":
       return get("accounts", `/${args.account_name}`);
+    case "merchant_get_developer_registration":
+      return get("accounts", `/${accountName()}/developerRegistration`);
+    case "merchant_register_gcp":
+      return write(
+        "accounts",
+        "POST",
+        `/${accountName()}/developerRegistration:registerGcp`,
+        { developerEmail: args.developer_email }
+      );
     case "merchant_list_subaccounts":
       return get("accounts", `/${accountName()}:listSubaccounts`, page(500));
     case "merchant_create_and_configure_account":
