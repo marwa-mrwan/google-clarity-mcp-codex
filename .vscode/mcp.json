@@ -18,23 +18,6 @@
       "env": {
         "MARKETING_ACCOUNTS_FILE": "${workspaceFolder}/.vscode/marketing.accounts.local.json"
       }
-    },
-    "mangools": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["${workspaceFolder}/mangools-mcp/index.js"],
-      "envFile": "${workspaceFolder}/.vscode/mcp.local.env"
-    },
-    "chrome-devtools": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "--no-install",
-        "chrome-devtools-mcp",
-        "--headless",
-        "--no-usage-statistics",
-        "--no-performance-crux"
-      ]
     }
   },
   "inputs": []

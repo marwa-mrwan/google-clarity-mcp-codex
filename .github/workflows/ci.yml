@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test MCP servers
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            google-mcp/package-lock.json
+            clarity-mcp/package-lock.json
+
+      - name: Install Google MCP dependencies
+        working-directory: google-mcp
+        run: npm ci
+
+      - name: Install Clarity MCP dependencies
+        working-directory: clarity-mcp
+        run: npm ci
+
+      - name: Test Google MCP
+        working-directory: google-mcp
+        run: npm test
+
+      - name: Verify tool registries
+        run: node scripts/verify-mcp-servers.mjs
+
+      - name: Audit production dependencies
+        run: |
+          npm audit --prefix google-mcp --omit=dev --audit-level=high
+          npm audit --prefix clarity-mcp --omit=dev --audit-level=high
+
+      - name: Reject common committed secret formats
+        shell: bash
+        run: |
+          if git grep -I -n -E -- '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{20,}|AIza[0-9A-Za-z_-]{35}|1//[0-9A-Za-z_-]{20,}'; then
+            echo "Potential secret detected in tracked files."
+            exit 1
+          fi

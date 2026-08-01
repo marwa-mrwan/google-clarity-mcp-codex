@@ -1,64 +1,76 @@
 # google-clarity-mangools-mcp-codex
 
-google-clarity-mangools-mcp-codex is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools for SEO, Google Ads, and campaign analysis.
+Local MCP workspace for Google marketing products and Microsoft Clarity. The repository name is kept unchanged for backward compatibility, while Mangools now lives in its own repository: [`marwa-mrwan/mangools-mcp`](https://github.com/marwa-mrwan/mangools-mcp).
 
-Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let separate Codex skills use the MCP tools as evidence for audits, reports, and campaign strategy.
+The workspace exposes **219 tools** through two local stdio MCP servers. Credentials, OAuth tokens, API keys, and client account mappings stay in ignored local files.
 
 ## What Is Included
 
-- `google-mcp`: Google Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
-- `clarity-mcp`: Microsoft Clarity project lookup, live insights, metrics, and project analysis.
-- `mangools-mcp`: KWFinder, SERPChecker, LinkMiner, and SiteProfiler research.
-- `chrome-devtools`: local Chrome DevTools MCP for rendered-page checks, console errors, network inspection, screenshots, and landing page QA.
-- `scripts/`: setup and migration helpers for local account mapping.
+- `google-mcp`: **211 tools** for Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
+- `clarity-mcp`: **8 tools** for Microsoft Clarity project discovery, live insights, summaries, analysis, and comparisons.
+- `scripts/`: setup, verification, local plugin installation, and account-mapping helpers.
 
-## Tool Routing
+Chrome DevTools and Mangools are not bundled or configured in this repository.
 
-- Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`.
-- Analytics traffic and conversions: `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
-- Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`, `ads_field_metadata`, `ads_validate_gaql`, `ads_policy_summary`, and the full audit tools.
-- Keyword research: `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, `serpchecker_serps`.
-- Backlinks and competitors: `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, `siteprofiler_competitors`.
-- UX friction and behavior: `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, `clarity_compare_projects`.
+## Exact Tool Inventory
 
-## Related Strategy Skills
+| MCP server / service | Tools | Included capabilities |
+| --- | ---: | --- |
+| Google Search Console | 10 | Sites, performance, URL inspection, sitemaps, and guarded site/sitemap management. |
+| Google Analytics 4 | 21 | Properties, standard/batch/pivot/realtime reports, metadata, compatibility, audits, and Admin API access. |
+| Google Ads | 76 | Multi-MCC discovery/routing, account hierarchy, campaigns, ad groups, ads, keywords, audiences, assets, targeting, reports, audits, recommendations, conversions, and guarded mutations. |
+| Google Tag Manager | 22 | Accounts, containers, workspaces, tags, triggers, variables, versions, publishing, permissions, and generic API access. |
+| Google Business Profile | 44 | Accounts, locations, reviews/replies, posts, media, Q&A, verification, categories, attributes, notifications, action links, lodging, calls, performance, and guarded CRUD. |
+| Google Merchant Center | 38 | Accounts/subaccounts, products/product inputs, data sources, promotions, inventory, conversions, reports, issues, quotas, and guarded CRUD. |
+| **Google server total** | **211** | One `google-marketing-suite` MCP server. |
+| Microsoft Clarity | 8 | Project discovery, request preparation, live insights, summaries, project analysis, and comparisons. |
+| **Repository total** | **219** | Two local stdio MCP servers. |
 
-The strategy skills are maintained separately from this MCP repo so they can be reused across projects through `~/.codex/skills`:
+## Google Ads Multi-MCC
 
-- [`marketing-intelligence`](https://github.com/marwa-mrwan/marketing-intelligence): main router for deciding which MCP tools and strategy skill should be used.
-- [`seo-strategist`](https://github.com/marwa-mrwan/seo-strategist): organic search, technical SEO, content, cannibalization, ecommerce SEO, local SEO, schema, hreflang, SXO, GSC, GA4, Clarity, and Mangools synthesis.
-- [`seo-report-sheet-builder`](https://github.com/marwa-mrwan/seo-report-sheet-builder): turns a completed technical SEO audit into a structured Google Sheets action plan with separated issue tabs, checklist columns, and non-duplicated recommendations.
-- [`google-ads-strategist`](https://github.com/marwa-mrwan/google-ads-strategist): Google Ads planning, Search, PMax, Demand Gen, YouTube, diagnosis, bidding, keywords, conversion tracking, creative/copy, landing page readiness, and client reports.
+- `ads_discover_accounts` discovers the accounts and MCCs directly available to the OAuth user.
+- MCC hierarchies are inspected and cached so each client account uses the correct `login-customer-id`.
+- `GOOGLE_ADS_LOGIN_CUSTOMER_IDS` accepts multiple comma-, semicolon-, or space-separated MCC IDs.
+- The legacy `GOOGLE_ADS_LOGIN_CUSTOMER_ID` variable remains supported.
+- Every customer-scoped Ads tool accepts an optional `login_customer_id` override.
 
-Install or update them by copying each skill folder into `~/.codex/skills/`, then restart Codex so the session reloads the skill list.
+Write tools are restricted to customer IDs explicitly listed in `GOOGLE_ADS_MUTATION_CUSTOMER_IDS`. Use `dry_run=true` when you only want a preview.
 
-## Local Files
+## Google Business Profile
 
-These files live in `.vscode/` and are intentionally ignored by Git:
+The 44 tools cover account and location discovery, location CRUD, reviews and replies, posts, media, Q&A, verification, categories, attributes, notifications, place-action links, lodging, calls, and performance.
 
-- `.vscode/mcp.local.env`: local environment variables and API credentials.
-- `.vscode/google.tokens.local.json`: Google OAuth token file generated by `npm run auth`.
-- `.vscode/marketing.accounts.local.json`: per-client website, GA4 property ID, and Clarity token mapping.
-- `.vscode/mcp.json`: local MCP server configuration for VS Code compatible clients.
+`gbp_api_call` covers documented endpoints that do not have a named tool and only accepts predefined Google API service hosts. Writes require `GBP_ENABLE_MUTATIONS=true`, `confirm=true`, and `dry_run=false`.
 
-Do not commit local token, credential, account, or `.env` files.
+## Google Merchant Center
+
+The 38 tools cover accounts/subaccounts, product inputs and processed products, data sources, promotions, local/regional inventory, conversion sources, reports, account/product issues, and quotas.
+
+`merchant_api_call` covers documented endpoints that do not have a named tool and only accepts predefined Merchant API service hosts. Writes require `MERCHANT_ENABLE_MUTATIONS=true`, `confirm=true`, and `dry_run=false`.
+
+See [`docs/google-business-profile-merchant-api.md`](docs/google-business-profile-merchant-api.md) for supported service families, safety behavior, and official API references.
+
+## Local Files and Secrets
+
+The following files are local and ignored by Git:
+
+- `.vscode/mcp.local.env`: credentials and API keys.
+- `.vscode/google.tokens.local.json`: generated Google OAuth tokens.
+- `.vscode/marketing.accounts.local.json`: website, GA4 property, and Clarity account mappings.
+- Any `.env`, credential, secret, or token JSON file matched by `.gitignore`.
+
+Never commit access tokens, refresh tokens, OAuth client secrets, developer tokens, Clarity tokens, or client account exports.
 
 ## Quick Start
-
-Clone the repo and install dependencies:
 
 ```bash
 git clone https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex.git
 cd google-clarity-mangools-mcp-codex
 
-npm install
 cd google-mcp && npm install
 cd ../clarity-mcp && npm install
-cd ../mangools-mcp && npm install
 cd ..
 ```
-
-The root `npm install` installs `chrome-devtools-mcp` locally so the MCP config can run it with `npx --no-install` instead of downloading it at runtime.
 
 Create `.vscode/mcp.local.env`:
 
@@ -66,14 +78,14 @@ Create `.vscode/mcp.local.env`:
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
-GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
+GOOGLE_ADS_LOGIN_CUSTOMER_IDS=1234567890,9876543210
 GOOGLE_ADS_API_VERSION=v24
+GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
+GBP_ENABLE_MUTATIONS=false
+MERCHANT_ENABLE_MUTATIONS=false
 GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
-MANGOOLS_API_KEY=...
 MARKETING_ACCOUNTS_FILE=../.vscode/marketing.accounts.local.json
 ```
-
-`GOOGLE_ADS_API_VERSION` is optional. If it is omitted, the Google MCP server tries supported Google Ads API versions automatically, starting with the newest configured version.
 
 Run Google OAuth once:
 
@@ -82,27 +94,11 @@ cd google-mcp
 npm run auth
 ```
 
-The OAuth flow saves tokens to the path from `GOOGLE_TOKEN_FILE`.
-
-## Google Token File Example
-
-`.vscode/google.tokens.local.json` is generated locally and ignored by Git. Its shape should look like this:
-
-```json
-{
-  "access_token": "ACCESS_TOKEN_PLACEHOLDER",
-  "refresh_token": "REFRESH_TOKEN_PLACEHOLDER",
-  "scope": "openid https://www.googleapis.com/auth/webmasters https://www.googleapis.com/auth/analytics.readonly https://www.googleapis.com/auth/analytics.edit https://www.googleapis.com/auth/analytics.manage.users https://www.googleapis.com/auth/tagmanager.readonly https://www.googleapis.com/auth/tagmanager.edit.containers https://www.googleapis.com/auth/tagmanager.delete.containers https://www.googleapis.com/auth/tagmanager.edit.containerversions https://www.googleapis.com/auth/tagmanager.publish https://www.googleapis.com/auth/tagmanager.manage.users https://www.googleapis.com/auth/tagmanager.manage.accounts https://www.googleapis.com/auth/adwords https://www.googleapis.com/auth/business.manage https://www.googleapis.com/auth/content",
-  "token_type": "Bearer",
-  "expiry_date": 1760000000000
-}
-```
-
-The important field for long-term access is `refresh_token`. If scopes are missing or Google tools stop authorizing, rerun `npm run auth` from `google-mcp`. Sitemap submit/delete needs the full Search Console scope `https://www.googleapis.com/auth/webmasters`; GA4 write/remove helpers need `analytics.edit`; GTM write/remove/publish helpers need the relevant `tagmanager.*` scopes. Older tokens with read-only scopes can list/report data but cannot make changes.
+The OAuth token file is written to `GOOGLE_TOKEN_FILE`. If you add new Google scopes, rerun the auth command so the refresh token includes them.
 
 ## Local Account Mapping
 
-Keep per-client IDs and tokens in `.vscode/marketing.accounts.local.json`. This file is ignored by Git and can be edited whenever accounts are added or tokens change.
+Keep per-client IDs and Clarity tokens in `.vscode/marketing.accounts.local.json`:
 
 ```json
 {
@@ -118,65 +114,40 @@ Keep per-client IDs and tokens in `.vscode/marketing.accounts.local.json`. This 
 }
 ```
 
-The Google MCP server uses `analytics_property_id`. The Clarity MCP server uses `clarity_token`. Both can match accounts by `name`, `label`, or `website` where the tool supports it.
-
-To add a new client, add one object to `accounts` with:
-
-- `name`: stable lowercase key, useful for tool calls.
-- `label`: display name for the client.
-- `website`: canonical website URL.
-- `analytics_property_id`: GA4 property ID for that client.
-- `clarity_token`: Microsoft Clarity Data Export API token for that client.
-
-## Migrating Existing Files
-
-To migrate from an existing GA4 properties file and an old env file with `CLARITY_PROJECTS_JSON_BASE64`, run:
-
-```bash
-node scripts/build-marketing-accounts.mjs \
-  --analytics /path/to/legacy-ga4-properties.json \
-  --env /path/to/mcp.local.env
-```
-
-Then review `.vscode/marketing.accounts.local.json` manually and keep the old env value only if you still need legacy Clarity configuration.
-
-## Verify MCP Servers
-
-Run this after setup or after pulling updates:
+## Verification
 
 ```bash
 node scripts/verify-mcp-servers.mjs
 ```
 
-Expected result:
+Expected output:
 
 ```text
-google-marketing-suite: 118 tools
+google-marketing-suite: 211 tools
 microsoft-clarity: 8 tools
-mangools: 82 tools
 ```
 
-Chrome DevTools MCP is configured in `.mcp.json` and `.vscode/mcp.json` as `chrome-devtools`. It runs headless, uses the locally installed package with `npx --no-install`, disables usage statistics, and disables CrUX URL lookups. Restart Codex or reload the VS Code MCP session after pulling changes so the new server appears.
-
-To test Google Ads access without printing account names or secrets:
+Run the Google safety and MCP protocol tests:
 
 ```bash
 cd google-mcp
-node --input-type=module -e "import dotenv from 'dotenv'; dotenv.config({path:'../.vscode/mcp.local.env'}); process.env.GOOGLE_TOKEN_FILE='../.vscode/google.tokens.local.json'; const {getAuthenticatedClient}=await import('./lib/google-auth.js'); const {handleAdsTool}=await import('./lib/ads.js'); const authClient=await getAuthenticatedClient(); const accounts=await handleAdsTool('ads_list_accounts', {}, authClient); console.log('ads accounts ok:', Array.isArray(accounts) ? accounts.length : 'non-array');"
+npm test
 ```
 
-## Workflow
+## Security
 
-1. Clarify the target site, country, language, date range, and business goal only if missing.
-2. Start with cheap discovery calls such as list/configured-properties/options before spending API quota.
-3. For vague requests, plan the MCP calls first, then run the smallest set that answers the question.
-4. Pick the right strategy skill, then use MCP tools as evidence.
-5. Group findings by impact: blocking issues, growth opportunities, and monitoring items.
-6. Always end with concrete next actions, including the exact tool/source behind each recommendation.
+- GitHub Actions runs dependency installation, tests, MCP registry verification, and secret-pattern checks.
+- `main` is protected against deletion and force pushes.
+- Pull requests must pass the configured CI check before merge.
+- Workflow permissions are read-only unless a future workflow explicitly needs more.
+- Dependency alerts and automated security updates are enabled on GitHub.
 
-## Output Style
+Report a security problem privately using the process in [`SECURITY.md`](SECURITY.md); do not open a public issue containing credentials or exploit details.
 
-- Keep the answer business-focused, not API-focused.
-- Mention missing credentials or inaccessible accounts plainly.
-- For audits, include priority, evidence, and recommended action.
-- For keyword research, include intent, difficulty, opportunity, and suggested content angle.
+## Related Repositories
+
+- [`mangools-mcp`](https://github.com/marwa-mrwan/mangools-mcp): standalone KWFinder, SERPChecker, SERPWatcher, LinkMiner, SiteProfiler, and AIWatcher MCP server.
+- [`marketing-intelligence`](https://github.com/marwa-mrwan/marketing-intelligence): routing and synthesis across marketing data sources.
+- [`seo-strategist`](https://github.com/marwa-mrwan/seo-strategist): SEO, local SEO, analytics, content, and technical strategy.
+- [`seo-report-sheet-builder`](https://github.com/marwa-mrwan/seo-report-sheet-builder): structured SEO execution workbooks.
+- [`google-ads-strategist`](https://github.com/marwa-mrwan/google-ads-strategist): Google Ads planning, audits, optimization, and reporting.

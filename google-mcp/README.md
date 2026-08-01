@@ -11,6 +11,8 @@ It exposes one MCP server, `google-marketing-suite`, with tools for:
 - Google Merchant Center
 - Google Tag Manager
 
+Current registry: **211 tools** — Search Console 10, GA4 21, Google Ads 76, Tag Manager 22, Business Profile 44, and Merchant Center 38.
+
 GA4, Search Console, and GTM include named read tools for common audits plus advanced API-call helpers for missing official API functions:
 
 - `ga4_admin_api_call`: GA4 Admin API create/update/delete/archive calls. Non-GET requires `confirm=true`.
@@ -166,18 +168,16 @@ Use `targeted_location_performance` for the Google Ads "Targeted locations" tabl
 
 ## Additional Tools
 
-- Business Profile:
-  - `gbp_list_accounts`
-  - `gbp_list_locations`
-  - `gbp_get_location`
-  - `gbp_performance`
-  - `gbp_search_keyword_impressions`
-- Merchant Center:
-  - `merchant_list_accounts`
-  - `merchant_list_subaccounts`
-  - `merchant_list_products`
-  - `merchant_list_issues`
-  - `merchant_search_report`
+- Google Ads multi-MCC:
+  - `ads_discover_accounts` discovers every directly accessible MCC/account and caches the correct `login-customer-id` route for each client.
+  - `GOOGLE_ADS_LOGIN_CUSTOMER_IDS` accepts multiple comma-separated MCC IDs. The old singular variable remains supported.
+  - Every customer-scoped Ads tool accepts an optional `login_customer_id` override.
+- Business Profile (44 tools): account/location CRUD, reviews and replies, local posts, media, Q&A, verification, categories, attributes, notifications, place-action links, lodging, calls, and performance.
+  - Use `gbp_api_call` for any documented endpoint not covered by a named tool. It only accepts predefined Google service hosts.
+- Merchant Center (38 tools): accounts/subaccounts, products and product inputs, data sources, promotions, local/regional inventory, conversion sources, reports, issue resolution, and quotas.
+  - Use `merchant_api_call` for any documented Merchant API endpoint not covered by a named tool. It only accepts predefined Google service hosts.
+- Full setup and safety reference:
+  - [`../docs/google-business-profile-merchant-api.md`](../docs/google-business-profile-merchant-api.md)
 
 ## Files Codex Uses
 
@@ -195,14 +195,19 @@ GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_REFRESH_TOKEN=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
+GOOGLE_ADS_LOGIN_CUSTOMER_IDS=1234567890,9876543210
+# Optional legacy/single-MCC fallback:
 GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
 GOOGLE_ADS_API_VERSION=v24
 GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
+GBP_ENABLE_MUTATIONS=false
+MERCHANT_ENABLE_MUTATIONS=false
 ```
 
-`GOOGLE_ADS_DEVELOPER_TOKEN` and `GOOGLE_ADS_LOGIN_CUSTOMER_ID` are only needed for Google Ads tools.
+`GOOGLE_ADS_DEVELOPER_TOKEN` is required for Ads. MCC IDs are optional because `ads_discover_accounts` can discover directly accessible MCCs from the OAuth user; configure the plural variable when you want explicit fallback routes.
 `GOOGLE_ADS_API_VERSION` is optional; omit it to let the MCP try supported versions automatically.
 Only add customer IDs to `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` when you intentionally allow write tools for those accounts. This allowlist is the write approval switch for Google Ads.
+Business Profile and Merchant writes are also disabled by default. A write requires its service env flag, `confirm=true`, and `dry_run=false`.
 
 After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
 

@@ -21,7 +21,6 @@ This workspace is prepared so source code can be pushed to GitHub while local to
 ```bash
 cd google-mcp && npm install
 cd ../clarity-mcp && npm install
-cd ../mangools-mcp && npm install
 ```
 
 3. Create one local secrets file at `.vscode/mcp.local.env`:
@@ -30,10 +29,9 @@ cd ../mangools-mcp && npm install
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
-GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
+GOOGLE_ADS_LOGIN_CUSTOMER_IDS=1234567890,9876543210
 GOOGLE_ADS_API_VERSION=v24
 GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
-MANGOOLS_API_KEY=...
 ```
 
 `GOOGLE_ADS_API_VERSION` is optional. If you leave it out, the Google MCP server tries supported Google Ads API versions automatically.

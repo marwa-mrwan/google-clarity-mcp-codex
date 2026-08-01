@@ -7,6 +7,35 @@ import axios from "axios";
 
 const DEFAULT_ADS_VERSIONS = ["v24", "v23", "v22", "v21"];
 let ADS_API_BASE = null;
+const ADS_LOGIN_ROUTE_CACHE = new Map();
+const ADS_DIRECT_ACCOUNT_IDS = new Set();
+const ADS_MANAGER_ACCOUNT_IDS = new Set();
+let ADS_DISCOVERY_COMPLETE = false;
+
+function normalizeAdsCustomerId(value) {
+  const normalized = String(value || "").replaceAll("-", "").trim();
+  return /^\d+$/.test(normalized) ? normalized : null;
+}
+
+function configuredLoginCustomerIds() {
+  const values = [
+    process.env.GOOGLE_ADS_LOGIN_CUSTOMER_IDS,
+    process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID,
+  ]
+    .filter(Boolean)
+    .flatMap((value) => String(value).split(/[\s,;]+/))
+    .map(normalizeAdsCustomerId)
+    .filter(Boolean);
+  return [...new Set(values)];
+}
+
+function isLoginRoutingError(error) {
+  if ([401, 403].includes(error.response?.status)) return true;
+  const payload = JSON.stringify(error.response?.data || error.message || "");
+  return /USER_PERMISSION_DENIED|CUSTOMER_NOT_ENABLED|CUSTOMER_NOT_FOUND|LOGIN_CUSTOMER_ID|AUTHENTICATION_ERROR/i.test(
+    payload
+  );
+}
 
 const CUSTOMER_ID_PROPERTY = {
   type: "string",
@@ -767,7 +796,23 @@ async function adsRequest(endpoint, body, authClient, developerToken, loginCusto
 }
 
 export function getAdsTools() {
-  return [
+  const tools = [
+    {
+      name: "ads_discover_accounts",
+      description:
+        "Discover every Google Ads account directly accessible to the OAuth user, identify all MCCs, and map client accounts to the correct login-customer-id automatically.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          refresh: {
+            type: "boolean",
+            description: "Ignore the in-memory routing cache and rediscover account access.",
+            default: false,
+          },
+        },
+        required: [],
+      },
+    },
     {
       name: "ads_list_accounts",
       description: "List Google Ads accounts available to the authenticated user, including client accounts under accessible manager accounts when available.",
@@ -1063,25 +1108,146 @@ export function getAdsTools() {
     ...ADVANCED_READ_TOOLS,
     ...WRITE_TOOLS,
   ];
+
+  return tools.map((tool) => {
+    if (!tool.inputSchema?.properties?.customer_id) return tool;
+    return {
+      ...tool,
+      inputSchema: {
+        ...tool.inputSchema,
+        properties: {
+          ...tool.inputSchema.properties,
+          login_customer_id: {
+            type: "string",
+            description:
+              "Optional MCC ID override. Normally omitted because the MCP auto-discovers the correct manager account.",
+          },
+        },
+      },
+    };
+  });
 }
 
 export async function handleAdsTool(name, args, authClient) {
   const developerToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
-  const loginCustomerId = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID;
+  const configuredManagerIds = configuredLoginCustomerIds();
 
   if (!developerToken) {
     throw new Error("GOOGLE_ADS_DEVELOPER_TOKEN is missing from your local MCP env file.");
   }
 
-  const query = async (customerId, gaqlQuery) => {
+  const rawQuery = async (customerId, gaqlQuery, loginCustomerId = null, extra = {}) => {
     const data = await adsRequest(
       `/customers/${customerId}/googleAds:search`,
-      { query: gaqlQuery },
+      { query: gaqlQuery, ...extra },
       authClient,
       developerToken,
       loginCustomerId
     );
     return data.results || [];
+  };
+
+  const discoverLoginRoutes = async ({ refresh = false } = {}) => {
+    if (!refresh && ADS_DISCOVERY_COMPLETE) return ADS_LOGIN_ROUTE_CACHE;
+
+    const token = (await authClient.getAccessToken()).token;
+    const base = await getWorkingBase(token, developerToken);
+    const accessibleRes = await axios.get(`${base}/customers:listAccessibleCustomers`, {
+      headers: { Authorization: `Bearer ${token}`, "developer-token": developerToken },
+    });
+    const directIds = (accessibleRes.data.resourceNames || [])
+      .map((resourceName) => normalizeAdsCustomerId(resourceName.replace("customers/", "")))
+      .filter(Boolean);
+
+    if (refresh) {
+      ADS_LOGIN_ROUTE_CACHE.clear();
+      ADS_DIRECT_ACCOUNT_IDS.clear();
+      ADS_MANAGER_ACCOUNT_IDS.clear();
+      ADS_DISCOVERY_COMPLETE = false;
+    }
+    for (const directId of directIds) {
+      ADS_DIRECT_ACCOUNT_IDS.add(directId);
+      ADS_LOGIN_ROUTE_CACHE.set(directId, null);
+      try {
+        const rows = await rawQuery(
+          directId,
+          "SELECT customer.id, customer.manager FROM customer LIMIT 1",
+          null
+        );
+        if (!rows[0]?.customer?.manager) continue;
+
+        ADS_MANAGER_ACCOUNT_IDS.add(directId);
+        ADS_LOGIN_ROUTE_CACHE.set(directId, directId);
+        const clients = await rawQuery(
+          directId,
+          `SELECT customer_client.id, customer_client.manager, customer_client.level,
+            customer_client.status, customer_client.hidden
+           FROM customer_client
+           WHERE customer_client.hidden = false
+           ORDER BY customer_client.level ASC LIMIT 10000`,
+          directId
+        );
+        for (const row of clients) {
+          const clientId = normalizeAdsCustomerId(row.customerClient?.id);
+          if (clientId && !ADS_LOGIN_ROUTE_CACHE.has(clientId)) {
+            ADS_LOGIN_ROUTE_CACHE.set(clientId, directId);
+          }
+        }
+      } catch {
+        // Keep the directly accessible account usable even if hierarchy enumeration is restricted.
+      }
+    }
+    ADS_DISCOVERY_COMPLETE = true;
+    return ADS_LOGIN_ROUTE_CACHE;
+  };
+
+  const routedRequest = async (customerId, endpoint, body, extra = {}) => {
+    const normalizedCustomerId = normalizeAdsCustomerId(customerId);
+    const explicitManagerId = normalizeAdsCustomerId(args.login_customer_id);
+    if (!normalizedCustomerId) {
+      throw new Error("customer_id must be a numeric Google Ads ID without dashes.");
+    }
+    if (args.login_customer_id && !explicitManagerId) {
+      throw new Error("login_customer_id must be a numeric Google Ads MCC ID without dashes.");
+    }
+
+    if (!ADS_LOGIN_ROUTE_CACHE.has(normalizedCustomerId)) {
+      await discoverLoginRoutes().catch(() => undefined);
+    }
+    const discoveredManagerId = ADS_LOGIN_ROUTE_CACHE.get(normalizedCustomerId);
+    const candidates = [explicitManagerId, discoveredManagerId, ...configuredManagerIds].filter(
+      (value, index, all) => value && all.indexOf(value) === index
+    );
+    candidates.push(null);
+
+    let lastError;
+    for (const loginCustomerId of candidates) {
+      try {
+        const data = await adsRequest(
+          endpoint,
+          body,
+          authClient,
+          developerToken,
+          loginCustomerId
+        );
+        ADS_LOGIN_ROUTE_CACHE.set(normalizedCustomerId, loginCustomerId || null);
+        return { data, loginCustomerId: loginCustomerId || null };
+      } catch (error) {
+        lastError = error;
+        if (!isLoginRoutingError(error)) throw error;
+      }
+    }
+    throw lastError;
+  };
+
+  const query = async (customerId, gaqlQuery, extra = {}) => {
+    const normalizedCustomerId = normalizeAdsCustomerId(customerId);
+    const response = await routedRequest(
+      normalizedCustomerId,
+      `/customers/${normalizedCustomerId}/googleAds:search`,
+      { query: gaqlQuery, ...extra }
+    );
+    return response.data.results || [];
   };
 
   const idFilter = (field, value) => {
@@ -1093,8 +1259,8 @@ export async function handleAdsTool(name, args, authClient) {
   };
 
   const normalizeCustomerId = (value, field = "customer_id") => {
-    const normalized = String(value || "").replaceAll("-", "").trim();
-    if (!/^\d+$/.test(normalized)) {
+    const normalized = normalizeAdsCustomerId(value);
+    if (!normalized) {
       throw new Error(`${field} must be a numeric Google Ads ID without dashes.`);
     }
     return normalized;
@@ -1336,38 +1502,39 @@ export async function handleAdsTool(name, args, authClient) {
   };
 
   const adsMutationRequest = async (endpoint, body) => {
-    const token = (await authClient.getAccessToken()).token;
-    const base = await getWorkingBase(token, developerToken);
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "developer-token": developerToken,
-      "Content-Type": "application/json",
-    };
-    if (loginCustomerId) {
-      headers["login-customer-id"] = loginCustomerId;
-    }
-    const res = await axios.post(`${base}${endpoint}`, body, { headers });
+    const customerId = endpoint.match(/\/customers\/(\d+)/)?.[1];
+    if (!customerId) throw new Error("Could not resolve customer_id from Ads mutation endpoint.");
+    const res = await routedRequest(customerId, endpoint, body);
     return {
       data: res.data,
-      requestId: res.headers["request-id"] || res.headers["request_id"] || null,
+      loginCustomerId: res.loginCustomerId,
+      requestId: null,
     };
   };
 
   const adsRootPostRequest = async (endpoint, body) => {
-    const token = (await authClient.getAccessToken()).token;
-    const base = await getWorkingBase(token, developerToken);
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "developer-token": developerToken,
-      "Content-Type": "application/json",
-    };
-    if (loginCustomerId) {
-      headers["login-customer-id"] = loginCustomerId;
+    const customerId = endpoint.match(/\/customers\/(\d+)/)?.[1];
+    if (!customerId) {
+      const token = (await authClient.getAccessToken()).token;
+      const base = await getWorkingBase(token, developerToken);
+      const response = await axios.post(`${base}${endpoint}`, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "developer-token": developerToken,
+          "Content-Type": "application/json",
+        },
+      });
+      return {
+        data: response.data,
+        loginCustomerId: null,
+        requestId: response.headers["request-id"] || response.headers["request_id"] || null,
+      };
     }
-    const res = await axios.post(`${base}${endpoint}`, body, { headers });
+    const res = await routedRequest(customerId, endpoint, body);
     return {
       data: res.data,
-      requestId: res.headers["request-id"] || res.headers["request_id"] || null,
+      loginCustomerId: res.loginCustomerId,
+      requestId: null,
     };
   };
 
@@ -3267,14 +3434,16 @@ export async function handleAdsTool(name, args, authClient) {
     const customerId = normalizeCustomerId(args.customer_id);
     assertReadOnlyGaql(args.query);
     try {
-      const response = await adsRequest(
+      const response = await routedRequest(
+        customerId,
         `/customers/${customerId}/googleAds:search`,
-        { query: args.query, validateOnly: true },
-        authClient,
-        developerToken,
-        loginCustomerId
+        { query: args.query, validateOnly: true }
       );
-      return { valid: true, response };
+      return {
+        valid: true,
+        response: response.data,
+        loginCustomerId: response.loginCustomerId,
+      };
     } catch (error) {
       return {
         valid: false,
@@ -3593,7 +3762,47 @@ export async function handleAdsTool(name, args, authClient) {
     });
   }
 
+  if (name === "ads_discover_accounts") {
+    await discoverLoginRoutes({ refresh: args.refresh === true });
+    const directAccounts = [];
+    for (const customerId of ADS_DIRECT_ACCOUNT_IDS) {
+      try {
+        const rows = await rawQuery(
+          customerId,
+          `SELECT customer.id, customer.descriptive_name, customer.currency_code,
+            customer.time_zone, customer.manager, customer.test_account,
+            customer.auto_tagging_enabled FROM customer LIMIT 1`,
+          ADS_MANAGER_ACCOUNT_IDS.has(customerId) ? customerId : null
+        );
+        directAccounts.push({
+          ...(rows[0]?.customer || { id: customerId }),
+          loginCustomerId: ADS_LOGIN_ROUTE_CACHE.get(customerId) || null,
+        });
+      } catch (error) {
+        directAccounts.push({ id: customerId, error: error.message });
+      }
+    }
+
+    const routes = [...ADS_LOGIN_ROUTE_CACHE.entries()].map(([customerId, managerId]) => ({
+      customerId,
+      loginCustomerId: managerId,
+      direct: ADS_DIRECT_ACCOUNT_IDS.has(customerId),
+      manager: ADS_MANAGER_ACCOUNT_IDS.has(customerId),
+    }));
+    return {
+      summary: {
+        directAccountCount: ADS_DIRECT_ACCOUNT_IDS.size,
+        directMccCount: ADS_MANAGER_ACCOUNT_IDS.size,
+        routedCustomerCount: routes.length,
+      },
+      configuredManagerIds,
+      directAccounts,
+      routes,
+    };
+  }
+
   if (name === "ads_list_accounts") {
+    await discoverLoginRoutes();
     const token = (await authClient.getAccessToken()).token;
     const base = await getWorkingBase(token, developerToken);
     const accessibleRes = await axios.get(`${base}/customers:listAccessibleCustomers`, {
@@ -3847,15 +4056,13 @@ export async function handleAdsTool(name, args, authClient) {
       }),
     };
 
-    const res = await axios.post(`${base}/customers/${customer_id}:generateKeywordIdeas`, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "developer-token": developerToken,
-        ...(loginCustomerId && { "login-customer-id": loginCustomerId }),
-      },
-    });
+    const routed = await routedRequest(
+      customer_id,
+      `/customers/${customer_id}:generateKeywordIdeas`,
+      body
+    );
 
-    return (res.data.results || []).slice(0, 30).map((idea) => ({
+    return (routed.data.results || []).slice(0, 30).map((idea) => ({
       keyword: idea.text,
       avgMonthlySearches: idea.keywordIdeaMetrics?.avgMonthlySearches,
       competition: idea.keywordIdeaMetrics?.competition,
@@ -3876,9 +4083,6 @@ export async function handleAdsTool(name, args, authClient) {
       geo_target_ids = [],
       include_average_cpc = true,
     } = args;
-    const token = (await authClient.getAccessToken()).token;
-    const base = await getWorkingBase(token, developerToken);
-
     const body = {
       keywords,
       language: `languageConstants/${language_id}`,
@@ -3889,19 +4093,13 @@ export async function handleAdsTool(name, args, authClient) {
       },
     };
 
-    const res = await axios.post(
-      `${base}/customers/${customer_id}:generateKeywordHistoricalMetrics`,
-      body,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "developer-token": developerToken,
-          ...(loginCustomerId && { "login-customer-id": loginCustomerId }),
-        },
-      }
+    const routed = await routedRequest(
+      customer_id,
+      `/customers/${customer_id}:generateKeywordHistoricalMetrics`,
+      body
     );
 
-    return (res.data.results || []).map((result) => ({
+    return (routed.data.results || []).map((result) => ({
       keyword: result.text,
       closeVariants: result.closeVariants || [],
       metrics: {

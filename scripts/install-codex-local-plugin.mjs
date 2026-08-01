@@ -36,13 +36,6 @@ function buildLocalMcpConfig() {
           MARKETING_ACCOUNTS_FILE: marketingAccountsFile,
         },
       },
-      mangools: {
-        command: "node",
-        args: [path.join(mcpRoot, "mangools-mcp", "index.js")],
-        env: {
-          MCP_SECRETS_ENV_FILE: secretsFile,
-        },
-      },
     },
   };
 }
@@ -150,11 +143,6 @@ function upsertCodexConfig() {
       name: "microsoft-clarity",
       script: path.join(mcpRoot, "clarity-mcp", "index.js"),
       env: { MARKETING_ACCOUNTS_FILE: marketingAccountsFile },
-    },
-    {
-      name: "mangools",
-      script: path.join(mcpRoot, "mangools-mcp", "index.js"),
-      env: {},
     },
   ];
 

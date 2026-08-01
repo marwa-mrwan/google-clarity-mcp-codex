@@ -33,7 +33,6 @@ async function main() {
   const googleClientSecret = await ask("GOOGLE_CLIENT_SECRET");
   const googleAdsDeveloperToken = await ask("GOOGLE_ADS_DEVELOPER_TOKEN", { optional: true });
   const googleAdsLoginCustomerId = await ask("GOOGLE_ADS_LOGIN_CUSTOMER_ID", { optional: true });
-  const mangoolsApiKey = await ask("MANGOOLS_API_KEY", { optional: true });
 
   const clarityProjectName = await ask("Clarity project name", { optional: true });
   const clarityProjectLabel = clarityProjectName
@@ -55,7 +54,6 @@ async function main() {
     line("GOOGLE_ADS_LOGIN_CUSTOMER_ID", googleAdsLoginCustomerId),
     "GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json",
     "MARKETING_ACCOUNTS_FILE=../.vscode/marketing.accounts.local.json",
-    line("MANGOOLS_API_KEY", mangoolsApiKey),
   ].filter(Boolean);
 
   fs.writeFileSync(envPath, `${envLines.join("\n")}\n`);

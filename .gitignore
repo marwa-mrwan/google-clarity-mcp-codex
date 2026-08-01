@@ -21,10 +21,8 @@
 
 google-mcp/.mcp.json
 clarity-mcp/.mcp.json
-mangools-mcp/.mcp.json
 google-mcp/.codex-plugin/
 clarity-mcp/.codex-plugin/
-mangools-mcp/.codex-plugin/
 
 .vscode/*.local.*
 .vscode/mcp.local.env

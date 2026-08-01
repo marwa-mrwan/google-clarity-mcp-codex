@@ -16,13 +16,6 @@
         "MCP_SECRETS_ENV_FILE": ".vscode/mcp.local.env",
         "MARKETING_ACCOUNTS_FILE": ".vscode/marketing.accounts.local.json"
       }
-    },
-    "mangools": {
-      "command": "node",
-      "args": ["mangools-mcp/index.js"],
-      "env": {
-        "MCP_SECRETS_ENV_FILE": ".vscode/mcp.local.env"
-      }
     }
   }
 }
