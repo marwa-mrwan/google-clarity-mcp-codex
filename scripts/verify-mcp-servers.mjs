@@ -29,3 +29,5 @@ const results = [
 for (const result of results) {
   console.log(`${result.name}: ${result.tools} tools`);
 }
+
+process.exit(0);

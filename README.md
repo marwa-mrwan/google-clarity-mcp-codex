@@ -1,22 +1,39 @@
 # google-clarity-mangools-mcp-codex
 
-google-clarity-mangools-mcp-codex is a local marketing analysis workspace for Codex. It connects Google Search Console, GA4, Google Ads, Google Tag Manager, Microsoft Clarity, and Mangools for SEO, Google Ads, and campaign analysis.
+google-clarity-mangools-mcp-codex is a local marketing analysis workspace for Codex. It exposes 281 tools across three MCP servers for Google marketing products, Microsoft Clarity, and Mangools.
 
 Use this repo as the local MCP layer. Keep secrets and client account IDs in local ignored files, then let separate Codex skills use the MCP tools as evidence for audits, reports, and campaign strategy.
 
 ## What Is Included
 
-- `google-mcp`: Google Search Console, GA4, Google Ads, PageSpeed Insights, Google Tag Manager, Google Business Profile, Merchant Center, and combined marketing reports.
-- `clarity-mcp`: Microsoft Clarity project lookup, live insights, metrics, and project analysis.
-- `mangools-mcp`: KWFinder, SERPChecker, LinkMiner, and SiteProfiler research.
-- `chrome-devtools`: local Chrome DevTools MCP for rendered-page checks, console errors, network inspection, screenshots, and landing page QA.
+- `google-mcp`: 191 tools for Google Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, Merchant Center, PageSpeed Insights, and combined reports.
+- `clarity-mcp`: 8 tools for Microsoft Clarity project lookup, live insights, metrics, comparisons, and project analysis.
+- `mangools-mcp`: 82 tools for KWFinder, SERPChecker, LinkMiner, SiteProfiler, SERPWatcher, and AIWatcher research.
 - `scripts/`: setup and migration helpers for local account mapping.
+
+## Exact Tool Inventory
+
+| MCP server / service | Tools | Included capabilities |
+| --- | ---: | --- |
+| Google Search Console | 10 | Sites, performance, URL inspection, sitemaps, and site/sitemap management. |
+| Google Analytics 4 | 21 | Properties, standard/batch/pivot/realtime reports, metadata, compatibility, audits, and Admin API access. |
+| Google Ads | 54 | Multi-MCC discovery and routing, campaigns, ad groups, ads, keywords, search terms, reporting, audits, recommendations, assets, conversions, billing diagnostics, and guarded mutations. |
+| Google Tag Manager | 22 | Accounts, containers, workspaces, tags, triggers, variables, versions, publishing, permissions, and generic API access. |
+| Google Business Profile | 44 | Accounts, locations, reviews/replies, posts, media, Q&A, verification, categories, attributes, notifications, action links, lodging, calls, performance, and guarded CRUD. |
+| Google Merchant Center | 38 | Accounts/subaccounts, products and product inputs, data sources, promotions, inventory, conversion sources, reports, issues, quotas, and guarded CRUD. |
+| PageSpeed Insights | 1 | Lighthouse/PageSpeed audit for a URL. |
+| Combined Google reporting | 1 | Cross-channel marketing report. |
+| Microsoft Clarity | 8 | Project discovery, request preparation, live insights, summaries, project analysis, and comparisons. |
+| Mangools | 82 | Keyword research, SERPs, backlinks, domain/competitor analysis, rank tracking, and AI visibility research. |
+| **Total** | **281** | Three local stdio MCP servers. |
 
 ## Tool Routing
 
 - Site health and SEO performance: `gsc_list_sites`, `gsc_performance`, `gsc_inspect_url`, `gsc_sitemaps`, `gsc_get_sitemap`, `gsc_submit_sitemap`, `gsc_delete_sitemap`, `gsc_get_site`, `gsc_add_site`, `gsc_delete_site`, `psi_audit_url`.
 - Analytics traffic and conversions: `ga4_list_properties`, `ga4_run_report`, `ga4_batch_run_reports`, `ga4_pivot_report`, `ga4_metadata`, `ga4_check_compatibility`, `ga4_realtime`, `ga4_property_audit`, and `ga4_admin_api_call`.
-- Google Ads audits: `ads_list_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`, `ads_field_metadata`, `ads_validate_gaql`, `ads_policy_summary`, and the full audit tools.
+- Google Ads audits: `ads_discover_accounts`, `ads_list_accounts`, `ads_list_client_accounts`, `ads_list_campaigns`, `ads_keyword_performance`, `ads_search_terms`, `ads_campaign_search_terms`, `ads_account_performance`, `ads_gaql_query`, `ads_deep_report`, `ads_field_metadata`, `ads_validate_gaql`, `ads_policy_summary`, and the full audit tools.
+- Business Profile operations: `gbp_list_accounts`, location CRUD, reviews/replies, local posts, media, Q&A, verification, notifications, place-action links, lodging, performance, and `gbp_api_call` for the remaining official endpoints.
+- Merchant Center operations: account/subaccount access, product inputs, processed products, feeds/data sources, promotions, inventory, conversions, reports, issue resolution, quotas, and `merchant_api_call` for the remaining official endpoints.
 - Keyword research: `kwfinder_related_keywords`, `kwfinder_competitor_keywords`, `kwfinder_keyword_details`, `kwfinder_trends`, `kwfinder_gap_analysis`, `serpchecker_serps`.
 - Backlinks and competitors: `linkminer_links`, `siteprofiler_overview`, `siteprofiler_backlink_profile`, `siteprofiler_top_content`, `siteprofiler_competitors`.
 - UX friction and behavior: `clarity_prepare_request`, `clarity_live_insights`, `clarity_metric_summary`, `clarity_analyze_project`, `clarity_compare_projects`.
@@ -51,14 +68,11 @@ Clone the repo and install dependencies:
 git clone https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex.git
 cd google-clarity-mangools-mcp-codex
 
-npm install
 cd google-mcp && npm install
 cd ../clarity-mcp && npm install
 cd ../mangools-mcp && npm install
 cd ..
 ```
-
-The root `npm install` installs `chrome-devtools-mcp` locally so the MCP config can run it with `npx --no-install` instead of downloading it at runtime.
 
 Create `.vscode/mcp.local.env`:
 
@@ -66,8 +80,12 @@ Create `.vscode/mcp.local.env`:
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
 GOOGLE_ADS_DEVELOPER_TOKEN=...
-GOOGLE_ADS_LOGIN_CUSTOMER_ID=...
+GOOGLE_ADS_LOGIN_CUSTOMER_IDS=1234567890,9876543210
 GOOGLE_ADS_API_VERSION=v24
+GOOGLE_ADS_ENABLE_MUTATIONS=false
+GOOGLE_ADS_MUTATION_CUSTOMER_IDS=
+GBP_ENABLE_MUTATIONS=false
+MERCHANT_ENABLE_MUTATIONS=false
 GOOGLE_TOKEN_FILE=../.vscode/google.tokens.local.json
 MANGOOLS_API_KEY=...
 MARKETING_ACCOUNTS_FILE=../.vscode/marketing.accounts.local.json
@@ -151,12 +169,12 @@ node scripts/verify-mcp-servers.mjs
 Expected result:
 
 ```text
-google-marketing-suite: 118 tools
+google-marketing-suite: 191 tools
 microsoft-clarity: 8 tools
 mangools: 82 tools
 ```
 
-Chrome DevTools MCP is configured in `.mcp.json` and `.vscode/mcp.json` as `chrome-devtools`. It runs headless, uses the locally installed package with `npx --no-install`, disables usage statistics, and disables CrUX URL lookups. Restart Codex or reload the VS Code MCP session after pulling changes so the new server appears.
+The verification script exits after printing the registry counts. Restart Codex or reload the VS Code MCP session after pulling changes so the updated tool registry appears.
 
 To test Google Ads access without printing account names or secrets:
 
