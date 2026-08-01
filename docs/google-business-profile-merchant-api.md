@@ -50,11 +50,20 @@ Business Profile API access requires Google approval for the project and the rel
 https://www.googleapis.com/auth/business.manage
 ```
 
+### Business Profile quota troubleshooting
+
+`429 RESOURCE_EXHAUSTED` is a project quota response, not an OAuth failure. Open Google Cloud Console, select the OAuth project, then inspect **APIs & Services > Enabled APIs & services > My Business Account Management API > Quotas**.
+
+- If the quota limit is `0`, submit the Google Business Profile **Basic API Access** application. Do not request a quota increase first.
+- If the limit is above `0`, check recent usage and spread requests instead of sending bursts.
+- The MCP converts this response into `GBP_QUOTA_EXHAUSTED` with the official quota documentation link.
+
 ## Merchant API coverage
 
 Named tools cover:
 
 - accounts and advanced-account subaccounts
+- Google Cloud project and developer-contact registration
 - processed products and writable product inputs
 - data sources and immediate fetches
 - promotions
@@ -71,6 +80,24 @@ OAuth uses:
 ```text
 https://www.googleapis.com/auth/content
 ```
+
+### Register the Google Cloud project
+
+Merchant API requires the authenticating Google Cloud project to be linked to a Merchant Center account. Get the Merchant account ID from Merchant Center, then preview the guarded registration:
+
+```json
+{
+  "tool": "merchant_register_gcp",
+  "arguments": {
+    "account_id": "123456789",
+    "developer_email": "developer@example.com"
+  }
+}
+```
+
+To execute it, set `MERCHANT_ENABLE_MUTATIONS=true`, then pass `dry_run=false` and `confirm=true`. The email receives the `API_DEVELOPER` role or an invitation if it is not already a Merchant Center user. Wait five minutes before retrying normal Merchant API calls.
+
+Use `merchant_get_developer_registration` with the same `account_id` to inspect the link. A matching unregistered-project `401` is converted into `MERCHANT_GCP_NOT_REGISTERED` with these next steps; unrelated authentication failures remain unchanged.
 
 ## Mutation safety
 
@@ -119,5 +146,7 @@ After adding scopes or changing the Google user, rerun `npm run auth` and restar
 - Google Ads account listing: https://developers.google.com/google-ads/api/docs/account-management/listing-accounts
 - Business Profile API overview: https://developers.google.com/my-business/ref_overview
 - Business Profile basic setup: https://developers.google.com/my-business/content/basic-setup
+- Business Profile quota limits: https://developers.google.com/my-business/content/limits
 - Google My Business REST reference: https://developers.google.com/my-business/reference/rest
 - Merchant API REST reference: https://developers.google.com/merchant/api/reference/rest
+- Merchant developer registration: https://developers.google.com/merchant/api/guides/quickstart/direct-api-calls

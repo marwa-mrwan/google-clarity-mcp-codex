@@ -1,4 +1,5 @@
 import axios from "axios";
+import { enhanceBusinessProfileError } from "./google-api-errors.js";
 
 const GBP_SERVICES = Object.freeze({
   account_management: "https://mybusinessaccountmanagement.googleapis.com/v1",
@@ -132,14 +133,19 @@ async function gbpRequest(
     }
   }
 
-  const response = await axios.request({
-    url: `${base}${safePath}`,
-    method: normalizedMethod,
-    headers: await getHeaders(authClient),
-    params,
-    paramsSerializer: { indexes: null },
-    ...(body !== undefined ? { data: body } : {}),
-  });
+  let response;
+  try {
+    response = await axios.request({
+      url: `${base}${safePath}`,
+      method: normalizedMethod,
+      headers: await getHeaders(authClient),
+      params,
+      paramsSerializer: { indexes: null },
+      ...(body !== undefined ? { data: body } : {}),
+    });
+  } catch (error) {
+    throw enhanceBusinessProfileError(error);
+  }
   return {
     executed: true,
     service,

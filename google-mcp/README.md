@@ -11,7 +11,7 @@ It exposes one MCP server, `google-marketing-suite`, with tools for:
 - Google Merchant Center
 - Google Tag Manager
 
-Current registry: **211 tools** — Search Console 10, GA4 21, Google Ads 76, Tag Manager 22, Business Profile 44, and Merchant Center 38.
+Current registry: **213 tools** — Search Console 10, GA4 21, Google Ads 76, Tag Manager 22, Business Profile 44, and Merchant Center 40.
 
 GA4, Search Console, and GTM include named read tools for common audits plus advanced API-call helpers for missing official API functions:
 
@@ -174,7 +174,9 @@ Use `targeted_location_performance` for the Google Ads "Targeted locations" tabl
   - Every customer-scoped Ads tool accepts an optional `login_customer_id` override.
 - Business Profile (44 tools): account/location CRUD, reviews and replies, local posts, media, Q&A, verification, categories, attributes, notifications, place-action links, lodging, calls, and performance.
   - Use `gbp_api_call` for any documented endpoint not covered by a named tool. It only accepts predefined Google service hosts.
-- Merchant Center (38 tools): accounts/subaccounts, products and product inputs, data sources, promotions, local/regional inventory, conversion sources, reports, issue resolution, and quotas.
+- Merchant Center (40 tools): accounts/subaccounts, developer registration, products and product inputs, data sources, promotions, local/regional inventory, conversion sources, reports, issue resolution, and quotas.
+  - Use `merchant_get_developer_registration` to inspect the linked Google Cloud project.
+  - Use the guarded `merchant_register_gcp` mutation to register the project and developer contact.
   - Use `merchant_api_call` for any documented Merchant API endpoint not covered by a named tool. It only accepts predefined Google service hosts.
 - Full setup and safety reference:
   - [`../docs/google-business-profile-merchant-api.md`](../docs/google-business-profile-merchant-api.md)

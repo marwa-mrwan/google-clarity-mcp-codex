@@ -96,3 +96,72 @@ test("Merchant writes are dry-run, reject full URLs, and keep account_id compati
     axios.request = originalRequest;
   }
 });
+
+test("Business Profile quota errors include safe setup guidance", async () => {
+  const originalRequest = axios.request;
+  axios.request = async () => {
+    const error = new Error("Request failed with status code 429");
+    error.response = {
+      status: 429,
+      data: { error: { status: "RESOURCE_EXHAUSTED" } },
+    };
+    throw error;
+  };
+
+  try {
+    await assert.rejects(
+      handleBusinessProfileTool("gbp_list_accounts", {}, authClient),
+      (error) =>
+        error.code === "GBP_QUOTA_EXHAUSTED" &&
+        /Basic API Access/.test(error.message) &&
+        /developers\.google\.com\/my-business\/content\/limits/.test(error.message)
+    );
+  } finally {
+    axios.request = originalRequest;
+  }
+});
+
+test("Merchant developer registration is guarded and unregistered projects get guidance", async () => {
+  const tools = getMerchantCenterTools();
+  assert.ok(tools.some((item) => item.name === "merchant_get_developer_registration"));
+  assert.ok(tools.some((item) => item.name === "merchant_register_gcp"));
+
+  const preview = await handleMerchantCenterTool(
+    "merchant_register_gcp",
+    { account_id: "123", developer_email: "developer@example.com" },
+    authClient
+  );
+  assert.equal(preview.executed, false);
+  assert.ok(preview.safety.blockedReasons.includes("dry_run is true"));
+  assert.match(preview.safety.preview.endpoint, /accounts\/123\/developerRegistration:registerGcp$/);
+  assert.deepEqual(preview.safety.preview.body, { developerEmail: "developer@example.com" });
+
+  const originalRequest = axios.request;
+  axios.request = async () => {
+    const error = new Error("Request failed with status code 401");
+    error.response = {
+      status: 401,
+      data: {
+        error: {
+          status: "UNAUTHENTICATED",
+          message: "The GCP project is not registered with the merchant account.",
+        },
+      },
+    };
+    throw error;
+  };
+
+  try {
+    await assert.rejects(
+      handleMerchantCenterTool("merchant_list_accounts", {}, authClient),
+      (error) =>
+        error.code === "MERCHANT_GCP_NOT_REGISTERED" &&
+        /merchant_register_gcp/.test(error.message) &&
+        /developers\.google\.com\/merchant\/api\/guides\/quickstart\/direct-api-calls/.test(
+          error.message
+        )
+    );
+  } finally {
+    axios.request = originalRequest;
+  }
+});
