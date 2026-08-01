@@ -1,6 +1,6 @@
-# google-clarity-mangools-mcp-codex
+# google-clarity-mcp-codex
 
-Local MCP workspace for Google marketing products and Microsoft Clarity. The repository name is kept unchanged for backward compatibility, while Mangools now lives in its own repository: [`marwa-mrwan/mangools-mcp`](https://github.com/marwa-mrwan/mangools-mcp).
+Local MCP workspace for Google marketing products and Microsoft Clarity.
 
 The workspace exposes **219 tools** through two local stdio MCP servers. Credentials, OAuth tokens, API keys, and client account mappings stay in ignored local files.
 
@@ -9,8 +9,6 @@ The workspace exposes **219 tools** through two local stdio MCP servers. Credent
 - `google-mcp`: **211 tools** for Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
 - `clarity-mcp`: **8 tools** for Microsoft Clarity project discovery, live insights, summaries, analysis, and comparisons.
 - `scripts/`: setup, verification, local plugin installation, and account-mapping helpers.
-
-Chrome DevTools and Mangools are not bundled or configured in this repository.
 
 ## Exact Tool Inventory
 
@@ -64,8 +62,8 @@ Never commit access tokens, refresh tokens, OAuth client secrets, developer toke
 ## Quick Start
 
 ```bash
-git clone https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex.git
-cd google-clarity-mangools-mcp-codex
+git clone https://github.com/marwa-mrwan/google-clarity-mcp-codex.git
+cd google-clarity-mcp-codex
 
 cd google-mcp && npm install
 cd ../clarity-mcp && npm install

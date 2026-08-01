@@ -1,13 +1,13 @@
 {
-  "name": "google-clarity-mangools-mcp-codex",
+  "name": "google-clarity-mcp-codex",
   "version": "1.0.0",
   "description": "Codex MCP plugin for Google Search Console, GA4, Google Ads, GTM, Business Profile, Merchant Center, and Microsoft Clarity.",
   "author": {
     "name": "marwa-mrwan",
     "url": "https://github.com/marwa-mrwan"
   },
-  "homepage": "https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex",
-  "repository": "https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex",
+  "homepage": "https://github.com/marwa-mrwan/google-clarity-mcp-codex",
+  "repository": "https://github.com/marwa-mrwan/google-clarity-mcp-codex",
   "license": "MIT",
   "keywords": [
     "seo",
@@ -20,13 +20,13 @@
   ],
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "google-clarity-mangools-mcp-codex",
+    "displayName": "google-clarity-mcp-codex",
     "shortDescription": "Codex MCP for Google marketing and Clarity.",
     "longDescription": "Local Codex MCP tools for Google Search Console, GA4, multi-MCC Google Ads, GTM, Business Profile, Merchant Center, and Clarity UX insights.",
     "developerName": "marwa-mrwan",
     "category": "Marketing",
     "capabilities": ["MCP", "Research", "Analysis"],
-    "websiteURL": "https://github.com/marwa-mrwan/google-clarity-mangools-mcp-codex",
+    "websiteURL": "https://github.com/marwa-mrwan/google-clarity-mcp-codex",
     "defaultPrompt": [
       "Analyze this site using Search Console and GA4.",
       "Audit Google Ads performance and search terms.",
