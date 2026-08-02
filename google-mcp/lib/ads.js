@@ -212,6 +212,7 @@ const ADS_DEEP_REPORT_TYPES = [
   "keyword_quality",
   "device_bid_modifiers",
   "placements",
+  "pmax_placements",
   "topics",
   "campaign_asset_links",
   "ad_group_asset_links",
@@ -1082,7 +1083,7 @@ export function getAdsTools() {
     },
     {
       name: "ads_deep_report",
-      description: "Run predefined deep-analysis Google Ads reports for devices, locations, landing pages, demographics, assets, recommendations, budgets, conversion actions, negative keywords, and change history.",
+      description: "Run predefined deep-analysis Google Ads reports for placements (Where ads showed), PMax placements, devices, locations, landing pages, demographics, assets, recommendations, budgets, conversion actions, negative keywords, and change history.",
       inputSchema: {
         type: "object",
         properties: {
@@ -2175,13 +2176,25 @@ export async function handleAdsTool(name, args, authClient) {
 
       placements: `SELECT campaign.id, campaign.name,
           ad_group.id, ad_group.name,
-          ad_group_criterion.criterion_id, ad_group_criterion.status,
-          ad_group_criterion.negative, ad_group_criterion.placement.url,
+          detail_placement_view.display_name,
+          detail_placement_view.placement,
+          detail_placement_view.placement_type,
+          detail_placement_view.target_url,
+          detail_placement_view.group_placement_target_url,
           metrics.clicks, metrics.impressions, metrics.ctr,
           metrics.average_cpc, metrics.conversions, metrics.cost_micros
         FROM detail_placement_view
         ${adGroupWhere}
         ORDER BY metrics.cost_micros DESC LIMIT ${rowLimit}`,
+
+      pmax_placements: `SELECT campaign.id, campaign.name,
+          performance_max_placement_view.display_name,
+          performance_max_placement_view.placement,
+          performance_max_placement_view.placement_type,
+          metrics.impressions
+        FROM performance_max_placement_view
+        ${campaignWhere}
+        ORDER BY metrics.impressions DESC LIMIT ${rowLimit}`,
 
       topics: `SELECT campaign.id, campaign.name,
           ad_group.id, ad_group.name,
@@ -3709,6 +3722,7 @@ export async function handleAdsTool(name, args, authClient) {
         "pmax_asset_group_assets",
         "pmax_listing_groups",
         "pmax_search_terms",
+        "pmax_placements",
         "shopping_products",
         "shopping_listing_groups",
         "video_campaigns",
