@@ -97,6 +97,28 @@ test("Merchant writes are dry-run, reject full URLs, and keep account_id compati
   }
 });
 
+test("Business Profile registry excludes discontinued APIs", () => {
+  const tools = getBusinessProfileTools();
+  const names = new Set(tools.map((item) => item.name));
+  const discontinued = [
+    "gbp_business_calls_insights",
+    "gbp_list_questions",
+    "gbp_create_question",
+    "gbp_update_question",
+    "gbp_delete_question",
+    "gbp_list_answers",
+    "gbp_upsert_answer",
+    "gbp_delete_answer",
+  ];
+  assert.equal(tools.length, 36);
+  for (const name of discontinued) assert.equal(names.has(name), false);
+
+  const genericCall = tools.find((item) => item.name === "gbp_api_call");
+  const services = genericCall.inputSchema.properties.service.enum;
+  assert.equal(services.includes("business_calls"), false);
+  assert.equal(services.includes("q_and_a"), false);
+});
+
 test("Business Profile quota errors include safe setup guidance", async () => {
   const originalRequest = axios.request;
   axios.request = async () => {

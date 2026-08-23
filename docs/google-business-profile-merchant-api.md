@@ -34,13 +34,11 @@ The MCP uses Google's federated Business Profile services rather than treating t
 - Performance
 - Notifications
 - Verifications
-- Business Calls
 - Lodging
 - Place Actions
-- Q&A
 - Google My Business v4 for reviews, posts, and media
 
-Named tools cover the normal workflows: account/location CRUD, reviews and replies, posts, media, questions and answers, verification, categories, attributes, Pub/Sub notifications, action links, lodging, calls, and performance.
+Named tools cover the normal workflows: account/location CRUD, reviews and replies, posts, media, verification, categories, attributes, Pub/Sub notifications, action links, lodging, and performance. The discontinued Q&A and Business Calls APIs are intentionally excluded.
 
 `gbp_api_call` covers remaining official methods. It accepts a service enum plus a relative path. Full URLs, path traversal, fragments, backslashes, and line breaks are rejected.
 
