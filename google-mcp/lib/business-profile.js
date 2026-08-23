@@ -7,10 +7,8 @@ const GBP_SERVICES = Object.freeze({
   performance: "https://businessprofileperformance.googleapis.com/v1",
   notifications: "https://mybusinessnotifications.googleapis.com/v1",
   verifications: "https://mybusinessverifications.googleapis.com/v1",
-  business_calls: "https://mybusinessbusinesscalls.googleapis.com/v1",
   lodging: "https://mybusinesslodging.googleapis.com/v1",
   place_actions: "https://mybusinessplaceactions.googleapis.com/v1",
-  q_and_a: "https://mybusinessqanda.googleapis.com/v1",
   legacy_v4: "https://mybusiness.googleapis.com/v4",
   media_v1: "https://mybusiness.googleapis.com/v1",
 });
@@ -227,35 +225,6 @@ export function getBusinessProfileTools() {
     tool("gbp_delete_media", "Delete an owner media item.", {
       media_name: resource("accounts/{accountId}/locations/{locationId}/media/{mediaId}"),
     }, ["media_name"], true),
-    tool("gbp_list_questions", "List questions for a location.", {
-      parent: resource("locations/{locationId}"),
-      order_by: { type: "string" },
-      ...pageProperties,
-    }, ["parent"]),
-    tool("gbp_create_question", "Create a question for a location.", {
-      parent: resource("locations/{locationId}"),
-      question: jsonBody(),
-    }, ["parent", "question"], true),
-    tool("gbp_update_question", "Update a question authored by the current user.", {
-      question_name: resource("locations/{locationId}/questions/{questionId}"),
-      update_mask: { type: "string" },
-      question: jsonBody(),
-    }, ["question_name", "update_mask", "question"], true),
-    tool("gbp_delete_question", "Delete a question authored by the current user.", {
-      question_name: resource("locations/{locationId}/questions/{questionId}"),
-    }, ["question_name"], true),
-    tool("gbp_list_answers", "List answers for a question.", {
-      question_name: resource("locations/{locationId}/questions/{questionId}"),
-      order_by: { type: "string" },
-      ...pageProperties,
-    }, ["question_name"]),
-    tool("gbp_upsert_answer", "Create or update the current user's answer.", {
-      question_name: resource("locations/{locationId}/questions/{questionId}"),
-      answer: jsonBody(),
-    }, ["question_name", "answer"], true),
-    tool("gbp_delete_answer", "Delete the current user's answer.", {
-      question_name: resource("locations/{locationId}/questions/{questionId}"),
-    }, ["question_name"], true),
     tool("gbp_list_verifications", "List verification attempts for a location.", {
       location_name: resource("locations/{locationId}"),
       ...pageProperties,
@@ -325,13 +294,6 @@ export function getBusinessProfileTools() {
       update_mask: { type: "string" },
       lodging: jsonBody(),
     }, ["location_name", "update_mask", "lodging"], true),
-    tool("gbp_business_calls_insights", "List Business Calls insights for a location.", {
-      location_name: resource("locations/{locationId}"),
-      start_date: { type: "string" },
-      end_date: { type: "string" },
-      metric_type: { type: "string", default: "AGGREGATE_COUNT" },
-      ...pageProperties,
-    }, ["location_name", "start_date", "end_date"]),
     tool("gbp_performance", "Fetch daily Business Profile performance metrics.", {
       location_name: resource("locations/{locationId}"),
       start_date: { type: "string" },
@@ -431,30 +393,6 @@ export async function handleBusinessProfileTool(name, args, authClient) {
       return write("legacy_v4", "POST", `/${args.parent}/media`, args.media_item);
     case "gbp_delete_media":
       return write("legacy_v4", "DELETE", `/${args.media_name}`);
-    case "gbp_list_questions":
-      return get("q_and_a", `/${args.parent}/questions`, {
-        pageSize: Math.min(Number(args.page_size) || 100, 100),
-        pageToken: args.page_token,
-        orderBy: args.order_by,
-      });
-    case "gbp_create_question":
-      return write("q_and_a", "POST", `/${args.parent}/questions`, args.question);
-    case "gbp_update_question":
-      return write("q_and_a", "PATCH", `/${args.question_name}`, args.question, {
-        updateMask: args.update_mask,
-      });
-    case "gbp_delete_question":
-      return write("q_and_a", "DELETE", `/${args.question_name}`);
-    case "gbp_list_answers":
-      return get("q_and_a", `/${args.question_name}/answers`, {
-        pageSize: Math.min(Number(args.page_size) || 100, 100),
-        pageToken: args.page_token,
-        orderBy: args.order_by,
-      });
-    case "gbp_upsert_answer":
-      return write("q_and_a", "POST", `/${args.question_name}/answers:upsert`, args.answer);
-    case "gbp_delete_answer":
-      return write("q_and_a", "DELETE", `/${args.question_name}/answers:delete`);
     case "gbp_list_verifications":
       return get("verifications", `/${args.location_name}/verifications`, {
         pageSize: Math.min(Number(args.page_size) || 100, 100),
@@ -528,21 +466,6 @@ export async function handleBusinessProfileTool(name, args, authClient) {
       return write("lodging", "PATCH", `/${args.location_name}/lodging`, args.lodging, {
         updateMask: args.update_mask,
       });
-    case "gbp_business_calls_insights": {
-      const start = parseDate(args.start_date, "start_date");
-      const end = parseDate(args.end_date, "end_date");
-      return get("business_calls", `/${args.location_name}/businesscallsinsights`, {
-        "filter.startDate.year": start.year,
-        "filter.startDate.month": start.month,
-        "filter.startDate.day": start.day,
-        "filter.endDate.year": end.year,
-        "filter.endDate.month": end.month,
-        "filter.endDate.day": end.day,
-        "filter.metricTypes": args.metric_type || "AGGREGATE_COUNT",
-        pageSize: Math.min(Number(args.page_size) || 20, 100),
-        pageToken: args.page_token,
-      });
-    }
     case "gbp_performance": {
       const start = parseDate(args.start_date, "start_date");
       const end = parseDate(args.end_date, "end_date");

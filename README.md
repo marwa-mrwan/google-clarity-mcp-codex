@@ -2,11 +2,11 @@
 
 Local MCP workspace for Google marketing products and Microsoft Clarity.
 
-The workspace exposes **221 tools** through two local stdio MCP servers. Credentials, OAuth tokens, API keys, and client account mappings stay in ignored local files.
+The workspace exposes **213 tools** through two local stdio MCP servers. Credentials, OAuth tokens, API keys, and client account mappings stay in ignored local files.
 
 ## What Is Included
 
-- `google-mcp`: **213 tools** for Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
+- `google-mcp`: **205 tools** for Search Console, GA4, Google Ads, Google Tag Manager, Google Business Profile, and Merchant Center.
 - `clarity-mcp`: **8 tools** for Microsoft Clarity project discovery, live insights, summaries, analysis, and comparisons.
 - `scripts/`: setup, verification, local plugin installation, and account-mapping helpers.
 
@@ -18,11 +18,11 @@ The workspace exposes **221 tools** through two local stdio MCP servers. Credent
 | Google Analytics 4 | 21 | Properties, standard/batch/pivot/realtime reports, metadata, compatibility, audits, and Admin API access. |
 | Google Ads | 76 | Multi-MCC discovery/routing, account hierarchy, campaigns, ad groups, ads, keywords, audiences, assets, targeting, reports, audits, recommendations, conversions, and guarded mutations. |
 | Google Tag Manager | 22 | Accounts, containers, workspaces, tags, triggers, variables, versions, publishing, permissions, and generic API access. |
-| Google Business Profile | 44 | Accounts, locations, reviews/replies, posts, media, Q&A, verification, categories, attributes, notifications, action links, lodging, calls, performance, and guarded CRUD. |
+| Google Business Profile | 36 | Accounts, locations, reviews/replies, posts, media, verification, categories, attributes, notifications, action links, lodging, performance, and guarded CRUD. |
 | Google Merchant Center | 40 | Accounts/subaccounts, developer registration, products/product inputs, data sources, promotions, inventory, conversions, reports, issues, quotas, and guarded CRUD. |
-| **Google server total** | **213** | One `google-marketing-suite` MCP server. |
+| **Google server total** | **205** | One `google-marketing-suite` MCP server. |
 | Microsoft Clarity | 8 | Project discovery, request preparation, live insights, summaries, project analysis, and comparisons. |
-| **Repository total** | **221** | Two local stdio MCP servers. |
+| **Repository total** | **213** | Two local stdio MCP servers. |
 
 ## Google Ads Multi-MCC
 
@@ -36,7 +36,7 @@ Write tools are restricted to customer IDs explicitly listed in `GOOGLE_ADS_MUTA
 
 ## Google Business Profile
 
-The 44 tools cover account and location discovery, location CRUD, reviews and replies, posts, media, Q&A, verification, categories, attributes, notifications, place-action links, lodging, calls, and performance.
+The 36 tools cover account and location discovery, location CRUD, reviews and replies, posts, media, verification, categories, attributes, notifications, place-action links, lodging, and performance. The discontinued Q&A and Business Calls APIs are intentionally not exposed.
 
 `gbp_api_call` covers documented endpoints that do not have a named tool and only accepts predefined Google API service hosts. Writes require `GBP_ENABLE_MUTATIONS=true`, `confirm=true`, and `dry_run=false`.
 
@@ -125,7 +125,7 @@ node scripts/verify-mcp-servers.mjs
 Expected output:
 
 ```text
-google-marketing-suite: 213 tools
+google-marketing-suite: 205 tools
 microsoft-clarity: 8 tools
 ```
 
