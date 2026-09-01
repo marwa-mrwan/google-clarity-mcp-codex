@@ -96,7 +96,7 @@ cd google-mcp
 npm run auth
 ```
 
-The OAuth token file is written to `GOOGLE_TOKEN_FILE`. If you add new Google scopes, rerun the auth command so the refresh token includes them.
+The OAuth token file is written to `GOOGLE_TOKEN_FILE`. A valid `GOOGLE_REFRESH_TOKEN` in the ignored local env file is also a complete persistent authentication source; a missing token JSON file does not mean OAuth is disconnected. Do not rerun OAuth unless setup is new, Google returns `invalid_grant`, access was revoked, or new scopes were added.
 
 ## Local Account Mapping
 

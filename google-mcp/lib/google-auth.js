@@ -56,7 +56,8 @@ export async function getAuthenticatedClient() {
   const client = createOAuthClient();
   const tokenPath = getTokenPath();
 
-  // Prefer tokens.json because it can contain all requested scopes.
+  // A saved token file and GOOGLE_REFRESH_TOKEN are equally valid persistent credentials.
+  // Do not require OAuth again when the environment already has a refresh token.
   if (fs.existsSync(tokenPath)) {
     const tokens = JSON.parse(fs.readFileSync(tokenPath, "utf8"));
     client.setCredentials(tokens);
@@ -67,7 +68,7 @@ export async function getAuthenticatedClient() {
     return client;
   }
 
-  // Fallback: refresh token from environment/plugin settings.
+  // Persistent refresh token from the local env/plugin settings.
   if (process.env.GOOGLE_REFRESH_TOKEN) {
     client.setCredentials({
       refresh_token: process.env.GOOGLE_REFRESH_TOKEN,
@@ -76,7 +77,7 @@ export async function getAuthenticatedClient() {
   }
 
   throw new Error(
-    "No Google refresh token found. Add GOOGLE_REFRESH_TOKEN to your local MCP env file or run npm run auth."
+    "No persistent Google credentials found. Set GOOGLE_REFRESH_TOKEN in the configured local MCP env file. Run npm run auth only for first-time setup, invalid_grant, revoked access, or newly required scopes."
   );
 }
 

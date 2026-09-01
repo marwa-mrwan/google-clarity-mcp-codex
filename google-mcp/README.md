@@ -211,7 +211,7 @@ MERCHANT_ENABLE_MUTATIONS=false
 Only add customer IDs to `GOOGLE_ADS_MUTATION_CUSTOMER_IDS` when you intentionally allow write tools for those accounts. This allowlist is the write approval switch for Google Ads.
 Business Profile and Merchant writes are also disabled by default. A write requires its service env flag, `confirm=true`, and `dry_run=false`.
 
-After adding new Google scopes, rerun `npm run auth` so the refresh token includes:
+Existing authentication should be reused from `GOOGLE_REFRESH_TOKEN` or `GOOGLE_TOKEN_FILE`. Do not request OAuth again merely because one of those two sources is absent. Rerun `npm run auth` only after adding new scopes, receiving `invalid_grant`, revoking access, or performing first-time setup. The requested scopes include:
 
 - `https://www.googleapis.com/auth/webmasters`
 - `https://www.googleapis.com/auth/analytics.edit`
